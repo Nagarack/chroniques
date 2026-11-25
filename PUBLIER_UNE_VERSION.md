@@ -2,7 +2,7 @@
 
 ## Comment ça marche
 
-1. Claude prépare une nouvelle version et l’envoie sur votre dépôt GitHub privé, avec une étiquette `vX.Y.Z`.
+1. Claude prépare une nouvelle version (nouveau numéro dans `package.json`) et l’envoie sur votre dépôt GitHub privé.
 2. GitHub Actions (onglet *Actions* du dépôt) lance les tests, construit l’application Android signée, le ZIP et la fiche de version signée, puis publie la version (onglet *Releases*).
 3. Votre serveur Chroniques vérifie toutes les 6 heures (ou tout de suite : Paramètres → « Vérifier maintenant »), télécharge la version, contrôle la signature et l’empreinte, puis affiche **« Installer et redémarrer »**. Rien ne s’installe sans votre accord.
 4. Une fois le serveur à jour, l’application Android des joueurs le détecte et propose **« Mettre à jour »** (Android demande une confirmation).

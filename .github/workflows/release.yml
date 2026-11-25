@@ -1,5 +1,5 @@
 # Chroniques — publication automatique d'une version.
-# Déclenchement : une étiquette « vX.Y.Z » envoyée sur GitHub (le script PUBLIER_VERSION.bat le fait pour vous).
+# Déclenchement : un envoi sur main qui change le numéro de version de package.json (ou une étiquette vX.Y.Z).
 # Étapes : tests → application Android signée → ZIP → fiche de version signée → version GitHub
 # (Chroniques_VX_Y_Z.zip, Chroniques-X.Y.Z.apk, chroniques-maj.json). Les serveurs configurés la trouvent seuls.
 # Secrets du dépôt (créés par PREPARER_GITHUB.bat) :
@@ -8,7 +8,11 @@
 #   CHRONIQUES_KEYSTORE_PASS  mot de passe de la clé Android
 name: Publication
 on:
+  # Publication dès qu'un envoi sur main change le numéro de version (package.json), si cette version
+  # n'existe pas encore sur GitHub. Une étiquette vX.Y.Z ou un lancement manuel (onglet Actions) marchent aussi.
   push:
+    branches: [main]
+    paths: ['package.json', '.github/workflows/release.yml']
     tags: ['v*']
   workflow_dispatch:
 permissions:
@@ -17,7 +21,25 @@ concurrency:
   group: publication
   cancel-in-progress: false
 jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    outputs:
+      publier: ${{ steps.v.outputs.publier }}
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V=$(node -p "require('./package.json').version")
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          if gh release view "v$V" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "La version v$V est déjà publiée : rien à faire."; echo "publier=non" >> "$GITHUB_OUTPUT"
+          else echo "publier=oui" >> "$GITHUB_OUTPUT"; fi
   tests:
+    needs: verifier
+    if: needs.verifier.outputs.publier == 'oui'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +48,8 @@ jobs:
           node-version: 20
       - run: node --test
   publier:
-    needs: tests
+    needs: [verifier, tests]
+    if: needs.verifier.outputs.publier == 'oui'
     runs-on: ubuntu-latest
     env:
       # Mêmes outils Android que ceux utilisés pour la version 5.0 (paquets Ubuntu), sans Gradle.
@@ -43,7 +66,6 @@ jobs:
           echo "VERSION=$V" >> "$GITHUB_ENV"
           if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "v$V" != "${GITHUB_REF_NAME}" ]; then
             echo "::error::L'étiquette ${GITHUB_REF_NAME} ne correspond pas à package.json ($V)."; exit 1; fi
-          if gh release view "v$V" >/dev/null 2>&1; then echo "::error::La version v$V existe déjà sur GitHub."; exit 1; fi
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Secrets présents ?
