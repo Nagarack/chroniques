@@ -16,8 +16,24 @@ function validate(v){if(!v||typeof v!=='object'||Array.isArray(v))throw new Erro
  const recharge=RECHARGE.includes(v.recharge)?v.recharge:'';const rechargeDice=String(v.rechargeDice??'').replace(/\s+/g,'').toLowerCase();
  if(rechargeDice&&!/^(\d{1,2}d\d{1,3}([+-]\d{1,3})?|\d{1,3})$/.test(rechargeDice))throw new Error('Charges récupérées : par exemple 1d6+1, 1d3 ou 2 (vide = toutes).');
  const out={name:text(v.name,'Nom',85),description:text(v.description??'','Description',280,true),category,quantity:qty,weight,chargesMax,charges,equipped:Boolean(v.equipped),attuned:Boolean(v.attuned)};
- if(chargesMax&&recharge){out.recharge=recharge;if(rechargeDice)out.rechargeDice=rechargeDice;}return out;
+ if(chargesMax&&recharge){out.recharge=recharge;if(rechargeDice)out.rechargeDice=rechargeDice;}
+ // 5.6 : contenant (sac, coffre, sac sans fond…) : capacité en kg ; holdMagic = le poids du contenu ne compte pas.
+ const capacity=Number(v.capacity??0);if(!Number.isFinite(capacity)||capacity<0||capacity>2000)throw new Error('Capacité : de 0 à 2 000 kg.');
+ if(capacity>0){out.capacity=Math.round(capacity*100)/100;if(v.holdMagic===true)out.holdMagic=true;}
+ return out;
 }
+const OPTIONAL=['recharge','rechargeDice','capacity','holdMagic'];
+function isContainer(it){return !!(it&&Number(it.capacity)>0);}
+function contents(pc,cid){return list(pc).filter(x=>x.in===cid);}
+function contentWeight(pc,cid){return Math.round(contents(pc,cid).reduce((n,x)=>n+(Number(x.weight)||0)*(Number(x.quantity)||0),0)*100)/100;}
+// Objets dont le poids ne compte pas (rangés dans un contenant magique).
+function weightless(pc,it){if(!it||!it.in)return false;const c=list(pc).find(x=>x.id===it.in);return !!(c&&c.holdMagic&&isContainer(c));}
+function release(pc,cid){for(const x of list(pc))if(x.in===cid)delete x.in;}
+function move(pc,itemId,into){const it=list(pc).find(x=>x.id===itemId);if(!it)throw new Error('Objet introuvable.');
+ if(!into){delete it.in;return it;}const c=list(pc).find(x=>x.id===into);if(!c||!isContainer(c))throw new Error('Contenant introuvable.');if(c.id===it.id)throw new Error('Un objet ne se range pas dans lui-même.');
+ if(isContainer(it))throw new Error('Un contenant ne se range pas dans un autre.');if(it.equipped||it.attuned)throw new Error('Retirez d’abord l’objet (équipé ou harmonisé).');
+ const w=Math.round((contentWeight(pc,c.id)-(it.in===c.id?(Number(it.weight)||0)*(Number(it.quantity)||0):0)+(Number(it.weight)||0)*(Number(it.quantity)||0))*100)/100;
+ if(w>c.capacity)throw new Error('Plus de place : '+String(w).replace('.',',')+' kg pour '+String(c.capacity).replace('.',',')+' kg de capacité.');it.in=c.id;return it;}
 const RECHARGE=['dawn','long','short'];
 // 5.5 : objets mystérieux. name/description = ce que voit le joueur ; secret = vraie nature (MJ seulement).
 function setSecret(item,v){if(v===null){delete item.secret;delete item.unidentified;delete item.curseRevealed;return item;}
@@ -41,12 +57,12 @@ function recharge(pc,id,amount){const it=list(pc).find(x=>x.id===id);if(!it)thro
  const r=rechargeRange(it.rechargeDice);const n=Number(amount);if(!Number.isInteger(n)||n<0||(r&&(n<r[0]||n>r[1])))throw new Error(r?'Total attendu entre '+r[0]+' et '+r[1]+'.':'Nombre invalide.');
  it.charges=Math.min(it.chargesMax,it.charges+n);delete it.rechargePending;return it;}
 function add(pc,id,v){const arr=items(pc);if(arr.length>=70)throw new Error('Maximum 70 objets par personnage.');if(arr.some(x=>x.id===id))throw new Error('Identifiant dupliqué.');const item={id,...validate(v)};arr.push(item);return item;}
-function update(pc,id,v){const item=list(pc).find(x=>x.id===id);if(!item)throw new Error('Objet introuvable.');const next=validate(v);if(item.chargesMax===0&&next.chargesMax===0)next.charges=0;Object.assign(item,next);return item;}
+function update(pc,id,v){const item=list(pc).find(x=>x.id===id);if(!item)throw new Error('Objet introuvable.');const next=validate(v);if(item.chargesMax===0&&next.chargesMax===0)next.charges=0;for(const k of OPTIONAL)if(!(k in next))delete item[k];if(next.equipped||next.attuned)delete item.in;Object.assign(item,next);if(!isContainer(item))release(pc,item.id);else if(item.in)delete item.in;return item;}
 function adjust(pc,id,field,delta){const item=list(pc).find(x=>x.id===id);if(!item)throw new Error('Objet introuvable.');if(!['quantity','charges'].includes(field))throw new Error('Champ invalide.');integer(delta,-100,100,'Variation');if(delta===0)throw new Error('Variation nulle.');const max=field==='quantity'?999:(item.chargesMax||0);const min=field==='quantity'?0:0;const next=integer((field==='quantity'?(item.quantity??1):(item.charges??0))+delta,min,max,'Nouvelle quantité');item[field]=next;return item;}
 function money(pc,coins){if(!coins||typeof coins!=='object'||Array.isArray(coins)||Object.keys(coins).some(k=>!MONEY.includes(k)))throw new Error('Monnaie invalide.');pc.coins??={};for(const k of MONEY){pc.coins[k]=integer(coins[k]??0,0,999999,'Monnaie '+k);}return pc.coins;}
 function stash(state){if(!Array.isArray(state.lootStash))state.lootStash=[];return state.lootStash;}
 function lootAdd(state,id,v){const arr=stash(state);if(arr.length>=100)throw new Error('Maximum 100 lots de trésor.');const item={id,...validate(v)};arr.push(item);return item;}
 function lootRemove(state,id){const arr=stash(state),i=arr.findIndex(x=>x.id===id);if(i<0)throw new Error('Lot introuvable.');return arr.splice(i,1)[0];}
 function give(state,pc,lootId,newId,quantity){const arr=stash(state),source=arr.find(x=>x.id===lootId);if(!source)throw new Error('Lot introuvable.');integer(quantity,1,999,'Quantité attribuée');if(quantity>source.quantity)throw new Error('Quantité insuffisante.');const item=add(pc,newId,{...source,quantity});source.quantity-=quantity;if(source.quantity===0)arr.splice(arr.indexOf(source),1);return item;}
-return {CATEGORIES,LABELS,MONEY,RECHARGE,setSecret,identify,revealCurse,liftCurse,curseLocked,playerView,restRecharge,rechargeRange,recharge,list,items,validate,add,update,adjust,money,stash,lootAdd,lootRemove,give};
+return {isContainer,contents,contentWeight,weightless,release,move,CATEGORIES,LABELS,MONEY,RECHARGE,setSecret,identify,revealCurse,liftCurse,curseLocked,playerView,restRecharge,rechargeRange,recharge,list,items,validate,add,update,adjust,money,stash,lootAdd,lootRemove,give};
 });

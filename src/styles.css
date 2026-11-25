@@ -1803,3 +1803,13 @@ fieldset{min-width:0}
 .map-hex{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}.map-hex .hex-line{fill:none;stroke:rgba(255,255,255,.35);stroke-width:1}
 .map-hex .hex-fog{fill:#0e0b09;opacity:.92}.map-hex.gm .hex-fog{opacity:.45}.map-hex .hex-explored{fill:#7fd18a;opacity:.12}
 .hex-party{position:absolute;transform:translate(-50%,-85%);z-index:5;font-size:clamp(16px,2.4vw,28px);pointer-events:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))}
+/* 5.6 : météo, états de santé, formes temporaires, contenants */
+.weather-line{margin:.25rem 0;display:flex;flex-wrap:wrap;align-items:baseline;gap:.35rem}.weather-icon{font-size:1.25rem}
+.weather-form{display:flex;flex-direction:column;gap:8px}.weather-form label{display:flex;flex-direction:column;gap:4px}
+.ts-weather{color:var(--goldpale);font-size:1rem;margin:0 0 10px;display:flex;flex-wrap:wrap;gap:.35rem;align-items:baseline}
+.health-word{font-weight:600}.health-hurt{color:var(--gold)}.health-bloodied,.health-critical,.health-down{color:var(--red)}
+.form-card{margin:12px 0;padding:10px 12px;border:1px solid var(--rule-soft,var(--border));border-radius:10px;background:var(--card2)}.form-card h4{margin:0}
+.form-stats{display:flex;flex-wrap:wrap;gap:.35rem 1rem;margin:.4rem 0}.form-start{margin:10px 0}.form-start-form{display:flex;flex-direction:column;gap:8px;margin-top:6px}.form-start-form label{display:flex;flex-direction:column;gap:4px}.form-start-form>.btn{align-self:flex-start}
+.container-box{margin:.5rem 0;padding:.5rem .6rem;border-left:3px solid var(--gold);background:var(--card2);border-radius:6px}.container-contents{margin-top:.5rem}.container-contents .inventory-card{margin-left:0}
+.item-into{display:flex;flex-direction:column;gap:4px;max-width:20rem;margin:.4rem 0;font-size:.9rem}
+.table-screen .ts-date,.table-screen .ts-weather{color:#e8d7a8}.table-screen .ts-weather .muted{color:#cfc6b8}

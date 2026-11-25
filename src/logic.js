@@ -254,7 +254,10 @@
   function changeHp(state,actor,id,delta,damageType){
     const p=requireEdit(state,actor,id);let n=Math.max(0,Math.floor(Math.abs(+delta)||0));if(!n)return state;let note='';
     if(+delta<0&&damageType){if(!DAMAGE_TYPES.includes(damageType))throw new Error('Type de dégâts inconnu.');const adj=adjustDamage(p.defenses,damageType,n);note=damageNote(damageType,adj,n);n=adj.amount;if(!n){log(state,p.name+' · aucun dégât'+note);return state;}}
-    if(+delta<0){let dmg=n;if(p.tempHp){const absorbed=Math.min(p.tempHp,dmg);p.tempHp-=absorbed;dmg-=absorbed;}p.hp=Math.max(0,p.hp-dmg);log(state,p.name+' · '+n+' dégâts'+note+' (annoncés par le MJ/joueur)');
+    if(+delta<0){let dmg=n;if(p.tempHp){const absorbed=Math.min(p.tempHp,dmg);p.tempHp-=absorbed;dmg-=absorbed;}
+      // 5.6 : forme temporaire (règles 2014) : la forme encaisse d’abord ; à 0 PV, retour à la forme normale et le surplus passe.
+      if(dmg&&p.form&&p.form.hpMax){const t=Math.min(p.form.hp,dmg);p.form.hp-=t;dmg-=t;if(p.form.hp<=0){log(state,p.name+' reprend sa forme normale ('+p.form.name+' à 0 PV)');delete p.form;}}
+      p.hp=Math.max(0,p.hp-dmg);log(state,p.name+' · '+n+' dégâts'+note+' (annoncés par le MJ/joueur)');
       if(p.concentration&&p.hp>0){
         if(!Array.isArray(p.concentrationChecks))p.concentrationChecks=[];
         p.concentrationChecks.push({id:'cc-'+Math.random().toString(36).slice(2,12),damage:n,dc:concentrationDC(n),round:state.combat.started?state.combat.round:null});
@@ -262,8 +265,9 @@
         log(state,p.name+' · sauvegarde de Constitution à faire avec un vrai d20 (DD '+concentrationDC(n)+')');
       }
     }
+    else if(p.form&&p.form.hpMax){p.form.hp=Math.min(p.form.hpMax,p.form.hp+n);log(state,p.name+' ('+p.form.name+') · '+n+' soins');}
     else {p.hp=Math.min(p.stats.hp,p.hp+n);log(state,p.name+' · '+n+' soins');}
-    if(p.hp===0){p.concentration='';p.concentrationChecks=[];p.economy={action:true,bonus:true,reaction:true,movement:0};}
+    if(p.hp===0){delete p.form;p.concentration='';p.concentrationChecks=[];p.economy={action:true,bonus:true,reaction:true,movement:0};}
     if(p.hp>0){p.deathSaves={success:0,failure:0};p.conditions=p.conditions.filter(x=>x!=='Inconscient');}
     return state;
   }

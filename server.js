@@ -56,6 +56,9 @@ const GC=require('./src/group-checks.js');
 const TV=require('./src/table-votes.js');
 const AFF=require('./src/afflictions.js');
 const TG=require('./src/tongues.js');
+const WX=require('./src/weather.js');
+const SHP=require('./src/shapes.js');
+const BS=require('./src/bestiary.js');BS.loadFull().catch(()=>{});
 const AD=require('./src/area-damage.js');
 const WA=require('./src/webauthn.js');
 const I18N=require('./src/i18n-core.js');
@@ -116,6 +119,8 @@ const allowedStatic=new Map([
  ['/src/afflictions.js',['src/afflictions.js','text/javascript; charset=utf-8']],
  ['/src/tongues.js',['src/tongues.js','text/javascript; charset=utf-8']],
  ['/src/hex.js',['src/hex.js','text/javascript; charset=utf-8']],
+ ['/src/weather.js',['src/weather.js','text/javascript; charset=utf-8']],
+ ['/src/shapes.js',['src/shapes.js','text/javascript; charset=utf-8']],
  ['/src/spells.js',['src/spells.js','text/javascript; charset=utf-8']],
  ['/src/spell-guide.js',['src/spell-guide.js','text/javascript; charset=utf-8']],
  ['/src/creatures.js',['src/creatures.js','text/javascript; charset=utf-8']],
@@ -337,7 +342,7 @@ function createServer(opts={}){
    if(p.id===u.characterId)return {...p,history:CH.forPlayer(p.history)}; // Notes secrètes du MJ retirées.
    // Shared party combat summary only; never send other characters' abilities, inventories or private notes.
    return {id:p.id,name:p.name,role:p.role,job:p.job,level:p.level,stats:{hp:p.stats.hp,ac:p.stats.ac},speed:p.speed,hp:p.hp,tempHp:p.tempHp,initiative:p.initiative,
-    owner:null,conditions:p.conditions,concentration:p.concentration,exhaustion:p.exhaustion,inspiration:!!p.inspiration,economy:{...p.economy},
+    owner:null,conditions:p.conditions,concentration:p.concentration,exhaustion:p.exhaustion,inspiration:!!p.inspiration,economy:{...p.economy},...(p.form?{form:SHP.summary(p.form)}:{}),
     resources:[],abilities:[],deathSaves:{success:0,failure:0}};
   });
   if(full.combat)full.combat.timers=(full.combat.timers||[]).filter(t=>full.characters.some(p=>p.id===t.id)); // Durées des créatures du MJ : jamais envoyées.
@@ -413,6 +418,10 @@ function createServer(opts={}){
   if(b.resourceId){const res=p.resources.find(r=>r.id===b.resourceId);if(!res)badRequest('Ressource inexistante.');ab.cost={resource:res.id,amount:1};}
   p.abilities.push(ab);
  }
+ // 5.6 : lumières des personnages → jetons des cartes ; jour et nuit des cartes en éclairage « auto ».
+ function lightsChanged(s){CM.syncPcLights(s,TR.bestByPc(s));for(const m of s.maps||[])try{CM.visionReveal(s,m.id,darkvisionOf(s));}catch{}}
+ // Le temps du monde passe : événements, lumières qui s’éteignent, éclairage des cartes.
+ function timePassed(s,minutes,{lights=true}={}){if(!s.worldTime?.enabled)return;const reached=WT.advance(s,minutes);logEvents(s,reached);if(lights&&s.travel)for(const m of TR.tickLights(s,minutes))logPublic(s,m.text);lightsChanged(s);}
  function logEvents(s,reached){for(const e of reached||[]){const msg='📅 Événement : '+e.title+(e.note&&e.shared?' — '+e.note:'');if(e.shared)logPublic(s,msg);else s.combat.log.unshift({id:random(5),msg,audience:'gm',when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});}}
  // Import d'un personnage exporté : chaque partie passe par les validations habituelles ; les éléments invalides sont ignorés et signalés.
  function importCharacter(s,a,data){const c=CT.check(data);const skipped=[];
@@ -475,7 +484,7 @@ function createServer(opts={}){
   case 'mapHexParty':{requireGm(u);ensureAspect(CM.read(s,id));const r=CM.hexMove(s,id,String(b.hex||''));if(r.steps>0){const TRm=require('./src/travel.js');const pace=TRm.PACES[b.pace]?b.pace:(s.travel?.pace&&TRm.PACES[s.travel.pace]?s.travel.pace:'normal');const p=TRm.PACES[pace];
    const km=r.km?Math.round(r.km*r.steps*10)/10:null;const minutes=km!==null?Math.round(km/p.kmh*60):null;
    logPublic(s,'🧭 Le groupe parcourt '+r.steps+' hexagone'+(r.steps>1?'s':'')+(km!==null?' ('+String(km).replace('.',',')+' km, environ '+Math.floor(minutes/60)+' h '+String(minutes%60).padStart(2,'0')+' de marche, allure '+({lent:'lente',normal:'normale',rapide:'rapide'})[pace]+')':''));
-   if(b.advanceTime===true&&minutes&&s.worldTime?.enabled){const reached=WT.advance(s,minutes);logEvents(s,reached);}}break;}
+   if(b.advanceTime===true&&minutes&&s.worldTime?.enabled)timePassed(s,minutes);}break;}
   case 'mapWallAdd':{requireGm(u);ensureAspect(CM.read(s,id));CM.wallAdd(s,id,'wall-'+random(8),b.values);break;}
   case 'mapWallRemove':{requireGm(u);CM.wallRemove(s,id,String(b.wallId||''));break;}
   case 'mapWallClear':{requireGm(u);CM.wallClear(s,id);break;}
@@ -560,7 +569,7 @@ function createServer(opts={}){
   case 'setAc':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');const before=pc.stats.ac;pc.stats.ac=intValue(b.value,'Classe d’armure',1,40);logPublic(s,pc.name+' · CA '+before+' → '+pc.stats.ac+' (équipement).');break;}
   case 'itemTransfer':{
    const from=L.findPc(s,id);if(!from||!L.canEdit(s,a,id))throw sleepBlock('Vous ne pouvez donner que vos propres objets.');const to=L.findPc(s,String(b.toId||''));if(!to||to.id===from.id)badRequest('Destinataire introuvable.');
-   const item=I.list(from).find(x=>x.id===String(b.itemId||''));if(!item)badRequest('Objet introuvable.');if(u.role!=='gm'&&I.curseLocked(item))badRequest(curseMsg(item));const qty=intValue(b.quantity??1,'Quantité',1,999);if(qty>(item.quantity??1))badRequest('Quantité insuffisante.');
+   const item=I.list(from).find(x=>x.id===String(b.itemId||''));if(!item)badRequest('Objet introuvable.');if(u.role!=='gm'&&I.curseLocked(item))badRequest(curseMsg(item));if(I.contents(from,item.id).length)badRequest('Videz d’abord ce contenant.');const qty=intValue(b.quantity??1,'Quantité',1,999);if(qty>(item.quantity??1))badRequest('Quantité insuffisante.');
    const newId='item-'+random(8);const whole=qty===(item.quantity??1);
    try{I.add(to,newId,{...item,quantity:qty,equipped:false,attuned:false});}catch(e){badRequest(e.message);}
    if(whole){from.inventoryItems=I.list(from).filter(x=>x.id!==item.id);}else item.quantity-=qty;
@@ -624,7 +633,7 @@ function createServer(opts={}){
    const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cet inventaire.');
    const old=I.items(pc),idx=old.findIndex(x=>x.id===b.itemId);if(idx<0)badRequest('Objet introuvable.');
    if(u.role!=='gm'&&I.curseLocked(old[idx]))badRequest(curseMsg(old[idx]));
-   old.splice(idx,1);s.media=M.list(s).filter(x=>!(x.kind==='item'&&x.entityId===b.itemId&&x.characterId===id));break;}
+   const gone=old[idx];old.splice(idx,1);I.release(pc,gone.id);s.media=M.list(s).filter(x=>!(x.kind==='item'&&x.entityId===b.itemId&&x.characterId===id));break;}
   case 'start':L.startCombat(s,a);break;
   case 'npcAdd':{requireGm(u);try{N.add(s,'npc-'+random(9),b.values);L.sortInitiative(s,a);}catch(e){badRequest(e.message);}break;}
   case 'npcUpdate':{requireGm(u);try{N.update(s,id,b.values);if(!s.combat.started&&!s.combat.manualOrder)L.sortInitiative(s,a);}catch(e){badRequest(e.message);}break;}
@@ -646,9 +655,9 @@ function createServer(opts={}){
    break;}
   // --- Calendrier du monde ---
   case 'worldTimeEnable':{requireGm(u);if(b.on===false){if(s.worldTime)s.worldTime.enabled=false;}else{WT.get(s).enabled=true;}break;}
-  case 'worldTimeSet':{requireGm(u);WT.setDate(s,b.values);logPublic(s,'📅 Nous sommes le '+WT.format(s.worldTime,s.worldTime.minutes)+'.');break;}
+  case 'worldTimeSet':{requireGm(u);WT.setDate(s,b.values);lightsChanged(s);logPublic(s,'📅 Nous sommes le '+WT.format(s.worldTime,s.worldTime.minutes)+'.');break;}
   case 'worldTimeAdvance':{requireGm(u);if(!s.worldTime?.enabled)badRequest('Activez d’abord le calendrier du monde.');const minutes=Number(b.minutes);const reached=WT.advance(s,minutes);const why=String(b.reason||'').replace(/[\u0000-\u001f]/g,' ').trim().slice(0,60);
-   logPublic(s,'⏳ '+WT.duration(minutes)+(why?' ('+why+')':'')+' · '+WT.format(s.worldTime,s.worldTime.minutes));logEvents(s,reached);if(s.travel)for(const m of TR.tickLights(s,minutes))logPublic(s,m.text);break;}
+   logPublic(s,'⏳ '+WT.duration(minutes)+(why?' ('+why+')':'')+' · '+WT.format(s.worldTime,s.worldTime.minutes));logEvents(s,reached);if(s.travel)for(const m of TR.tickLights(s,minutes))logPublic(s,m.text);lightsChanged(s);break;}
   case 'worldCalendar':{requireGm(u);WT.setCalendar(s,b.values||{});break;}
   case 'worldEventAdd':{requireGm(u);WT.eventAdd(s,'wev-'+random(8),b.values);break;}
   case 'worldEventRemove':{requireGm(u);WT.eventRemove(s,id);break;}
@@ -669,7 +678,7 @@ function createServer(opts={}){
   // Carnet personnel : visible du joueur du personnage et du MJ seulement (les autres reçoivent une fiche réduite).
   case 'pcNotesSave':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');const t=String(b.text??'').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'');if(t.length>6000)badRequest('Carnet : 6 000 caractères maximum.');pc.privateNotes=t;pc.privateNotesAt=new Date().toISOString();break;}
   // Coffre commun du groupe.
-  case 'stashDeposit':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Vous ne pouvez déposer que vos propres objets.');if(u.role!=='gm'&&I.curseLocked(I.list(pc).find(x=>x.id===String(b.itemId||''))))badRequest(curseMsg(I.list(pc).find(x=>x.id===String(b.itemId||''))));const r=PS.deposit(s,pc,b.itemId,b.quantity,'item-'+random(8));if(r.newId)cloneItemMedia(s,pc.id,r.item.id,'party-stash',r.newId,r.whole);logPublic(s,'🧰 '+pc.name+' dépose '+(r.count>1?r.count+' × ':'')+r.item.name+' dans le coffre du groupe.');break;}
+  case 'stashDeposit':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Vous ne pouvez déposer que vos propres objets.');if(u.role!=='gm'&&I.curseLocked(I.list(pc).find(x=>x.id===String(b.itemId||''))))badRequest(curseMsg(I.list(pc).find(x=>x.id===String(b.itemId||''))));if(I.contents(pc,String(b.itemId||'')).length)badRequest('Videz d’abord ce contenant.');const r=PS.deposit(s,pc,b.itemId,b.quantity,'item-'+random(8));if(r.newId)cloneItemMedia(s,pc.id,r.item.id,'party-stash',r.newId,r.whole);logPublic(s,'🧰 '+pc.name+' dépose '+(r.count>1?r.count+' × ':'')+r.item.name+' dans le coffre du groupe.');break;}
   case 'stashWithdraw':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cet inventaire.');const r=PS.withdraw(s,pc,b.itemId,b.quantity,'item-'+random(8),u.role==='gm');if(r.newId)cloneItemMedia(s,'party-stash',r.item.id,pc.id,r.newId,r.whole);logPublic(s,'🧰 '+pc.name+' prend '+(r.count>1?r.count+' × ':'')+r.item.name+' dans le coffre du groupe.');break;}
   case 'stashCoins':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette bourse.');const dir=String(b.direction||'');const amt=PS.coins(s,pc,b.amounts,dir,u.role==='gm');const txt=I.MONEY.filter(k=>amt[k]).map(k=>amt[k]+' '+GEAR.COIN_FR[k]).join(' ');logPublic(s,'🧰 '+pc.name+(dir==='in'?' dépose ':' prend ')+txt+(dir==='in'?' dans':' dans')+' le coffre du groupe.');break;}
   case 'stashAdd':{requireGm(u);const it=PS.add(s,'item-'+random(8),b.values||{});logPublic(s,'🧰 Le MJ place '+it.name+' dans le coffre du groupe.');break;}
@@ -679,7 +688,7 @@ function createServer(opts={}){
   case 'travelStart':{requireGm(u);const t=TR.start(s,b.values||{});logPublic(s,'🧭 Départ vers '+t.destination+(t.distanceKm?' ('+t.distanceKm.toLocaleString('fr-FR')+' km)':'')+' · rythme '+TR.PACES[t.pace].label.toLowerCase()+'.');break;}
   case 'travelPace':{requireGm(u);TR.setPace(s,String(b.pace||''));logPublic(s,'🧭 Rythme '+TR.PACES[s.travel.pace].label.toLowerCase()+(TR.PACES[s.travel.pace].note?' — '+TR.PACES[s.travel.pace].note:'')+'.');break;}
   case 'travelAdvance':{requireGm(u);const hours=Number(b.hours);const msgs=TR.advance(s,hours);if(s.worldTime?.enabled){const reached=WT.advance(s,hours*60);logEvents(s,reached);}
-   logPublic(s,'🧭 '+hours+' h de marche · '+String(s.travel.doneKm).replace('.',',')+(s.travel.distanceKm?' / '+String(s.travel.distanceKm).replace('.',','):'')+' km'+(s.worldTime?.enabled?' · '+WT.format(s.worldTime,s.worldTime.minutes):''));for(const m of msgs)logPublic(s,m.text);break;}
+   logPublic(s,'🧭 '+hours+' h de marche · '+String(s.travel.doneKm).replace('.',',')+(s.travel.distanceKm?' / '+String(s.travel.distanceKm).replace('.',','):'')+' km'+(s.worldTime?.enabled?' · '+WT.format(s.worldTime,s.worldTime.minutes):''));for(const m of msgs)logPublic(s,m.text);lightsChanged(s);break;}
   case 'travelCamp':{requireGm(u);for(const m of TR.camp(s))logPublic(s,'⛺ '+m.text);break;}
   case 'travelRations':{requireGm(u);const missing=TR.eatRations(s,I);logPublic(s,'🍞 Une ration décomptée pour chacun'+(missing.length?' · '+missing.join(', '):'')+'.');break;}
   case 'areaDamage':{requireGm(u);const type=String(b.damageType||'');if(type&&!L.DAMAGE_TYPES.includes(type))badRequest('Type de dégâts inconnu.');
@@ -694,8 +703,12 @@ function createServer(opts={}){
   case 'tableRemove':{requireGm(u);RT.remove(s,String(b.tableId||''));break;}
   case 'tableRoll':{requireGm(u);const r=RT.roll(s,String(b.tableId||''),b.total,b.shared===true);const msg='🎲 '+r.table.name+' ('+r.table.die+' : '+r.entry.total+') → '+(r.row?r.row.text:'aucune ligne');if(r.entry.shared)logPublic(s,msg);else logGm(s,msg);break;}
   case 'travelEnd':{requireGm(u);TR.end(s);logPublic(s,'🧭 Fin du voyage.');break;}
-  case 'lightAdd':{requireGm(u);const pc=b.values?.pcId?L.findPc(s,String(b.values.pcId)):null;if(b.values?.pcId&&!pc)badRequest('Personnage introuvable.');const l=TR.lightAdd(s,'li-'+random(8),{...b.values,pcId:pc?.id||''},pc?.name||'');logPublic(s,'🕯 '+l.label+(l.owner?' ('+l.owner+')':'')+' allumée — '+TR.fmtMin(l.minutesLeft)+'.');break;}
-  case 'lightRemove':{requireGm(u);TR.lightRemove(s,String(b.lightId||''));break;}
+  case 'lightAdd':{const pc=b.values?.pcId?L.findPc(s,String(b.values.pcId)):null;if(b.values?.pcId&&!pc)badRequest('Personnage introuvable.');
+   if(u.role!=='gm'&&!(pc&&L.canEdit(s,a,pc.id)))throw sleepBlock('Vous n’allumez que la lumière de votre personnage.');
+   const kind=String(b.values?.kind||'');if(!TR.LIGHTS[kind])badRequest('Source de lumière inconnue.');
+   let took=null;if(b.values?.fromBag===true&&pc&&kind!=='sort'){took=TR.takeFuel(pc,kind);if(took===false)badRequest(pc.name+' n’a rien pour l’allumer dans son sac ('+TR.LIGHTS[kind].label.toLowerCase()+').');}
+   const l=TR.lightAdd(s,'li-'+random(8),{kind,pcId:pc?.id||''},pc?.name||'');logPublic(s,'🕯 '+l.label+(l.owner?' ('+l.owner+')':'')+' allumée — '+TR.fmtMin(l.minutesLeft)+(took?' · '+took+' : 1 de moins':'')+'.');lightsChanged(s);break;}
+  case 'lightRemove':{const l=(s.travel?.lights||[]).find(x=>x.id===String(b.lightId||''));if(!l)badRequest('Lumière introuvable.');if(u.role!=='gm'&&!(l.pcId&&L.canEdit(s,a,l.pcId)))throw sleepBlock('Vous n’éteignez que la lumière de votre personnage.');TR.lightRemove(s,l.id);lightsChanged(s);break;}
   // Factions, réputation et relations.
   case 'factionMembers':{requireGm(u);FA.setMembers(s,String(b.id||''),b.members);break;}
   case 'factionRep':{requireGm(u);const r=FA.reputation(s,String(b.id||''),b.delta);const why=String(b.reason||'').replace(/[\u0000-\u001f]/g,' ').trim().slice(0,80);
@@ -726,7 +739,7 @@ function createServer(opts={}){
   case 'move':L.updateMovement(s,a,id,n(b.value,0,1000));break;
   case 'hp':if(b.damageType&&!L.DAMAGE_TYPES.includes(String(b.damageType)))badRequest('Type de dégâts inconnu.');L.changeHp(s,a,id,n(b.delta,-10000,10000),String(b.damageType||''));break;
   case 'downtimeGrant':{requireGm(u);const days=DT.grant(s,s.characters.filter(p=>!p.fallen).map(p=>p.id),b.days);logPublic(s,'⏳ Intermède : '+days+' jour'+(days>1?'s':'')+' accordé'+(days>1?'s':'')+' à chaque personnage');
-   if(b.world===true&&s.worldTime?.enabled){const reached=WT.advance(s,days*1440);logPublic(s,'⏳ '+days+' jour'+(days>1?'s':'')+' passent · '+WT.format(s.worldTime,s.worldTime.minutes));logEvents(s,reached);}break;}
+   if(b.world===true&&s.worldTime?.enabled){timePassed(s,days*1440);logPublic(s,'⏳ '+days+' jour'+(days>1?'s':'')+' passent · '+WT.format(s.worldTime,s.worldTime.minutes));}break;}
   case 'downtimeAdd':{const pcId=String(b.pcId||'');if(!L.findPc(s,pcId))badRequest('Personnage introuvable.');if(!L.canEdit(s,a,pcId))throw sleepBlock('Accès refusé à cette fiche.');DT.add(s,'dt-'+random(10),pcId,b.values);break;}
   case 'downtimeUpdate':case 'downtimeRemove':case 'downtimeSpend':{const act=(s.downtime?.activities||[]).find(x=>x.id===id);if(!act)badRequest('Activité introuvable.');if(!L.canEdit(s,a,act.pcId))throw sleepBlock('Accès refusé à cette fiche.');
    if(b.kind==='downtimeUpdate')DT.update(s,id,b.values);else if(b.kind==='downtimeRemove')DT.remove(s,id);
@@ -742,6 +755,15 @@ function createServer(opts={}){
   case 'voteCast':{TV.cast(s,u.id,b.optionId===null?null:String(b.optionId||''));break;}
   case 'voteClose':{requireGm(u);const r=TV.close(s);const w=r.vote.options.filter(o=>r.tally.winners.includes(o.id)).map(o=>o.text);logPublic(s,'🗳 Vote · '+r.vote.question+' · '+(w.length?(w.length>1?'égalité : ':'')+w.join(' / ')+' ('+r.tally.counts[r.tally.winners[0]]+' voix sur '+r.tally.total+')':'aucune voix'));break;}
   case 'voteCancel':{requireGm(u);TV.cancel(s);break;}
+  // 5.6 : météo, états de santé, formes temporaires, contenants.
+  case 'weatherSet':{requireGm(u);const w=WX.set(s,b.values===null?null:(b.values||{}));if(w)logPublic(s,WX.icon(w)+' Météo : '+WX.label(w)+(w.note?' — '+w.note:''));break;}
+  case 'healthWords':{requireGm(u);if(b.on===false)s.healthWords=false;else delete s.healthWords;break;}
+  case 'formStart':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');const v=b.values||{};let beast=null;
+   if(v.srd){beast=BS.get(String(v.srd));if(!beast)badRequest('Créature introuvable dans le bestiaire.');if(v.kind!=='other'&&!/^(Bête|Beast)/.test(String(beast.type||'')))badRequest('Choisissez une bête.');}
+   const f=SHP.start(pc,v,beast,s.edition);logPublic(s,'🐾 '+pc.name+' prend la forme : '+f.name+' ('+SHP.KINDS[f.kind].toLowerCase()+(f.rule==='2014'?', '+f.hp+' PV':f.tempHp?', '+f.tempHp+' PV temporaires':'')+')');break;}
+  case 'formEnd':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');const f=SHP.end(pc);logPublic(s,'🐾 '+pc.name+' reprend sa forme normale ('+f.name+')');break;}
+  case 'itemMove':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cet inventaire.');const cur=I.list(pc).find(x=>x.id===String(b.itemId||''));if(u.role!=='gm'&&I.curseLocked(cur))badRequest(curseMsg(cur));
+   try{I.move(pc,String(b.itemId||''),b.into?String(b.into):'');}catch(e){badRequest(e.message);}break;}
   case 'groupCheckStart':{requireGm(u);GC.start(s,'gc-'+random(8),b.values);break;}
   case 'groupCheckAnswer':{const pcId=String(b.pcId||'');if(!L.findPc(s,pcId)||!L.canEdit(s,a,pcId))throw sleepBlock('Vous répondez uniquement pour votre personnage.');GC.answer(s,pcId,b.total);break;}
   case 'groupCheckClose':{requireGm(u);const r=GC.close(s);const c0=r.check,v=r.verdict;const name=id=>L.findPc(s,id)?.name||'?';const ok=c0.ids.filter(id=>c0.results[id]!==undefined&&c0.results[id]>=c0.dc).map(name),ko=c0.ids.filter(id=>c0.results[id]!==undefined&&c0.results[id]<c0.dc).map(name);

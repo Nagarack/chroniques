@@ -27,7 +27,8 @@ function equipmentAc(pc,classId){const items=(pc.inventoryItems||[]).filter(i=>i
  const reliable=known||(armorItem&&!armorOf(armorItem).dex);
  return {ac,parts,armor:armorItem?armorItem.name:null,shield:!!shield,reliable,warning:tooWeak?'Force '+strNeed[1]+' requise : vitesse réduite de 3 m.':''};}
 // --- Charge transportée : Force × 7,5 kg (équivalent de Force × 15 livres) ---
-function carried(pc){return Math.round((pc.inventoryItems||[]).reduce((n,it)=>n+(Number(it.weight)||0)*(Number(it.quantity)||0),0)*100)/100;}
+// 5.6 : le contenu d’un contenant magique (sac sans fond…) ne pèse rien ; le contenant garde son propre poids.
+function carried(pc){const all=pc.inventoryItems||[];const magic=new Set(all.filter(c=>c.holdMagic&&Number(c.capacity)>0).map(c=>c.id));return Math.round(all.reduce((n,it)=>n+(it.in&&magic.has(it.in)?0:(Number(it.weight)||0)*(Number(it.quantity)||0)),0)*100)/100;}
 function capacity(pc){const str=Number(pc.stats?.abilities?.str)||10;/* Force inconnue : 10 par défaut. */return Math.round(str*7.5*10)/10;}
 function load(pc){const w=carried(pc),cap=capacity(pc);return {weight:w,capacity:cap,ratio:cap?w/cap:0,over:w>cap};}
 // --- Harmonisation : 3 objets au maximum ---

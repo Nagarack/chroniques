@@ -51,10 +51,13 @@ function slot(s,id,level,delta){const n=find(s,id);if(!n)err('Créature introuva
 function recharge(s,id,name){const n=find(s,id);if(!n)err('Créature introuvable.');const i=(n.spent||[]).indexOf(String(name||''));if(i<0)err('Ce pouvoir est déjà disponible.');n.spent.splice(i,1);log(s,n.name+' · '+name+' : rechargé');return n;}
 function setDefense(s,id,type,value){const n=find(s,id);if(!n)err('Créature introuvable.');if(!DAMAGE_TYPES.includes(type))err('Type de dégâts inconnu.');if(value&&!Object.prototype.hasOwnProperty.call(DEFENSE_STATES,value))err('Défense inconnue.');n.defenses=cleanDefenses(n.defenses);if(value)n.defenses[type]=value;else delete n.defenses[type];log(s,n.name+' · '+type.toLowerCase()+' : '+(value?DEFENSE_STATES[value].toLowerCase():'normal'));return n;}
 function condition(s,id,value){const n=find(s,id);if(!n)err('Créature introuvable.');if(!CONDITIONS.includes(value))err('Condition inconnue.');n.conditions=n.conditions.includes(value)?n.conditions.filter(x=>x!==value):[...n.conditions,value];log(s,n.name+' · état '+value);return n;}
-function publicNpc(n){return {id:n.id,name:n.name,kind:n.kind,initiative:n.initiative,conditions:n.conditions.slice(),visibility:'public',showHp:n.showHp,...(n.showHp?{hp:n.hp,hpMax:n.hpMax}:{}),...(n.ownerPc?{ownerPc:n.ownerPc,companionId:n.companionId,ac:n.ac,actions:n.actions}:{})};}
-function project(s){const nc=JSON.parse(JSON.stringify(s));nc.combat.npcs=list(s).filter(n=>n.visibility==='public').map(publicNpc);
+// 5.6 : état de santé décrit aux joueurs quand les PV restent cachés (indemne, blessé, en sang, au bord de la mort, à terre).
+const HEALTH={unhurt:'Indemne',hurt:'Blessé',bloodied:'En sang',critical:'Au bord de la mort',down:'Hors de combat'};
+function health(hp,max){const h=Number(hp),m=Number(max);if(!Number.isFinite(h)||!(m>0))return null;if(h<=0)return 'down';if(h>=m)return 'unhurt';if(h>m/2)return 'hurt';if(h>m/4)return 'bloodied';return 'critical';}
+function publicNpc(n,words=true){return {id:n.id,name:n.name,kind:n.kind,initiative:n.initiative,conditions:n.conditions.slice(),visibility:'public',showHp:n.showHp,...(n.showHp?{hp:n.hp,hpMax:n.hpMax}:words?{health:health(n.hp,n.hpMax)}:{}),...(n.ownerPc?{ownerPc:n.ownerPc,companionId:n.companionId,ac:n.ac,actions:n.actions}:{})};}
+function project(s){const nc=JSON.parse(JSON.stringify(s));nc.combat.npcs=list(s).filter(n=>n.visibility==='public').map(n=>publicNpc(n,s.healthWords!==false));
  const allowed=new Set([...nc.characters.map(x=>x.id),...nc.combat.npcs.map(x=>x.id)]);
  const originalId=s.combat.order?.[s.combat.index];nc.combat.order=(s.combat.order||[]).filter(id=>allowed.has(id));nc.combat.index=nc.combat.order.indexOf(originalId);nc.combat.privateTurn=Boolean(s.combat.started&&nc.combat.index<0);
  nc.combat.log=(nc.combat.log||[]).filter(entry=>entry.audience!=='gm');return nc;}
-return {concentration,concentrationResult,list,find,validate,add,update,remove,hp,condition,setDefense,legendary,actionLog,recharge,slot,project,publicNpc,DAMAGE_TYPES,DEFENSE_STATES};
+return {HEALTH,health,concentration,concentrationResult,list,find,validate,add,update,remove,hp,condition,setDefense,legendary,actionLog,recharge,slot,project,publicNpc,DAMAGE_TYPES,DEFENSE_STATES};
 });

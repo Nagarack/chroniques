@@ -25,6 +25,9 @@ function chargesOf(text){const t=String(text||'');const m=/(?:dispose(?: en outr
  const out={chargesMax:max,charges:max};
  const r=/(?:récupère|récupèrent|regagne)[^.]{0,40}?(\d+d\d+(?:\s*[+-]\s*\d+)?|\d+|toutes les)\s+charges?[^.]*?aube|regains\s+(\d+d\d+(?:\s*[+-]\s*\d+)?|\d+|all)\s+(?:expended )?charges[^.]*?dawn/i.exec(t);
  if(r){out.recharge='dawn';const d=String(r[1]||r[2]).replace(/\s+/g,'').toLowerCase();if(!/^(toutesles|all)$/.test(d))out.rechargeDice=d;}return out;}
-function toItemValues(e){const ch=chargesOf(e.full||e.short)||{chargesMax:0,charges:0};return {name:e.name.slice(0,85),description:e.short.slice(0,280),category:e.category||'other',quantity:1,weight:Math.round(e.weight*100)/100,...ch,equipped:false,attuned:false};}
+// 5.6 : contenants du SRD (capacité en kg ; holdMagic : le contenu ne pèse rien ; poids du sac magique d’après le SRD).
+const CONTAINERS={'eq:backpack':{capacity:15},'eq:sack':{capacity:15},'eq:pouch':{capacity:3},'eq:chest':{capacity:150},'mg:bag-of-holding':{capacity:250,holdMagic:true,weight:7.5},'mg:handy-haversack':{capacity:60,holdMagic:true,weight:2.5}};
+function toItemValues(e){const ch=chargesOf(e.full||e.short)||{chargesMax:0,charges:0};const box=CONTAINERS[e.id]||null;const w=Math.round(e.weight*100)/100;
+ return {name:e.name.slice(0,85),description:e.short.slice(0,280),category:e.category||'other',quantity:1,weight:box&&box.weight&&!w?box.weight:w,...ch,equipped:false,attuned:false,...(box?{capacity:box.capacity,holdMagic:!!box.holdMagic}:{})};}
 return {load,loaded,search,get,toItemValues,chargesOf};
 });

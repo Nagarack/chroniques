@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## 5.6.0 — Formes temporaires, contenants, lumières reliées aux cartes, jour et nuit, météo, états de santé
+**Personnages**
+- **Forme sauvage et Métamorphose** : fiche → En partie → « 🐾 Se transformer », à partir d’une bête du bestiaire SRD ou d’une forme personnalisée (le niveau maximum de FP de la Forme sauvage est rappelé). Règles 2014 : la forme a ses propres PV ; les dégâts la frappent d’abord et, à 0 PV, le personnage reprend sa forme normale et subit le surplus. Règles 2024 : PV temporaires (niveau pour la Forme sauvage, PV de la bête pour Métamorphose). Le groupe voit la forme dans l’ordre d’initiative.
+- **Contenants** : un objet peut devenir un contenant (capacité en kg, contenu sans poids pour un sac sans fond). Le catalogue SRD règle le sac à dos, le sac, la bourse, le coffre, le sac sans fond et le havresac magique. « Ranger dans » place un objet dans un contenant ; la charge transportée en tient compte. Un contenant plein ne se donne pas et ne se dépose pas au coffre tant qu’il n’est pas vidé.
+
+**Exploration**
+- **Lumières reliées à l’inventaire et aux cartes** : « 🔥 Allumer » sur une torche, une bougie ou une flasque d’huile retire une unité du sac ; les joueurs allument et éteignent eux-mêmes leur lumière. Tant qu’elle brûle, le jeton du porteur éclaire la carte (une lumière réglée à la main sur le jeton reste prioritaire) ; quand elle s’éteint avec l’heure du monde, le jeton aussi. Les lumières s’usent désormais aussi lors des déplacements du groupe sur la carte en hexagones et des intermèdes.
+- **Jour et nuit** : éclairage « Selon l’heure du monde » dans la vision des jetons : lieu éclairé de 6 h à 20 h, obscurité la nuit.
+- **Météo du jour** : le MJ choisit le ciel, les précipitations, la température, le vent et une note ; les joueurs la voient à l’accueil, ainsi que l’écran de table et le spectateur. Descriptif seulement ; le MJ voit en plus des repères de visibilité.
+
+**Combat**
+- **États de santé** : quand les PV d’une créature sont cachés, les joueurs, l’écran de table et le spectateur voient « Indemne », « Blessé », « En sang », « Au bord de la mort » ou « Hors de combat ». Le MJ peut les masquer (case dans l’ordre d’initiative).
+
+**Corrections** : modifier un objet retire bien une recharge ou une capacité effacée ; un groupe de créatures aux PV cachés n’affiche plus « undefined » chez les joueurs.
+
 ## 5.5.0 — Votes, objets mystérieux, maladies et poisons, langues, mémorial, statistiques, spectateur, hexagones
 **À la table**
 - **Votes de table** : le MJ pose une question (2 à 8 réponses) depuis la page Combat ou Séance du jour ; chacun vote depuis son appareil et peut changer d’avis. Vote anonyme possible : personne, pas même le MJ, ne voit qui a voté quoi. Résultat noté au journal.
