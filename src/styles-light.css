@@ -974,6 +974,17 @@ table.srd-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--c
 .ad-row{border-bottom:1px dotted var(--c-line,#cabdaf)}
 .pk-list li{border-bottom:1px dotted var(--c-line,#cabdaf)}
 .rt-card .rt-result{color:inherit}
+.inspiration-row{border-top:1px solid var(--rule-soft,var(--rule))}
+.inspiration-row.on strong{color:var(--gold)}
+.po-insp{color:inherit!important}
+.charter-limits li{border:1px solid var(--rule-soft,var(--rule))}
+.charter-rule{border:1px solid var(--rule-soft,var(--rule))}
+.dt-item{border:1px solid var(--rule-soft,var(--rule))}
+.dt-bar{background:var(--rule-soft,#d2c8bc)}
+.dt-bar i{background:var(--gold,#9d763e)}
+.warn-text{color:var(--red,#872b21)}
+.mc-row{border-bottom:1px solid var(--rule-soft,var(--rule))}
+.fight-turnopt{border-top:1px solid var(--rule-soft,var(--rule))}
 :root{color-scheme:light;--grain:none;--c-bg:#f4efe4;--c-bg-2:#ede5d6;--c-surface:#fbf8f1;--c-surface-2:#f0e9dc;--c-line:#dcd1be;--c-line-soft:#e7dfcf;--c-text:#2b2118;--c-muted:#5c4b37;--c-accent:#9a3a26;--c-accent-strong:#8c2f1f;--c-on-accent:#fffaf3;--c-ok:#3d6a4c;--c-warn:#a8741a;--c-danger:#b3402c;--c-focus:#8c2f1f}
 .workspace-parchment :is(p,span,small,li,strong,em,h1,h2,h3,h4,label,div){color:#3d2f1d}
 .workspace-parchment .muted,.workspace-parchment .muted *{color:#6b5a42}

@@ -34,15 +34,22 @@ function startingAc(dex){return 10+mod(dex);}
 function averageGain(classId,con){const c=CLASS[classId];return c?Math.max(1,c.die/2+1+mod(con)):null;}
 function rolledGain(classId,con,roll){const c=CLASS[classId];const r=Math.floor(Number(roll));if(!c||!(r>=1&&r<=c.die))return null;return Math.max(1,r+mod(con));}
 function asiAt(classId,level,edition){const c=CLASS[classId]||{};const base=[4,8,12,16,19].concat(c.asi||[]);if(!base.includes(level))return null;return edition==='2024'&&level===19?'Don épique':'Amélioration de caractéristiques ou don';}
-function slotsText(sp){if(!sp||!sp.slots.length)return '—';if(sp.kind==='pact')return sp.slots[0]+' emplacement(s) de niveau '+sp.slotLevel;return sp.slots.map((n,i)=>'niv. '+(i+1)+' × '+n).join(', ');}
+function slotsText(sp){if(!sp||!sp.slots.length)return '—';if(sp.kind==='pact')return sp.slots[0]+' emplacement(s) de niveau '+sp.slotLevel;return sp.slots.map((n,i)=>'niv. '+(i+1)+' × '+n).join(', ')+(sp.kind==='mixed'?' + pacte : '+sp.pact.slots[0]+' emplacement(s) de niveau '+sp.pact.slotLevel:'');}
 // Ce qui change au prochain niveau : à confirmer par le joueur et le MJ avec le livre ou le SRD.
-function levelUpPreview(pc,edition){const classId=(pc.progression&&pc.progression.classId)||(P?P.detectClass(pc.job):null);const c=CLASS[classId],from=pc.level||1,to=from+1;const con=(pc.stats&&pc.stats.abilities&&pc.stats.abilities.con)||10;
- const out={classId,className:c?info(classId).name:null,from,to,hitDie:c?c.die:null,conMod:mod(con),average:c?averageGain(classId,con):null,changes:[]};
+function levelUpPreview(pc,edition,targetClass){const primary=(pc.progression&&pc.progression.classId)||(P?P.detectClass(pc.job):null);
+ const list=P&&P.classesOf?P.classesOf(pc):[{classId:primary,level:pc.level||1,subclass:'',primary:true}];
+ const classId=targetClass&&CLASS[targetClass]?targetClass:primary;const cur=list.find(x=>x.classId===classId);const fromClass=cur?cur.level:0,toClass=fromClass+1;
+ const c=CLASS[classId],from=pc.level||1,to=from+1;const con=(pc.stats&&pc.stats.abilities&&pc.stats.abilities.con)||10;
+ const out={classId,className:c?info(classId).name:null,from,to,classLevel:toClass,newClass:!cur,hitDie:c?c.die:null,conMod:mod(con),average:c?averageGain(classId,con):null,changes:[]};
+ if(list.length>1||!cur)out.changes.push((c?info(classId).name:'Classe')+' : niveau '+fromClass+' → '+toClass+' (niveau de personnage '+to+').');
+ if(!cur&&P&&P.MC_PROFS){out.changes.push('Multiclassage, maîtrises acquises : '+P.MC_PROFS[classId]+'.');if(edition==='2024')out.changes.push('Vérifiez la table de multiclassage de la classe dans votre livre 2024.');}
  if(prof(to)>prof(from))out.changes.push('Bonus de maîtrise : +'+prof(from)+' → +'+prof(to)+' (attaques, compétences maîtrisées, DD des sorts).');
- const asi=c&&asiAt(classId,to,edition);if(asi)out.changes.push(asi+' au niveau '+to+'.');
- if(c&&c.extra&&c.extra.includes(to))out.changes.push(to===5?'Attaque supplémentaire : deux attaques par action Attaquer.':'Attaque supplémentaire améliorée ('+(to===11?3:4)+' attaques par action Attaquer).');
- if(P&&classId){const lvl=P.subclassLevel(classId,edition);if(lvl===to)out.changes.push('Choix de la sous-classe.');
-  const a=P.slotsFor(classId,from,edition),b=P.slotsFor(classId,to,edition);const ta=slotsText(a),tb=slotsText(b);if(ta!==tb&&tb!=='—')out.changes.push('Emplacements de sorts : '+ta+' → '+tb+'.');}
+ const asi=c&&asiAt(classId,toClass,edition);if(asi)out.changes.push(asi+(list.length>1||!cur?' (niveau '+toClass+' de la classe).':' au niveau '+toClass+'.'));
+ if(c&&c.extra&&c.extra.includes(toClass))out.changes.push(toClass===5?'Attaque supplémentaire : deux attaques par action Attaquer (ne se cumule pas entre classes).':'Attaque supplémentaire améliorée ('+(toClass===11?3:4)+' attaques par action Attaquer).');
+ if(P&&classId){const lvl=P.subclassLevel(classId,edition);if(lvl===toClass)out.changes.push('Choix de la sous-classe.');
+  let a,b;if(P.spellsFor){a=P.spellsFor(pc,edition);const clone=JSON.parse(JSON.stringify(pc));clone.level=to;if(classId!==primary){clone.progression=clone.progression||{};const l=(clone.progression.multiclass||[]).filter(x=>x.classId!==classId);l.push({classId,level:toClass,subclass:cur?cur.subclass:''});clone.progression.multiclass=l;}b=P.spellsFor(clone,edition);}
+  else{a=P.slotsFor(classId,from,edition);b=P.slotsFor(classId,to,edition);}
+  const ta=slotsText(a),tb=slotsText(b);if(ta!==tb&&tb!=='—')out.changes.push('Emplacements de sorts : '+ta+' → '+tb+'.');}
  if(!c)out.changes.push('Classe non reconnue : reportez-vous au livre pour les PV et capacités.');
  out.changes.push('Nouvelles capacités de classe : consultez la table de progression de la classe.');
  return out;}

@@ -13,7 +13,7 @@ function canRead(u,map){return !!map&&(u.role==='gm'||map.visibility==='shared')
 function markerImage(marker){const image=marker.image||null;return {builtinId:image?.source==='builtin'?image.id:null,hasImage:!!(image&&(image.source==='upload'||image.source==='media'))};}
 // Joueurs : le lien vers une fiche du carnet n'est transmis que si cette fiche est publiée.
 function publicLink(s,p){const l=p.linked;const sec=l&&PLANNER_LINKS[l.kind];if(!sec)return {};const e=((s.campaignPlanner||{})[sec]||[]).find(x=>x.id===l.id);return e&&e.visibility==='shared'?{plannerLink:{kind:l.kind,id:e.id,title:e.title}}:{};}
-function projected(s,u){return (s.maps||[]).filter(m=>canRead(u,m)).map(m=>({id:m.id,title:m.title,summary:m.summary,visibility:m.visibility,hasImage:!!m.filename,grid:gridOf(m),fog:{enabled:!!(m.fog&&m.fog.enabled),revealed:(m.fog&&Array.isArray(m.fog.revealed)?m.fog.revealed:[]).map(c=>c.slice())},tokens:(m.tokens||[]).filter(t=>u.role==='gm'||t.visible).map(t=>({...t})),areas:(m.areas||[]).map(a=>({...a})),markers:(m.markers||[]).filter(p=>u.role==='gm'||p.visibility==='shared').map(p=>({id:p.id,title:p.title,description:p.description,visibility:p.visibility,x:p.x,y:p.y,symbol:SYMBOLS[p.symbol]?p.symbol:'point',...markerImage(p),...(u.role==='gm'?{linked:p.linked||null,loot:Array.isArray(p.loot)?p.loot:[],lootRevealed:p.lootRevealed===true}:{...(p.lootRevealed===true?{lootRevealed:true,publicLoot:(p.loot||[]).map(x=>({name:x.name,quantity:x.quantity??1}))}:{}),...publicLink(s,p)})}))}));}
+function projected(s,u){return (s.maps||[]).filter(m=>canRead(u,m)).map(m=>({id:m.id,title:m.title,summary:m.summary,visibility:m.visibility,hasImage:!!m.filename,grid:gridOf(m),vision:m.vision?{...m.vision}:{enabled:false,light:'lit',range:18},fog:{enabled:!!(m.fog&&m.fog.enabled),revealed:(m.fog&&Array.isArray(m.fog.revealed)?m.fog.revealed:[]).map(c=>c.slice())},tokens:(m.tokens||[]).filter(t=>u.role==='gm'||t.visible).map(t=>({...t})),areas:(m.areas||[]).map(a=>({...a})),markers:(m.markers||[]).filter(p=>u.role==='gm'||p.visibility==='shared').map(p=>({id:p.id,title:p.title,description:p.description,visibility:p.visibility,x:p.x,y:p.y,symbol:SYMBOLS[p.symbol]?p.symbol:'point',...markerImage(p),...(u.role==='gm'?{linked:p.linked||null,loot:Array.isArray(p.loot)?p.loot:[],lootRevealed:p.lootRevealed===true}:{...(p.lootRevealed===true?{lootRevealed:true,publicLoot:(p.loot||[]).map(x=>({name:x.name,quantity:x.quantity??1}))}:{}),...publicLink(s,p)})}))}));}
 function add(s,id,v){if(maps(s).length>=MAX_MAPS)bad('Maximum 24 cartes.');if(!/^map-[A-Za-z0-9_-]{7,48}$/.test(id))bad('Identifiant invalide.');const m={id,title:text(v?.title,'Titre',90,true),summary:text(v?.summary||'','Description',500),visibility:visibility(v?.visibility),markers:[],filename:null,mime:null};maps(s).push(m);return m;}
 function update(s,id,v){const m=read(s,id);if(!m)bad('Carte introuvable.');m.title=text(v?.title,'Titre',90,true);m.summary=text(v?.summary||'','Description',500);m.visibility=visibility(v?.visibility);return m;}
 function setMapVisibility(s,id,v){const m=read(s,id);if(!m)bad('Carte introuvable.');m.visibility=visibility(v);return m;}
@@ -67,7 +67,7 @@ function fogState(m){if(!m.fog||typeof m.fog!=='object')m.fog={enabled:false,rev
 function setFog(s,id,op,v){const m=read(s,id);if(!m)bad('Carte introuvable.');const f=fogState(m);
  if(op==='enable'){f.enabled=true;}else if(op==='disable'){f.enabled=false;}else if(op==='reset'){f.revealed=[];f.enabled=true;}
  else if(op==='undo'){f.revealed.pop();}
- else if(op==='reveal'){const r=Number(v?.r);if(!Number.isInteger(r)||r<10||r>500)bad('Rayon invalide.');if(f.revealed.length>=MAX_REVEALS)bad('Trop de zones révélées : utilisez « Tout révéler » ou recommencez.');f.revealed.push([checkPoint(v?.x),checkPoint(v?.y),r]);}
+ else if(op==='reveal'){const r=Number(v?.r);if(!Number.isInteger(r)||r<10||r>500)bad('Rayon invalide.');if(f.revealed.length>=(m.vision&&m.vision.enabled?MAX_VISION_REVEALS:MAX_REVEALS))bad('Trop de zones révélées : utilisez « Tout révéler » ou recommencez.');f.revealed.push([checkPoint(v?.x),checkPoint(v?.y),r]);}
  else bad('Opération de brouillard inconnue.');return m;}
 function tokenRead(s,mapId,id){return read(s,mapId)?.tokens?.find(t=>t.id===id)||null;}
 function tokenAdd(s,mapId,id,v){const m=read(s,mapId);if(!m)bad('Carte introuvable.');if(!Array.isArray(m.tokens))m.tokens=[];if(m.tokens.length>=MAX_TOKENS)bad('Maximum '+MAX_TOKENS+' jetons par carte.');if(!/^tok-[A-Za-z0-9_-]{6,48}$/.test(id))bad('Identifiant invalide.');
@@ -79,10 +79,38 @@ function tokenMove(s,mapId,id,x,y){const t=tokenRead(s,mapId,id);if(!t)bad('Jeto
 function tokenSet(s,mapId,id,v){const t=tokenRead(s,mapId,id);if(!t)bad('Jeton introuvable.');if(v&&'visible' in v)t.visible=!!v.visible;if(v&&v.color!==undefined){if(!TOKEN_COLORS.includes(v.color))bad('Couleur inconnue.');t.color=v.color;}if(v&&v.label!==undefined)t.label=text(v.label,'Nom du jeton',40,true);return t;}
 function tokenRemove(s,mapId,id){const m=read(s,mapId),i=m?.tokens?.findIndex(t=>t.id===id);if(i==null||i<0)bad('Jeton introuvable.');return m.tokens.splice(i,1)[0];}
 // --- Gabarits de zones de sort (V4.3) : en mètres, convertis à l'écran selon la grille ---
+// 5.3 : vision des jetons. Quand la vision est active sur une carte avec brouillard et grille, chaque jeton de personnage
+// révèle un cercle autour de lui à chaque déplacement (les zones explorées restent visibles). Pas de murs ni de lignes de vue :
+// le MJ garde la main sur le brouillard (« Annuler », « Recommencer »).
+const LIGHTS={'':0,bougie:3,torche:12,lumiere:12,lanterne:18};// mètres (lumière vive + faible) d’après le SRD
+const MAX_VISION_REVEALS=1500;
+function visionOf(m){if(!m.vision||typeof m.vision!=='object')m.vision={enabled:false,light:'lit',range:18};return m.vision;}
+function scaleMeters(m){const g=gridOf(m);const mt=/([\d]+(?:[.,]\d+)?)\s*(m|mètres?|ft|pi|pieds?|feet|foot)?/i.exec(g.scale||'');if(!mt)return 1.5;const v=Number(mt[1].replace(',','.'));if(!(v>0))return 1.5;return /^(ft|pi|pied|feet|foot)/i.test(mt[2]||'')?v*0.3:v;}
+function setVision(s,id,v){const m=read(s,id);if(!m)bad('Carte introuvable.');const vi=visionOf(m);
+ if(v&&'enabled' in v){if(v.enabled&&!(gridOf(m).cells>0))bad('Ajoutez d’abord une grille (nombre de cases) pour calculer les distances de vision.');vi.enabled=!!v.enabled;if(vi.enabled)fogState(m).enabled=true;}
+ if(v&&v.light!==undefined){if(!['lit','dark'].includes(v.light))bad('Éclairage inconnu.');vi.light=v.light;}
+ if(v&&v.range!==undefined){const r=Number(v.range);if(!Number.isFinite(r)||r<1.5||r>300)bad('Portée de vue : 1,5 à 300 m.');vi.range=Math.round(r*10)/10;}return m;}
+function tokenLight(s,mapId,id,v){const t=tokenRead(s,mapId,id);if(!t)bad('Jeton introuvable.');if(v&&v.light!==undefined){if(!Object.hasOwn(LIGHTS,v.light))bad('Source de lumière inconnue.');t.light=v.light;}
+ if(v&&v.sight!==undefined){const n=Number(v.sight);if(!Number.isFinite(n)||n<0||n>300)bad('Vision : 0 à 300 m.');t.sight=Math.round(n*10)/10;}return t;}
+// Rayon (mètres) d’un jeton : en lumière, la portée de vue de la carte ; dans le noir, la meilleure de sa vision dans le noir et de sa lumière.
+function tokenRadius(m,t,darkvision){const vi=visionOf(m);const own=Number(t.sight)>0?Number(t.sight):Number(darkvision)||0;const light=LIGHTS[t.light||'']||0;
+ return vi.light==='dark'?Math.max(own,light):Math.max(vi.range||18,light);}
+// Révèle autour des jetons de personnages visibles (ou d’un seul). `darkvisionOf(refId)` donne la vision dans le noir en mètres.
+function visionReveal(s,mapId,darkvisionOf,onlyTokenId){const m=read(s,mapId);if(!m)return 0;const vi=visionOf(m);const f=fogState(m);if(!vi.enabled||!f.enabled)return 0;const cells=gridOf(m).cells;if(!cells)return 0;
+ const unit=1000/cells/scaleMeters(m);let n=0;
+ for(const t of m.tokens||[]){if(t.kind!=='pc'||!t.visible||(onlyTokenId&&t.id!==onlyTokenId))continue;const meters=tokenRadius(m,t,darkvisionOf?darkvisionOf(t.refId):0);if(!(meters>0))continue;
+  const r=Math.max(5,Math.min(1000,Math.round(meters*unit)));
+  // Déjà entièrement révélé : rien à ajouter.
+  if(f.revealed.some(([x,y,rr])=>Math.hypot(x-t.x,y-t.y)+r<=rr))continue;
+  // Les anciens cercles contenus dans le nouveau deviennent inutiles.
+  f.revealed=f.revealed.filter(([x,y,rr])=>Math.hypot(x-t.x,y-t.y)+rr>r);
+  if(f.revealed.length>=MAX_VISION_REVEALS)bad('Trop de zones révélées sur cette carte : utilisez « Recommencer » ou désactivez la vision.');
+  f.revealed.push([t.x,t.y,r]);n++;}
+ return n;}
 const AREA_SHAPES=['circle','cone','line','cube'],AREA_COLORS=['or','rouge','bleu','vert','violet'],MAX_AREAS=30;
 function areaAdd(s,mapId,id,v,by){const m=read(s,mapId);if(!m)bad('Carte introuvable.');if(!(m.grid&&m.grid.cells))bad('Ajoutez d’abord une grille à la carte pour placer une zone.');if(!Array.isArray(m.areas))m.areas=[];if(m.areas.length>=MAX_AREAS)bad('Maximum '+MAX_AREAS+' zones sur une carte : effacez-en.');
  const shape=AREA_SHAPES.includes(v?.shape)?v.shape:bad('Forme inconnue.');const size=Number(v?.size);if(!Number.isFinite(size)||size<1||size>150)bad('Taille : 1 à 150 m.');const angle=Number(v?.angle??0);if(!Number.isFinite(angle)||angle<-360||angle>360)bad('Orientation invalide.');
  const a={id,shape,size:Math.round(size*10)/10,x:checkPoint(v?.x),y:checkPoint(v?.y),angle:Math.round(angle),color:AREA_COLORS.includes(v?.color)?v.color:'rouge',label:text(String(v?.label??''),'Nom de la zone',40,false),by:String(by||'').slice(0,60)};m.areas.push(a);return a;}
 function areaRemove(s,mapId,areaId){const m=read(s,mapId),i=m?.areas?.findIndex(a=>a.id===areaId);if(i==null||i<0)bad('Zone introuvable.');return m.areas.splice(i,1)[0];}
 function areaClear(s,mapId){const m=read(s,mapId);if(!m)bad('Carte introuvable.');m.areas=[];return m;}
-module.exports={PLANNER_LINKS,AREA_SHAPES,MAX_AREAS,areaAdd,areaRemove,areaClear,MAX_TOKENS,TOKEN_COLORS,setGrid,setFog,tokenRead,tokenAdd,tokenMove,tokenSet,tokenRemove,MAX_MAPS,MAX_MARKERS,SYMBOLS,maps,read,canRead,projected,add,update,setMapVisibility,setMarkerVisibility,remove,markerRead,markerAdd,markerUpdate,markerRemove};
+module.exports={LIGHTS,setVision,tokenLight,tokenRadius,visionReveal,scaleMeters,PLANNER_LINKS,AREA_SHAPES,MAX_AREAS,areaAdd,areaRemove,areaClear,MAX_TOKENS,TOKEN_COLORS,setGrid,setFog,tokenRead,tokenAdd,tokenMove,tokenSet,tokenRemove,MAX_MAPS,MAX_MARKERS,SYMBOLS,maps,read,canRead,projected,add,update,setMapVisibility,setMarkerVisibility,remove,markerRead,markerAdd,markerUpdate,markerRemove};

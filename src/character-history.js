@@ -43,7 +43,10 @@ function observe(prev,next,kind,body={}){
   const known=new Set((old.grimoire||[]).map(e=>e.id));const learned=(pc.grimoire||[]).filter(e=>!known.has(e.id));if(learned.length)push(next,pc,'Apprend : '+learned.map(e=>e.name||e.custom&&e.custom.name||e.spellId).join(', ')+'.');
   const comp=new Set((old.companions||[]).map(c=>c.id));for(const c of pc.companions||[])if(!comp.has(c.id))push(next,pc,c.name+' rejoint '+pc.name+'.');
   if((pc.exhaustion||0)>(old.exhaustion||0))push(next,pc,'Épuisement niveau '+pc.exhaustion+'.');
+  if(pc.inspiration&&!old.inspiration)push(next,pc,'Reçoit l’inspiration héroïque.');
  }
+ // Intermèdes terminés (5.3).
+ {const od=new Map((((prev.downtime||{}).activities)||[]).map(x=>[x.id,x]));for(const x of (next.downtime||{}).activities||[]){if(!x.done||(od.get(x.id)||{}).done)continue;const pc=(next.characters||[]).find(p=>p.id===x.pcId);if(pc)push(next,pc,'Intermède terminé : '+x.title+'.');}}
  // Quêtes partagées : objectifs accomplis et quêtes terminées, pour tout le groupe.
  const oq=new Map(((prev.campaignPlanner||{}).quests||[]).map(q=>[q.id,q]));
  for(const q of (next.campaignPlanner||{}).quests||[]){if(q.visibility!=='shared')continue;const o=oq.get(q.id);

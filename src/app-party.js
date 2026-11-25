@@ -19,7 +19,7 @@ function row(pc){const ab=pc.stats?.abilities||{};const pb=prof(pc.level);const 
  const sa=SPELL_ABILITY[cls];const dc=sa&&mod(ab[sa])!=null&&pb?8+pb+mod(ab[sa]):null;
  return {id:pc.id,name:pc.name,cls,level:pc.level,ac:pc.stats?.ac,hp:pc.hp,hpMax:pc.stats?.hp,tempHp:pc.tempHp||0,speed:pc.speed,
   perception:passive('perception')??(Number.isInteger(pc.stats?.passive)?pc.stats.passive:null),investigation:passive('investigation'),insight:passive('intuition'),
-  saves,spellDc:dc,spellAbility:sa||'',conditions:pc.conditions||[],concentration:pc.concentration||'',exhaustion:pc.exhaustion||0};}
+  saves,spellDc:dc,spellAbility:sa||'',conditions:pc.conditions||[],concentration:pc.concentration||'',exhaustion:pc.exhaustion||0,inspiration:!!pc.inspiration,mc:P&&P.isMulticlass&&P.isMulticlass(pc)?P.classLabel(pc):''};}
 function rows(state){return (state.characters||[]).map(row);}
 function partyView({state,h}){const {esc,attr}=h;const list=rows(state);if(!list.length)return '<p class="empty">Aucun personnage.</p>';
  const best=k=>{const v=list.map(r=>r[k]).filter(x=>x!=null);return v.length?Math.max(...v):null;};
@@ -29,9 +29,9 @@ function partyView({state,h}){const {esc,attr}=h;const list=rows(state);if(!list
  <div class="party-table-wrap" tabindex="0" role="region" aria-label="Tableau du groupe (défilement horizontal possible)"><table class="party-table">
  <caption class="visually-hidden">Défenses, scores passifs et sauvegardes du groupe</caption>
  <thead><tr><th scope="col">Personnage</th><th scope="col">CA</th><th scope="col">PV</th><th scope="col" title="Perception passive">Perc.</th><th scope="col" title="Investigation passive">Invest.</th><th scope="col" title="Intuition passive">Intuit.</th>${KEYS.map(k=>`<th scope="col" title="Sauvegarde">${SHORT[k]}</th>`).join('')}<th scope="col">DD sorts</th><th scope="col">Vit.</th><th scope="col">États</th><th scope="col"><span class="visually-hidden">Historique</span></th></tr></thead>
- <tbody>${list.map(r=>`<tr><th scope="row">${esc(r.name)}<small>niv. ${r.level}${r.saves.str.value==null&&r.saves.dex.value==null?' · caractéristiques à saisir':''}</small></th><td>${r.ac??'—'}</td><td class="${r.hp*2<=r.hpMax?'party-low':''}">${r.hp}/${r.hpMax}${r.tempHp?` <small>+${r.tempHp}</small>`:''}</td>${cell(r.perception,'perception')}${cell(r.investigation,'investigation')}${cell(r.insight,'insight')}
+ <tbody>${list.map(r=>`<tr><th scope="row">${esc(r.name)}<small>${r.mc?esc(r.mc)+' · ':''}niv. ${r.level}${r.saves.str.value==null&&r.saves.dex.value==null?' · caractéristiques à saisir':''}</small></th><td>${r.ac??'—'}</td><td class="${r.hp*2<=r.hpMax?'party-low':''}">${r.hp}/${r.hpMax}${r.tempHp?` <small>+${r.tempHp}</small>`:''}</td>${cell(r.perception,'perception')}${cell(r.investigation,'investigation')}${cell(r.insight,'insight')}
  ${KEYS.map(k=>`<td>${sign(r.saves[k].value)}${r.saves[k].prof&&r.saves[k].value!=null?'<span class="party-prof" title="Maîtrise">★</span>':''}</td>`).join('')}<td>${r.spellDc?r.spellDc+` <small>${SHORT[r.spellAbility]}</small>`:'—'}</td><td>${r.speed??'—'} m</td>
- <td>${[...r.conditions,r.concentration?'Conc. : '+r.concentration:'',r.exhaustion?'Épuis. '+r.exhaustion:''].filter(Boolean).map(c=>`<span class="tag">${esc(c)}</span>`).join(' ')||'<span class="muted">—</span>'}</td>
+ <td>${[...r.conditions,r.concentration?'Conc. : '+r.concentration:'',r.exhaustion?'Épuis. '+r.exhaustion:'',r.inspiration?'✦ Inspiration':''].filter(Boolean).map(c=>`<span class="tag">${esc(c)}</span>`).join(' ')||'<span class="muted">—</span>'}</td>
  <td><button type="button" class="text-button" data-party-history="${attr(r.id)}" aria-label="Historique de ${attr(r.name)}">Historique</button></td></tr>`).join('')}</tbody></table></div>`;}
 // ---------- Historique ----------
 const CATS=[['all','Tout'],['progress','Progression'],['items','Objets & argent'],['fights','Combats'],['story','Quêtes & documents'],['notes','Notes du MJ']];

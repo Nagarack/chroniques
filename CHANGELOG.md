@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 5.3.0 — Multiclassage, charte de la table, intermèdes, vision des jetons
+**À la table**
+- **Multiclassage** : « Monter de niveau » demande quelle classe gagne le niveau (classe actuelle ou nouvelle classe, avec vérification des prérequis à 13). Panneau « Classes » sur la fiche (Progression & règles) : niveaux par classe, sous-classes, dés de vie par type, maîtrises acquises (table du SRD 5.1). Emplacements de sorts combinés selon les règles de multiclassage (moitié et tiers arrondis à l’inférieur en 2014, au supérieur en 2024) ; la magie de pacte reste à part et revient au repos court.
+- **Inspiration héroïque** : le MJ l’accorde ou la retire (fiche, ou bouton « ✦ Inspirer » sur les cartes du groupe) ; le joueur l’utilise ou la donne à un personnage qui n’en a pas. Rappel de la règle de l’édition (avantage en 2014, relance d’un dé en 2024). Visible dans la vue du groupe et l’historique.
+- **Préparer une action** : déclencheur et action notés, l’action du tour est consommée ; « Déclencher » utilise la réaction ; sans déclencheur, l’action préparée est perdue au début du tour suivant. Les actions préparées des créatures restent secrètes.
+- **Retarder son tour** (option de table, désactivable dans la charte) : le participant sort de l’ordre, puis « Agir maintenant » le replace juste après le tour en cours. Un tour retardé non repris est perdu au round suivant.
+- **Distances en pieds** : Mon compte → « Distances : mètres / pieds ». Tout ce qui s’affiche est converti (1,5 m = 5 ft), y compris les textes de règles ; par défaut, pieds en anglais et mètres en français. Les champs de saisie restent en mètres, sauf le déplacement en combat.
+
+**Campagne**
+- **Charte de la table** (nouvelle page) : règles maison classées par rubrique, partagées ou réservées au MJ, avec rappel facultatif dans l’Écran du MJ et exemples courants à ajouter d’un clic ; notes de séance zéro. Les règles maison sont incluses dans les modèles de campagne.
+- **Outils de sécurité** : lignes (sujets absents du jeu) et voiles (sujets hors champ), que chacun peut ajouter sans que son nom apparaisse ; **carte X** et **demande de pause** anonymes : le MJ reçoit un bandeau et une notification, sans aucun nom enregistré (ni dans la campagne, ni dans le journal).
+- **Intermèdes** : le MJ accorde des jours d’intermède au groupe (et peut avancer la date du monde) ; chaque joueur les consacre à ses activités : artisanat (5 po de valeur par jour, matières premières à moitié prix, coopération), formation (250 jours à 1 po), profession, recherches, récupération… Repères du SRD 5.1, modifiables ; aucun dé virtuel.
+- **Vision des jetons** : sur une carte avec brouillard et grille, les jetons des aventuriers révèlent automatiquement un cercle autour d’eux quand ils bougent. En lieu éclairé : portée de vue choisie par le MJ ; dans l’obscurité : vision dans le noir (d’après l’espèce de la fiche) ou lumière du jeton (bougie, torche, lanterne, sort Lumière). Les zones explorées restent visibles.
+
+**Limites connues** : la vision ne gère ni murs ni lignes de vue (le MJ retouche le brouillard à la main) ; les maîtrises de multiclassage affichées sont celles de la table 2014 du SRD (à vérifier dans le livre 2024) ; les sorts connus et préparés de chaque classe restent à gérer dans le grimoire.
+
 ## 5.2.0 — Chroniques en anglais, iPhone
 - **🌐 Interface en anglais** : bouton « English / Français » dans Mon compte et sur l’écran de connexion ; par défaut, la langue de l’appareil. Chacun choisit sa langue : les données de la campagne ne changent pas, un MJ francophone et des joueurs anglophones peuvent partager la même table.
 - **Tout est traduit** : environ 5 000 textes d’interface et messages du serveur, les fenêtres de confirmation, les dates, les notifications (dans la langue de chaque compte), les tutoriels express, les aide-mémoire MJ et joueur, un guide d’utilisation anglais condensé et les écrans de l’application Android.

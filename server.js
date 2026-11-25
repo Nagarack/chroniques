@@ -48,6 +48,8 @@ const WP=require('./src/web-push.js');
 const SD=require('./src/state-diff.js');
 const TR=require('./src/travel.js');
 const RT=require('./src/random-tables.js');
+const TCH=require('./src/table-charter.js');
+const DT=require('./src/downtime.js');
 const AD=require('./src/area-damage.js');
 const WA=require('./src/webauthn.js');
 const I18N=require('./src/i18n-core.js');
@@ -98,6 +100,8 @@ const allowedStatic=new Map([
  ['/src/data/srd-monstres-en.js',['src/data/srd-monstres-en.js','text/javascript; charset=utf-8']],
  ['/src/data/srd-monsters.en.js',['src/data/srd-monsters.en.js','text/javascript; charset=utf-8']],
  ['/src/data/srd-items.en.js',['src/data/srd-items.en.js','text/javascript; charset=utf-8']],
+ ['/src/table-charter.js',['src/table-charter.js','text/javascript; charset=utf-8']],
+ ['/src/downtime.js',['src/downtime.js','text/javascript; charset=utf-8']],
  ['/src/spells.js',['src/spells.js','text/javascript; charset=utf-8']],
  ['/src/spell-guide.js',['src/spell-guide.js','text/javascript; charset=utf-8']],
  ['/src/creatures.js',['src/creatures.js','text/javascript; charset=utf-8']],
@@ -182,6 +186,9 @@ function createServer(opts={}){
  // « À vous de jouer » : seulement si l'application du joueur n'est pas affichée à l'écran.
  const lastTurnNotice=new Map();
  function present(userId){for(const x of listeners)if(x.userId===userId&&x.visible!==false)return true;return false;}
+ // Carte X / pause : notification aux MJ, sans nom (le signal est anonyme).
+ function signalNotify(c,kind){const gms=(c.members||[]).filter(m=>m.role==='gm').map(m=>m.userId);if(!gms.length)return;
+  pushTo(gms,{title:'Chroniques',body:kind==='pause'?'Pause demandée à la table.':'Carte X levée : écartez la scène en cours, sans demander pourquoi.',url:'/',tag:'carte-x'}).catch(()=>{});}
  function turnNotify(c){const cb=c.state.combat;if(!cb?.started)return;const active=L.activeId(c.state);const pc=L.findPc(c.state,active);if(!pc)return;
   const key=cb.round+'|'+active;if(lastTurnNotice.get(c.id)===key)return;lastTurnNotice.set(c.id,key);
   const st=pushStore();const users=c.members.filter(m=>m.characterId===pc.id&&(st.prefs?.[m.userId]?.turn!==false)&&!present(m.userId)).map(m=>m.userId);if(!users.length)return;
@@ -218,6 +225,8 @@ function createServer(opts={}){
   for(const m of recs){if(move){m.entityId=toItem;m.characterId=toChar;continue;}if(M.list(s).length>=M.MAX_MEDIA)break;
    if(m.builtinId){s.media.push({...m,id:'img-'+random(12),entityId:toItem,characterId:toChar});continue;}
    const rec=copyLibraryImage(s,m);if(rec)s.media.push({id:'img-'+random(12),kind:'item',entityId:toItem,characterId:toChar,visibility:m.visibility,caption:m.caption||'',featured:!!m.featured,...rec});}}
+ // 5.3 : vision dans le noir d’un personnage (traits d’espèce), en mètres.
+ function darkvisionOf(s){return refId=>{const pc=L.findPc(s,refId);if(!pc)return 0;let best=0;try{for(const f of H.features(pc,s.edition)||[])if(/^Vision dans le noir/.test(f.name||'')){const mt=/(\d+(?:[.,]\d+)?)\s*m/.exec(f.description||'');if(mt)best=Math.max(best,Number(mt[1].replace(',','.')));}}catch{}return best;};}
  function logGm(s,msg){s.combat.log.unshift({id:random(5),msg,audience:'gm',when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});s.combat.log=s.combat.log.slice(0,60);}
  function logPublic(s,msg){s.combat.log.unshift({id:random(5),msg,when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});s.combat.log=s.combat.log.slice(0,60);}
  // Suppression différée : la fiche peut être restaurée par « Annuler » pendant quelques secondes. Le fichier n'est effacé
@@ -283,7 +292,7 @@ function createServer(opts={}){
  // la dernière réponse reçue, on ne lui envoie que les différences.
  const syncCache=new Map();
  // Actions permises au co-MJ restreint : tout ce qui concerne les créatures pendant le combat, rien d'autre.
- const ASSISTANT_KINDS=new Set(['npcAdd','npcUpdate','npcRemove','npcHp','npcCondition','conditionTimer','npcConcentration','npcConcentrationResult','npcLegendary','npcActionLog','npcSlot','npcRecharge','npcDefense','lairDone','next','turnTimer','turnTimerRestart','templateDeploy','encounterDeploy']);
+ const ASSISTANT_KINDS=new Set(['npcAdd','npcUpdate','npcRemove','npcHp','npcCondition','conditionTimer','npcConcentration','npcConcentrationResult','npcLegendary','npcActionLog','npcSlot','npcRecharge','npcDefense','lairDone','next','turnTimer','turnTimerRestart','templateDeploy','encounterDeploy','readyAction','readyResolve','delayTurn','actNow']);
  function syncOut(req,c,full,since){const key=sha(cookie(req,'chroniques_sid')||'')+'|'+c.id;const prev=syncCache.get(key);const tag=random(9);const text=JSON.stringify(full.state);let out=full;
   if(since&&prev&&prev.tag===since){try{const ops=SD.diff(JSON.parse(prev.text),full.state);if(ops){out={...full,patch:ops,base:since};delete out.state;}}catch{}}
   syncCache.delete(key);syncCache.set(key,{tag,text});while(syncCache.size>300)syncCache.delete(syncCache.keys().next().value);
@@ -306,15 +315,18 @@ function createServer(opts={}){
    if(p.id===u.characterId)return {...p,history:CH.forPlayer(p.history)}; // Notes secrètes du MJ retirées.
    // Shared party combat summary only; never send other characters' abilities, inventories or private notes.
    return {id:p.id,name:p.name,role:p.role,job:p.job,level:p.level,stats:{hp:p.stats.hp,ac:p.stats.ac},speed:p.speed,hp:p.hp,tempHp:p.tempHp,initiative:p.initiative,
-    owner:null,conditions:p.conditions,concentration:p.concentration,exhaustion:p.exhaustion,economy:{...p.economy},
+    owner:null,conditions:p.conditions,concentration:p.concentration,exhaustion:p.exhaustion,inspiration:!!p.inspiration,economy:{...p.economy},
     resources:[],abilities:[],deathSaves:{success:0,failure:0}};
   });
   if(full.combat)full.combat.timers=(full.combat.timers||[]).filter(t=>full.characters.some(p=>p.id===t.id)); // Durées des créatures du MJ : jamais envoyées.
+  if(full.combat){const isPc=x=>full.characters.some(p=>p.id===x.id);full.combat.readied=(full.combat.readied||[]).filter(isPc);full.combat.delayed=(full.combat.delayed||[]).filter(isPc);} // Actions préparées des créatures : secret du MJ.
  }
  if(u.role!=='gm')full=N.project(full);
  full.media=M.projected(c.state,u);
  full.ambience=AMB.projected(c.state); // Jamais les noms de fichiers sur disque.
  if(u.role!=='gm')full.randomTables=RT.projected(c.state); // Tables privées du MJ : jamais envoyées.
+ if(u.role!=='gm'&&c.state.downtime)full.downtime=DT.projected(c.state,u.characterId); // Intermèdes des autres personnages : non transmis.
+ if(u.role!=='gm'&&c.state.tableCharter)full.tableCharter=TCH.projected(c.state); // Signaux (carte X) et règles du MJ : jamais envoyés.
  full.maps=CM.projected(c.state,u);
  // Le projecteur commun ne doit jamais transmettre les données de la fiche source
  // si la créature est masquée. Le MJ choisit librement le titre public.
@@ -393,7 +405,7 @@ function createServer(opts={}){
   if(Array.isArray(c.history))pc.history=c.history.slice(-CH.MAX).map(e=>({id:random(8),at:/^\d{4}-\d\d-\d\dT/.test(String(e?.at||''))?String(e.at).slice(0,30):new Date().toISOString(),world:String(e?.world||'').slice(0,60),session:null,text:String(e?.text||'').replace(/[\u0000-\u001f]/g,' ').slice(0,300)})).filter(e=>e.text.trim());
   (pc.history??=[]).push({id:random(8),at:new Date().toISOString(),world:'',session:null,text:'Rejoint la campagne'+(data.from?.campaign?' (venant de « '+String(data.from.campaign).slice(0,60)+' »)':'')+'.'});
   logPublic(s,'Personnage importé : '+pc.name+(skipped.length?' ('+skipped.length+' élément(s) ignoré(s) : '+[...new Set(skipped)].slice(0,6).join(', ')+')':'')+'.');return pc;}
- const UNDOABLE={hp:'PV',areaDamage:'dégâts de zone',tableRemove:'suppression de table',exhaustion:'épuisement',npcLegendary:'action légendaire',defense:'défense',npcDefense:'défense de créature',npcHp:'PV créature',tempHp:'PV temporaires',condition:'état',npcCondition:'état créature',next:'tour suivant',conditionTimer:'durée d’état',start:'début du combat',end:'fin du combat',deathSave:'jet contre la mort',init:'initiative',sortInitiative:'tri de l’initiative',move:'déplacement',moveInitiative:'ordre d’initiative',resetTurn:'réinitialisation du tour',spend:'dépense d’action',slot:'emplacement de sort',castSpell:'sort lancé',resource:'ressource',concentration:'concentration',resolveConcentration:'concentration',rest:'repos',npcAdd:'ajout de créature',npcUpdate:'modification de créature',npcRemove:'retrait de créature',libItemDelete:'objet maison supprimé',handoutDelete:'document supprimé',shopDelete:'marchand supprimé',shopItemRemove:'article retiré',mapAreaClear:'zones effacées',scheduleClear:'dates effacées',scheduleRemove:'date retirée',templateDelete:'monstre supprimé',encounterDelete:'rencontre supprimée',restLongAll:'repos long du groupe',xpAward:'XP distribuée',milestone:'jalon'};
+ const UNDOABLE={hp:'PV',areaDamage:'dégâts de zone',tableRemove:'suppression de table',exhaustion:'épuisement',inspiration:'inspiration',charterRuleRemove:'règle de la table',downtimeRemove:'activité d’intermède',charterLimitRemove:'limite de la table',npcLegendary:'action légendaire',defense:'défense',npcDefense:'défense de créature',npcHp:'PV créature',tempHp:'PV temporaires',condition:'état',npcCondition:'état créature',next:'tour suivant',conditionTimer:'durée d’état',start:'début du combat',end:'fin du combat',deathSave:'jet contre la mort',init:'initiative',sortInitiative:'tri de l’initiative',move:'déplacement',moveInitiative:'ordre d’initiative',resetTurn:'réinitialisation du tour',spend:'dépense d’action',slot:'emplacement de sort',castSpell:'sort lancé',resource:'ressource',concentration:'concentration',resolveConcentration:'concentration',rest:'repos',npcAdd:'ajout de créature',npcUpdate:'modification de créature',npcRemove:'retrait de créature',libItemDelete:'objet maison supprimé',handoutDelete:'document supprimé',shopDelete:'marchand supprimé',shopItemRemove:'article retiré',mapAreaClear:'zones effacées',scheduleClear:'dates effacées',scheduleRemove:'date retirée',templateDelete:'monstre supprimé',encounterDelete:'rencontre supprimée',restLongAll:'repos long du groupe',xpAward:'XP distribuée',milestone:'jalon'};
  const undoStacks=new Map();
  function canUndo(c){const st=undoStacks.get(c.id);const top=st&&st[st.length-1];return Boolean(top&&top.version===c.version);}
  function undo(c,u){requireGm(u);const st=undoStacks.get(c.id)||[];const top=st[st.length-1];if(!top||top.version!==c.version){undoStacks.delete(c.id);badRequest('Rien à annuler : l’état a changé depuis la dernière action.');}
@@ -416,10 +428,14 @@ function createServer(opts={}){
   case 'mapTokenAdd':{requireGm(u);const v=b.values||{};let label=v.label,visible=v.visible;
    if(v.kind==='pc'){const pc=L.findPc(s,String(v.refId||''));if(!pc)badRequest('Personnage introuvable.');label=pc.name;visible=true;}
    if(v.kind==='npc'){const n=N.find(s,String(v.refId||''));if(!n)badRequest('Créature introuvable.');label=n.name;if(visible===undefined)visible=n.visibility==='public';}
-   CM.tokenAdd(s,id,'tok-'+random(10),{...v,label:String(label||'').slice(0,40),visible});break;}
+   const added=CM.tokenAdd(s,id,'tok-'+random(10),{...v,label:String(label||'').slice(0,40),visible});CM.visionReveal(s,id,darkvisionOf(s),added.id);break;}
   case 'mapTokenMove':{const map=CM.read(s,id);if(!map||!CM.canRead(u,map))throw sleepBlock('Carte non accessible.');const t=CM.tokenRead(s,id,String(b.tokenId||''));if(!t)badRequest('Jeton introuvable.');
    const cmpNpc=t.kind==='npc'?N.find(s,t.refId):null;
-   if(u.role!=='gm'&&!(t.kind==='pc'&&t.visible&&L.canEdit(s,a,t.refId))&&!(cmpNpc?.ownerPc&&t.visible&&L.canEdit(s,a,cmpNpc.ownerPc)))throw sleepBlock('Vous ne pouvez déplacer que votre propre jeton.');CM.tokenMove(s,id,t.id,b.x,b.y);break;}
+   if(u.role!=='gm'&&!(t.kind==='pc'&&t.visible&&L.canEdit(s,a,t.refId))&&!(cmpNpc?.ownerPc&&t.visible&&L.canEdit(s,a,cmpNpc.ownerPc)))throw sleepBlock('Vous ne pouvez déplacer que votre propre jeton.');CM.tokenMove(s,id,t.id,b.x,b.y);CM.visionReveal(s,id,darkvisionOf(s),t.id);break;}
+  case 'mapVision':{requireGm(u);CM.setVision(s,id,b.values);CM.visionReveal(s,id,darkvisionOf(s));break;}
+  case 'mapTokenLight':{const map=CM.read(s,id);if(!map||!CM.canRead(u,map))throw sleepBlock('Carte non accessible.');const t=CM.tokenRead(s,id,String(b.tokenId||''));if(!t)badRequest('Jeton introuvable.');
+   if(u.role!=='gm'&&!(t.kind==='pc'&&t.visible&&L.canEdit(s,a,t.refId)))throw sleepBlock('Vous ne pouvez régler que votre propre jeton.');if(u.role!=='gm'&&b.values&&b.values.sight!==undefined)badRequest('Seul le MJ règle la vision d’un jeton.');
+   CM.tokenLight(s,id,t.id,b.values);CM.visionReveal(s,id,darkvisionOf(s),t.id);break;}
   case 'mapTokenSet':{requireGm(u);CM.tokenSet(s,id,String(b.tokenId||''),b.values);break;}
   case 'mapTokenRemove':{requireGm(u);CM.tokenRemove(s,id,String(b.tokenId||''));break;}
   case 'mapAreaAdd':{const map=CM.read(s,id);if(!map||!CM.canRead(u,map))throw sleepBlock('Carte non accessible.');CM.areaAdd(s,id,'zone-'+random(8),b.values,a);break;}
@@ -666,6 +682,25 @@ function createServer(opts={}){
   case 'ability':L.useAbility(s,a,id,String(b.abilityId||''));break;
   case 'move':L.updateMovement(s,a,id,n(b.value,0,1000));break;
   case 'hp':if(b.damageType&&!L.DAMAGE_TYPES.includes(String(b.damageType)))badRequest('Type de dégâts inconnu.');L.changeHp(s,a,id,n(b.delta,-10000,10000),String(b.damageType||''));break;
+  case 'downtimeGrant':{requireGm(u);const days=DT.grant(s,s.characters.map(p=>p.id),b.days);logPublic(s,'⏳ Intermède : '+days+' jour'+(days>1?'s':'')+' accordé'+(days>1?'s':'')+' à chaque personnage');
+   if(b.world===true&&s.worldTime?.enabled){const reached=WT.advance(s,days*1440);logPublic(s,'⏳ '+days+' jour'+(days>1?'s':'')+' passent · '+WT.format(s.worldTime,s.worldTime.minutes));logEvents(s,reached);}break;}
+  case 'downtimeAdd':{const pcId=String(b.pcId||'');if(!L.findPc(s,pcId))badRequest('Personnage introuvable.');if(!L.canEdit(s,a,pcId))throw sleepBlock('Accès refusé à cette fiche.');DT.add(s,'dt-'+random(10),pcId,b.values);break;}
+  case 'downtimeUpdate':case 'downtimeRemove':case 'downtimeSpend':{const act=(s.downtime?.activities||[]).find(x=>x.id===id);if(!act)badRequest('Activité introuvable.');if(!L.canEdit(s,a,act.pcId))throw sleepBlock('Accès refusé à cette fiche.');
+   if(b.kind==='downtimeUpdate')DT.update(s,id,b.values);else if(b.kind==='downtimeRemove')DT.remove(s,id);
+   else{const r=DT.spend(s,id,b.days);const pc=L.findPc(s,act.pcId);if(r.finished)logPublic(s,(pc?.name||'Personnage')+' · intermède terminé : '+act.title);}break;}
+  case 'charterRuleAdd':{requireGm(u);TCH.ruleAdd(s,'hr-'+random(10),b.values);break;}
+  case 'charterRuleUpdate':{requireGm(u);TCH.ruleUpdate(s,id,b.values);break;}
+  case 'charterRuleRemove':{requireGm(u);TCH.ruleRemove(s,id);break;}
+  case 'charterIntro':{requireGm(u);TCH.setIntro(s,b.text);break;}
+  case 'charterOptions':{requireGm(u);TCH.setOptions(s,b.values);break;}
+  case 'charterLimitAdd':{TCH.limitAdd(s,'lim-'+random(10),String(b.limit||''),b.text);break;}
+  case 'charterLimitRemove':{requireGm(u);TCH.limitRemove(s,String(b.limit||''),id);break;}
+  case 'charterSignal':{TCH.signal(s,'sig-'+random(10),String(b.signal||''));break;}
+  case 'charterSignalAck':{requireGm(u);TCH.signalAck(s,id);break;}
+  case 'delayTurn':case 'actNow':case 'readyAction':case 'readyResolve':if(u.assistantElevated&&L.findPc(s,id))throw sleepBlock('Le co-MJ gère seulement les créatures.');
+   if(b.kind==='actNow'){L.actNow(s,a,id);break;}if(b.kind==='readyAction'){L.readyAction(s,a,id,b.trigger,b.what,b.spell===true);break;}if(b.kind==='readyResolve'){L.readyResolve(s,a,id,String(b.mode||''));break;}
+   {if(!TCH.allowDelay(s))badRequest('« Retarder son tour » est désactivé dans la charte de la table.');L.delayTurn(s,a,id);break;}
+  case 'inspiration':{const mode=String(b.mode||'');if(!['give','remove','use','pass'].includes(mode))badRequest('Action d’inspiration inconnue.');L.setInspiration(s,a,id,mode,String(b.target||''));break;}
   case 'exhaustion':if(![1,-1].includes(Number(b.delta)))badRequest('Valeur d’épuisement incorrecte.');L.setExhaustion(s,a,id,Number(b.delta));break;
   case 'defense':if(!L.DAMAGE_TYPES.includes(String(b.type||'')))badRequest('Type de dégâts inconnu.');if(b.value&&!L.DEFENSE_STATES[String(b.value)])badRequest('Défense inconnue.');L.setDefense(s,a,id,String(b.type),String(b.value||''));break;
   case 'npcLegendary':requireGm(u);try{N.legendary(s,id,String(b.op||''),b.cost,b.text||'');}catch(e){badRequest(e.message);}break;
@@ -731,8 +766,15 @@ function createServer(opts={}){
   case 'levelUp':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');pc.levelUpReady=false;
    if(s.edition==='custom')badRequest('Progression automatique désactivée pour les règles personnalisées.');
    if(pc.level>=20)badRequest('Le niveau maximum est 20.');pc.level++;
+   // 5.3 : niveau pris dans une autre classe (multiclassage).
+   let mcNote='';{const target=String(b.classId||'');if(target&&target!==P.primaryClass(pc)){if(!P.CLASSES[target]){pc.level--;badRequest('Classe inconnue.');}const cur=P.classesOf(pc).find(x=>x.classId===target);
+    try{if(cur)P.multiclass(pc,'level',{classId:target,level:cur.level+1});else P.multiclass(pc,'add',{classId:target,level:1});}catch(e){pc.level--;badRequest(e.message);}
+    mcNote=' · '+P.CLASSES[target].name+' '+(cur?cur.level+1:1);}}
    const gain=b.hpGain==null?0:intValue(b.hpGain,'PV gagnés',1,40);if(gain){pc.stats.hp=Math.min(999,pc.stats.hp+gain);pc.hp=Math.min(pc.stats.hp,pc.hp+gain);}
-   s.combat.log.unshift({id:random(5),msg:pc.name+' · niveau '+pc.level+(gain?' · +'+gain+' PV max':'')+' (dons et capacités à valider)',when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});break;}
+   s.combat.log.unshift({id:random(5),msg:pc.name+' · niveau '+pc.level+mcNote+(gain?' · +'+gain+' PV max':'')+' (dons et capacités à valider)',when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});break;}
+  case 'multiclass':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');if(!['add','level','subclass','remove'].includes(b.op))badRequest('Opération inconnue.');
+   try{P.multiclass(pc,b.op,{classId:String(b.classId||''),level:b.level==null?undefined:Number(b.level),subclass:b.subclass});}catch(e){badRequest(e.message);}
+   logPublic(s,pc.name+' · classes : '+P.classLabel(pc));break;}
   case 'setSkill':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');
    if(!Object.hasOwn(P.SKILLS,b.skillId)||!['none','trained','expert'].includes(b.rank))badRequest('Compétence ou maîtrise invalide.');
    pc.progression??={};pc.progression.skills??={};pc.progression.skills[b.skillId]=b.rank;break;}
@@ -1154,7 +1196,7 @@ function createServer(opts={}){
     const u=requireUser(req),c=currentCampaign(u);
     // Empêche un ancien onglet d'écrire dans une autre campagne après un changement de table.
     if(b.campaignId!==undefined&&b.campaignId!==c.id)throw Object.assign(new Error('La campagne active a changé. Actualisez la page avant de modifier les données.'),{status:409});
-    if(pathname==='/api/action'){const elevated=u.role==='assistant'&&ASSISTANT_KINDS.has(String(b.kind));const out=apply(c,elevated?{...u,role:'gm',assistantElevated:true}:u,b);if(['next','start'].includes(b.kind))turnNotify(c);send(res,200,syncOut(req,c,out,typeof b.since==='string'?b.since:''));return;}
+    if(pathname==='/api/action'){const elevated=u.role==='assistant'&&ASSISTANT_KINDS.has(String(b.kind));const out=apply(c,elevated?{...u,role:'gm',assistantElevated:true}:u,b);if(['next','start','delayTurn'].includes(b.kind))turnNotify(c);if(b.kind==='charterSignal')signalNotify(c,b.signal);send(res,200,syncOut(req,c,out,typeof b.since==='string'?b.since:''));return;}
     if(pathname==='/api/media/change'){limit(req,'media');send(res,200,commitMedia(c,u,b,true));return;}
     if(pathname==='/api/library/image'){
      requireGm(u);limit(req,'media');

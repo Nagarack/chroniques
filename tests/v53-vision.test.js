@@ -1,0 +1,32 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const CM=require('../src/campaign-maps.js');
+function map(){const s={maps:[]};CM.add(s,'map-abcdefgh',{title:'Crypte',visibility:'shared'});CM.setGrid(s,'map-abcdefgh',{cells:20,scale:'1,5 m'});return s;}
+test('vision : rayon selon la lumière et la vision dans le noir',()=>{const s=map();const m=CM.read(s,'map-abcdefgh');
+ assert.throws(()=>{const t={maps:[]};CM.add(t,'map-zzzzzzzz',{title:'x',visibility:'shared'});CM.setVision(t,'map-zzzzzzzz',{enabled:true});},/grille/);
+ CM.setVision(s,'map-abcdefgh',{enabled:true,light:'dark'});assert.ok(m.fog.enabled);
+ const tok=CM.tokenAdd(s,'map-abcdefgh','tok-aaaaaaa',{kind:'pc',refId:'pc-1',label:'Elfe',x:500,y:500});
+ assert.strictEqual(CM.tokenRadius(m,tok,18),18);assert.strictEqual(CM.tokenRadius(m,tok,0),0);
+ CM.tokenLight(s,'map-abcdefgh',tok.id,{light:'lanterne'});assert.strictEqual(CM.tokenRadius(m,tok,0),18);
+ CM.setVision(s,'map-abcdefgh',{light:'lit',range:30});assert.strictEqual(CM.tokenRadius(m,tok,0),30);
+ assert.strictEqual(CM.scaleMeters({grid:{cells:10,scale:'5 ft'}}),1.5);});
+test('vision : révélation au déplacement, sans doublons',()=>{const s=map();const m=CM.read(s,'map-abcdefgh');CM.setVision(s,'map-abcdefgh',{enabled:true,light:'dark'});
+ CM.tokenAdd(s,'map-abcdefgh','tok-aaaaaaa',{kind:'pc',refId:'pc-1',label:'Nain',x:100,y:100});CM.tokenAdd(s,'map-abcdefgh','tok-bbbbbbb',{kind:'npc',refId:'npc-1',label:'Orc',x:900,y:900});
+ const dv=()=>18;assert.strictEqual(CM.visionReveal(s,'map-abcdefgh',dv),1);
+ // 20 cases de 1,5 m sur 1000 unités : 18 m = 12 cases = 600 unités.
+ assert.deepStrictEqual(m.fog.revealed[0],[100,100,600]);assert.strictEqual(CM.visionReveal(s,'map-abcdefgh',dv),0);
+ CM.tokenMove(s,'map-abcdefgh','tok-aaaaaaa',900,100);assert.strictEqual(CM.visionReveal(s,'map-abcdefgh',dv,'tok-aaaaaaa'),1);assert.strictEqual(m.fog.revealed.length,2);
+ const pj=CM.projected(s,{role:'player'})[0];assert.strictEqual(pj.vision.enabled,true);});
+test('vision : serveur, droits sur la lumière du jeton',async t=>{const f=await require('./_fixture.js').fixture(t);
+ let r=await f.action('mapAdd',{values:{title:'Crypte',summary:'',visibility:'shared'}});assert.strictEqual(r.status,200,JSON.stringify(r.data));
+ const st=(await f.call('/api/state',{cookie:f.gm})).data.state;const mapId=st.maps[0].id;
+ r=await f.action('mapVision',{id:mapId,values:{enabled:true}});assert.strictEqual(r.status,400);
+ r=await f.action('mapGrid',{id:mapId,values:{cells:20,scale:'1,5 m'}});if(r.status!==200)r=await f.action('mapSetGrid',{id:mapId,values:{cells:20,scale:'1,5 m'}});
+ assert.strictEqual(r.status,200,JSON.stringify(r.data));
+ r=await f.action('mapVision',{id:mapId,values:{enabled:true,light:'dark'}});assert.strictEqual(r.status,200,JSON.stringify(r.data));
+ const s2=(await f.call('/api/state',{cookie:f.gm})).data.state;assert.strictEqual(s2.maps[0].fog.enabled,true);
+ r=await f.action('mapTokenAdd',{id:mapId,values:{kind:'pc',refId:f.a.id,x:500,y:500}});assert.strictEqual(r.status,200,JSON.stringify(r.data));
+ const s3=(await f.call('/api/state',{cookie:f.gm})).data.state;const tok=s3.maps[0].tokens[0];const before=s3.maps[0].fog.revealed.length;
+ r=await f.action('mapTokenLight',{id:mapId,tokenId:tok.id,values:{light:'torche'}},f.pb);assert.strictEqual(r.status,403);
+ r=await f.action('mapTokenLight',{id:mapId,tokenId:tok.id,values:{sight:60}},f.pa);assert.strictEqual(r.status,400);
+ r=await f.action('mapTokenLight',{id:mapId,tokenId:tok.id,values:{light:'torche'}},f.pa);assert.strictEqual(r.status,200);
+ const s4=(await f.call('/api/state',{cookie:f.pa})).data.state;assert.ok(s4.maps[0].fog.revealed.length>=Math.max(1,before));assert.strictEqual(s4.maps[0].tokens[0].light,'torche');});

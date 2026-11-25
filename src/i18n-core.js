@@ -32,7 +32,10 @@ function create(dict){const exact=new Map(),buckets=new Map();let size=0;
   const strip=x=>x.replace(/[\s·:—–|/,]+$/,'');
   const ml=k.match(lead);if(ml&&en.includes('{'+ml[1]+'}'))addUnit(k.replace(lead,''),drop(en,ml[1]));
   const mt=k.match(trail);if(mt&&en.includes('{'+mt[1]+'}'))addUnit(strip(k.replace(trail,'')),strip(drop(en,mt[1])));}
+ const EDGE=/^[·—–|/]\s+|\s+[·—–|/]$/g;
  for(const [k0,v] of Object.entries(dict||{})){if(typeof v!=='string'||!v)continue;const k=norm(decode(k0));const en=decode(v);addUnit(k,en);
+  // Morceau de message (« Début de tour · », « · reçoit… ») : aussi sans le séparateur, pour les messages composés.
+  if(EDGE.test(k)){EDGE.lastIndex=0;const kk=k.replace(EDGE,'').trim(),ee=en.replace(EDGE,'').trim();if(kk&&ee&&/[A-Za-zÀ-ÿ]/.test(kk))addUnit(kk,ee);}EDGE.lastIndex=0;
   // Morceaux séparés par « · » : même découpage dans les deux langues.
   const fs=k.split(SEP),es=en.split(SEP);if(fs.length>1&&fs.length===es.length)for(let i=0;i<fs.length;i+=2)if(/[A-Za-zÀ-ÿ]/.test(fs[i]))addUnit(norm(fs[i]),es[i].trim());
   const SENT=/(?<=[.!?…])\s+(?=[A-ZÀ-Ý(«“{])/;const fx=k.split(SENT),ex2=en.split(SENT);if(fx.length>1&&fx.length===ex2.length)for(let i=0;i<fx.length;i++)if(/[A-Za-zÀ-ÿ]/.test(fx[i])&&!/\{\d+\}/.test(fx[i])===!/\{\d+\}/.test(ex2[i]))addUnit(norm(fx[i]),ex2[i].trim());}
@@ -70,5 +73,14 @@ function create(dict){const exact=new Map(),buckets=new Map();let size=0;
    out+=tag;last=re.lastIndex;}
   return out+text(h.slice(last));}
  return {size,translateText,translateHtml};}
-return {create,decode,norm};
+// 5.3 : distances en pieds (1,5 m = 5 ft). « 9 m » → « 30 ft », « 18 mètres » → « 60 pieds » / « 60 feet ».
+function units(lang){const en=lang==='en';
+ const ftNum=m=>{const f=Number(m)/0.3;const r=Math.round(f);const v=Math.abs(f-r)<0.05?String(r):String(Math.round(f*10)/10);return en?v:v.replace('.',',');};
+ const DIST=/(\d+(?:[.,]\d+)?)([   ]?)(mètres?|metres?|meters?|m)(?![A-Za-zÀ-ÿ²³0-9])/g;
+ const convText=t=>{if(typeof t!=='string'||t.indexOf('m')<0||!/\d/.test(t))return t;return t.replace(DIST,(x,n,sp,u)=>{const m=Number(n.replace(',','.'));if(!Number.isFinite(m))return x;const ft=ftNum(m);if(u==='m')return ft+(sp||' ')+'ft';return ft+(sp||' ')+(en?(ft==='1'?'foot':'feet'):(ft==='1'?'pied':'pieds'));});};
+ const convHtml=h=>{if(typeof h!=='string'||h.indexOf('m')<0||!/\d/.test(h))return h;let out='',skip=0;const re=/<!--[\s\S]*?-->|<\/?([a-zA-Z][\w-]*)[^<>]*>/g;let last=0,m;
+  while((m=re.exec(h))){const seg=h.slice(last,m.index);out+=skip?seg:convText(seg);const name=(m[1]||'').toLowerCase();if(name==='textarea'||name==='script'||name==='style'){skip+=m[0][1]==='/'?-1:1;if(skip<0)skip=0;}out+=skip?m[0]:m[0].replace(/(\s(?:title|aria-label|data-tip)=")([^"]*)(")/g,(x,a,v,b)=>a+convText(v)+b);last=re.lastIndex;}
+  return out+(skip?h.slice(last):convText(h.slice(last)));};
+ return {ftNum,convText,convHtml};}
+return {create,decode,norm,units};
 });

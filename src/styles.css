@@ -1712,3 +1712,44 @@ fieldset{min-width:0}
 .ad-form .btn-group{display:flex;flex-wrap:wrap;gap:8px}.ad-form .btn-group .btn{width:auto;flex:0 0 auto}
 .rt-roll label:first-child{display:grid!important;gap:4px}.rt-roll input[name=total]{width:100%;font-size:1.15rem}
 .rt-card .rt-result{font-size:1.1rem!important;color:inherit}
+
+/* 5.3 : inspiration héroïque */
+.inspiration-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin:12px 0;padding-top:12px;border-top:1px solid var(--rule-soft,var(--rule))}.inspiration-row>div:first-child{flex:1 1 220px}.inspiration-row p{margin:2px 0 0}
+.inspiration-row.on strong{color:var(--gold)}
+.inspiration-pass{display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex:1 1 100%}.inspiration-pass select{min-width:0;flex:1 1 140px}
+.po-insp{font-size:.78rem;padding:2px 0;align-self:flex-start;color:inherit!important;text-decoration:underline}.po-insp[aria-pressed="true"]{font-weight:700}
+/* 5.3 : charte de la table */
+.charter-signals .btn{flex:1 1 180px}
+.charter-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.charter-columns h4{margin:.4rem 0}
+.charter-limits{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}.charter-limits li{display:inline-flex;align-items:center;gap:6px;padding:3px 6px 3px 12px;border:1px solid var(--rule-soft,var(--rule));border-radius:999px;font-weight:600;font-size:.9rem}.charter-limits li .icon-close{min-width:28px;min-height:28px;padding:0}
+.charter-limit-form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px;margin-top:12px}.charter-limit-form label{display:flex;flex-direction:column;gap:4px;flex:1 1 160px}.charter-limit-text{flex:2 1 200px!important}
+.charter-rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}.charter-rule{border:1px solid var(--rule-soft,var(--rule));border-radius:10px;padding:10px 12px}.charter-rule p{margin:.35rem 0}
+.charter-rule-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px}.charter-tags{display:flex;gap:4px;flex-wrap:wrap}
+.charter-cat{margin:1rem 0 .4rem}.charter-checks{display:flex;flex-wrap:wrap;gap:4px 16px;margin:6px 0}
+.charter-rule-form,.charter-intro-form{display:flex;flex-direction:column;gap:8px;margin:8px 0}.charter-rule-form label,.charter-intro-form label{display:flex;flex-direction:column;gap:4px}.charter-rule-form label.check{flex-direction:row;align-items:center}
+.charter-presets ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}.charter-add,.charter-presets{margin-top:12px}
+.charter-signal p{margin:2px 0}
+/* 5.3 : retarder / préparer */
+.init-item{flex-wrap:wrap}.turn-options{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:4px}
+.turn-options .turn-ready{flex:1 1 220px}.turn-flag{font-weight:600}.ready-details{flex:1 1 100%}.ready-details summary{cursor:pointer}
+.ready-form{display:flex;flex-direction:column;gap:6px;margin-top:6px}.ready-form label{display:flex;flex-direction:column;gap:3px}.ready-form label.check{flex-direction:row;align-items:center;gap:6px}
+.player-turn .turn-options{margin:8px 0}
+/* 5.3 : intermèdes */
+.dt-list{display:flex;flex-direction:column;gap:10px;margin:8px 0}.dt-item{border:1px solid var(--rule-soft,var(--rule));border-radius:10px;padding:10px 12px}.dt-item.done{opacity:.85}
+.dt-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px}.dt-item p{margin:.3rem 0}
+.dt-bar{height:8px;border-radius:6px;background:var(--rule-soft,#3f3832);overflow:hidden;margin:6px 0}.dt-bar i{display:block;height:100%;background:var(--gold,#c9a46f)}
+.dt-spend{display:flex;align-items:flex-end;gap:6px}.dt-spend label{display:flex;flex-direction:column;gap:2px;font-size:.85rem}.dt-spend input{width:5.5em}
+.dt-form{display:flex;flex-direction:column;gap:8px;margin-top:8px}.dt-form label{display:flex;flex-direction:column;gap:4px}.dt-craft{display:flex;flex-direction:column;gap:6px}
+.dt-grant{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px}.dt-grant label{display:flex;flex-direction:column;gap:4px}.dt-grant label.check{flex-direction:row;align-items:center}
+.dt-gm-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}.dt-gm-row ul{margin:4px 0 0 1.1rem;padding:0}
+/* 5.3 : vision des jetons */
+.vision-tools{flex:1 1 100%}.vision-tools summary{cursor:pointer;font-weight:600}.map-vision-form{display:flex;flex-direction:column;gap:8px;margin-top:6px}.map-vision-form label{display:flex;flex-direction:column;gap:4px}.map-vision-form label.check{flex-direction:row;align-items:center;gap:6px}
+/* 5.3 : multiclassage */
+.warn-text{color:var(--red,#c0392b);font-weight:600}
+.mc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}.mc-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;padding:6px 0;border-bottom:1px solid var(--rule-soft,var(--rule))}
+.mc-tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.mc-sub-form{display:flex;gap:4px}.mc-sub-form input{width:10em;min-width:0}
+.mc-add{margin-top:10px}.mc-add-form{display:flex;flex-direction:column;gap:8px;margin-top:6px}.mc-add-form label{display:flex;flex-direction:column;gap:4px}.mc-info p{margin:.2rem 0}
+.levelup-class{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.fight-turnopt{margin-top:8px;padding-top:8px;border-top:1px solid var(--rule-soft,var(--rule))}
+
+.charter-intro-form>.btn,.dt-grant .btn,.mc-add-form>.btn{align-self:flex-start}

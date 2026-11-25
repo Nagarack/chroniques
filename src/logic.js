@@ -94,7 +94,7 @@
   function participants(state){return [...state.characters,...(state.combat.npcs||[])];}
   function startCombat(state,actor) {
     if(actor!=='mj')throw new Error('Seul le MJ gère l’initiative dans cette démonstration.');
-    state.combat.round=1;state.combat.index=0;
+    state.combat.round=1;state.combat.index=0;state.combat.delayed=[];state.combat.readied=[];
     if(!state.combat.manualOrder || !validOrder(state))sortInitiative(state,actor);
     state.combat.order=state.combat.order.slice();
     state.combat.started=true;state.combat.turnStartedAt=new Date().toISOString();
@@ -174,12 +174,12 @@
     }
     state.combat.timers=keep;
   }
-  function nextTurn(state,actor){
-    if(actor!=='mj')throw new Error('Seul le MJ fait avancer les tours.');
+  function nextTurn(state,actor,opts={}){
+    if(actor!=='mj'&&!opts.internal)throw new Error('Seul le MJ fait avancer les tours.');
     if(!state.combat.started)throw new Error('Le combat n’a pas commencé.');
     if(!state.combat.order.length)return state;
     const groupOf=id=>{const n=(state.combat.npcs||[]).find(x=>x.id===id);return n&&n.group?n.group:'';};
-    const g=groupOf(activeId(state));tickConditionTimers(state,activeId(state));
+    const g=groupOf(activeId(state));if(!opts.delaying)tickConditionTimers(state,activeId(state));
     let steps=1;if(g){while(state.combat.index+steps<state.combat.order.length&&groupOf(state.combat.order[state.combat.index+steps])===g){tickConditionTimers(state,state.combat.order[state.combat.index+steps]);steps++;}}
     state.combat.index+=steps;if(state.combat.index>=state.combat.order.length){state.combat.index=0;state.combat.round++;}
     {const first=(state.combat.npcs||[]).find(x=>x.id===activeId(state));const ng=first&&first.group;for(const n of state.combat.npcs||[])if(n.legendaryMax&&(n.id===activeId(state)||(ng&&n.group===ng)))n.legendaryLeft=n.legendaryMax;}
@@ -187,16 +187,45 @@
     state.combat.turnStartedAt=new Date().toISOString();
     checkLair(state);
     {const n=(state.combat.npcs||[]).find(x=>x.id===activeId(state));const ng=n&&n.group;for(const m of state.combat.npcs||[])if((m.id===activeId(state)||(ng&&m.group===ng))&&Array.isArray(m.spent)&&m.spent.length&&m.hp>0)state.combat.log.unshift({id:'recharge-'+m.id+'-'+state.combat.round,msg:m.name+' · lancez 1d6 pour '+m.spent.join(', ')+' (le pouvoir revient sur le résultat indiqué)',when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),audience:'gm'});}
+    {const now=activeId(state);const who=participants(state).find(x=>x.id===now);const secret=!findPc(state,now);
+     // Tour retardé jusqu’à revenir à sa place : le tour retardé est perdu, le nouveau tour commence normalement.
+     if((state.combat.delayed||[]).some(d=>d.id===now)){state.combat.delayed=state.combat.delayed.filter(d=>d.id!==now);noteTurn(state,(who?.name||'Participant')+' n’a pas repris son tour retardé : il est perdu',secret);}
+     // Une action préparée dure jusqu’au début du tour suivant de celui qui l’a préparée.
+     if((state.combat.readied||[]).some(r=>r.id===now)){state.combat.readied=state.combat.readied.filter(r=>r.id!==now);noteTurn(state,(who?.name||'Participant')+' · action préparée non déclenchée : elle est perdue',secret);}}
     const pc=findPc(state,activeId(state));
     if(pc){pc.economy={action:false,bonus:false,reaction:false,movement:0}; log(state,'Début de tour · '+pc.name+' · round '+state.combat.round);}
     else {const npc=(state.combat.npcs||[]).find(n=>n.id===activeId(state));if(npc){state.combat.log.unshift({id:'npc-turn-'+state.combat.round+'-'+state.combat.index,msg:'Début de tour · '+npc.name+' · round '+state.combat.round,when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),audience:'gm'});}}
     return state;
   }
+  function noteTurn(state,msg,secret){if(!secret){log(state,msg);return;}state.combat.log.unshift({id:Math.random().toString(36).slice(2,11),msg,when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),audience:'gm'});state.combat.log=state.combat.log.slice(0,60);}
+  // 5.3 : retarder son tour (option de table) et préparer une action (règle officielle : action + réaction au déclencheur).
+  function controls(state,actor,id){const pc=findPc(state,id);if(pc){if(!canEdit(state,actor,id))throw new Error('Accès refusé à cette fiche.');return {who:pc,pc:true};}
+    const n=(state.combat.npcs||[]).find(x=>x.id===id);if(!n)throw new Error('Participant introuvable.');if(actor!=='mj')throw new Error('Accès réservé au MJ.');return {who:n,pc:false};}
+  function delayTurn(state,actor,id){if(!state.combat.started)throw new Error('Le combat n’a pas commencé.');const {who,pc}=controls(state,actor,id);
+    if(activeId(state)!==id)throw new Error('On ne peut retarder que son propre tour, au moment où il commence.');if(who.group)throw new Error('Les créatures groupées jouent ensemble : déplacez le groupe avec ↑ et ↓.');
+    state.combat.delayed=(state.combat.delayed||[]).filter(d=>d.id!==id);state.combat.delayed.push({id,round:state.combat.round});noteTurn(state,who.name+' retarde son tour',!pc);
+    nextTurn(state,actor,{internal:true,delaying:true});return state;}
+  function actNow(state,actor,id){if(!state.combat.started)throw new Error('Le combat n’a pas commencé.');const {who,pc}=controls(state,actor,id);
+    if(!(state.combat.delayed||[]).some(d=>d.id===id))throw new Error(who.name+' n’a pas retardé son tour.');
+    const order=state.combat.order;const cur=activeId(state);const grp=x=>((state.combat.npcs||[]).find(n=>n.id===x)||{}).group||'';
+    let j=order.indexOf(cur);while(grp(cur)&&j+1<order.length&&grp(order[j+1])===grp(cur))j++;const target=order[j];
+    order.splice(order.indexOf(id),1);order.splice(order.indexOf(target)+1,0,id);state.combat.index=order.indexOf(cur);state.combat.manualOrder=true;
+    state.combat.delayed=state.combat.delayed.filter(d=>d.id!==id);noteTurn(state,who.name+' reprend son tour : il joue juste après '+(participants(state).find(x=>x.id===cur)?.name||'le tour en cours')+' (nouvelle place dans l’initiative)',!pc);return state;}
+  const clip=(v,max,label)=>{const t=String(v==null?'':v).replace(/[\u0000-\u001f]/g,' ').trim();if(t.length>max)throw new Error(label+' : '+max+' caractères maximum.');return t;};
+  function readyAction(state,actor,id,trigger,what,spell){if(!state.combat.started)throw new Error('Le combat n’a pas commencé.');const {who,pc}=controls(state,actor,id);
+    const tr=clip(trigger,140,'Déclencheur'),wh=clip(what,140,'Action');if(!tr)throw new Error('Décrivez le déclencheur (ce qui doit se produire).');if(!wh)throw new Error('Décrivez l’action préparée.');
+    if(pc){if(isBlocked(who))throw new Error('Ce personnage est incapable d’agir.');if(who.economy.action)throw new Error('L’action de ce tour est déjà utilisée.');who.economy.action=true;}
+    state.combat.readied=(state.combat.readied||[]).filter(r=>r.id!==id);state.combat.readied.push({id,trigger:tr,action:wh,spell:spell===true,round:state.combat.round});
+    noteTurn(state,who.name+' prépare une action : '+wh+' · déclencheur : '+tr+(spell?' (sort : concentration jusqu’au déclenchement)':''),!pc);return state;}
+  function readyResolve(state,actor,id,mode){const {who,pc}=controls(state,actor,id);const r=(state.combat.readied||[]).find(x=>x.id===id);if(!r)throw new Error('Aucune action préparée.');
+    if(mode==='use'){if(pc){if(isBlocked(who))throw new Error('Ce personnage est incapable d’agir.');if(who.economy.reaction)throw new Error('La réaction est déjà utilisée : l’action préparée ne peut pas être déclenchée.');who.economy.reaction=true;}}
+    else if(mode!=='cancel')throw new Error('Choix inconnu.');
+    state.combat.readied=state.combat.readied.filter(x=>x.id!==id);noteTurn(state,mode==='use'?who.name+' déclenche son action préparée : '+r.action+' (réaction utilisée)':who.name+' renonce à son action préparée',!pc);return state;}
   // Actions de repaire : au compte 20 de l'initiative (en perdant les égalités), une fois par round.
   function checkLair(state){const lair=(state.combat.npcs||[]).filter(n=>n.lair&&n.hp>0);if(!lair.length)return;const id=activeId(state);const p=participants(state).find(x=>x.id===id);
     if(!p||state.combat.lairRound===state.combat.round||Number(p.initiative)>=20)return;state.combat.lairRound=state.combat.round;state.combat.lairPending=lair.map(n=>n.id);
     state.combat.log.unshift({id:'lair-'+state.combat.round,msg:'Initiative 20 · actions de repaire : '+lair.map(n=>n.name).join(', '),when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),audience:'gm'});}
-  function endCombat(state,actor){if(actor!=='mj')throw new Error('Accès réservé au MJ.');state.combat.started=false;state.combat.timers=[];log(state,'Fin du combat');return state;}
+  function endCombat(state,actor){if(actor!=='mj')throw new Error('Accès réservé au MJ.');state.combat.started=false;state.combat.timers=[];state.combat.delayed=[];state.combat.readied=[];log(state,'Fin du combat');return state;}
   function setInitiative(state,actor,id,n){if(actor!=='mj')throw new Error('Accès réservé au MJ.');const p=findPc(state,id);if(!p)throw new Error('Personnage introuvable.');p.initiative=Math.floor(CLAMP(n,-99,99));if(!state.combat.started&&!state.combat.manualOrder)sortInitiative(state,actor);return state;}
   function spendType(state,actor,id,type){
     const p=requireEdit(state,actor,id);if(!['action','bonus','reaction'].includes(type))throw new Error('Type inconnu.');
@@ -243,6 +272,16 @@
   function toggleConcentration(state,actor,id,spell){const p=requireEdit(state,actor,id);if(isBlocked(p))throw new Error('Impossible de maintenir la concentration.');p.concentration=spell&&String(spell).trim().slice(0,80)||'';p.concentrationChecks=[];log(state,p.name+' · concentration '+(p.concentration||'terminée'));return state;}
   function changeResource(state,actor,id,rid,delta){const p=requireEdit(state,actor,id);const r=p.resources.find(r=>r.id===rid);if(!r)throw new Error('Ressource introuvable.');r.left=Math.floor(CLAMP(r.left+delta,0,r.max));log(state,p.name+' · '+r.name+' : '+r.left+'/'+r.max);return state;}
   function deathSave(state,actor,id,result){const p=requireEdit(state,actor,id);if(p.hp>0)throw new Error('Ce personnage a encore des PV.');const key=result==='success'?'success':result==='failure'?'failure':null;if(!key)throw new Error('Jet invalide.');p.deathSaves[key]=Math.min(3,p.deathSaves[key]+1);log(state,p.name+' · sauvegarde contre la mort : '+(key==='success'?'succès':'échec'));return state;}
+  /* 5.3 : inspiration héroïque (une seule à la fois). Le MJ l’accorde ou la retire ; le joueur la dépense
+     (aucun dé n’est lancé ici : on note seulement qu’elle est utilisée) ou la donne à un autre personnage qui n’en a pas. */
+  function setInspiration(state,actor,id,mode,targetId){
+    if(mode==='give'||mode==='remove'){if(actor!=='mj')throw new Error('Seul le MJ accorde ou retire l’inspiration.');const p=findPc(state,id);if(!p)throw new Error('Personnage introuvable.');
+      if(mode==='give'){if(p.inspiration)throw new Error(p.name+' a déjà l’inspiration.');p.inspiration=true;log(state,p.name+' · reçoit l’inspiration héroïque');}
+      else{if(!p.inspiration)throw new Error(p.name+' n’a pas l’inspiration.');p.inspiration=false;log(state,p.name+' · inspiration retirée');}return state;}
+    const p=requireEdit(state,actor,id);if(!p.inspiration)throw new Error(p.name+' n’a pas l’inspiration.');
+    if(mode==='use'){p.inspiration=false;log(state,p.name+' · utilise son inspiration héroïque');return state;}
+    if(mode==='pass'){const t=findPc(state,targetId);if(!t||t.id===p.id)throw new Error('Personnage introuvable.');if(t.inspiration)throw new Error(t.name+' a déjà l’inspiration.');p.inspiration=false;t.inspiration=true;log(state,p.name+' · donne son inspiration à '+t.name);return state;}
+    throw new Error('Action d’inspiration inconnue.');}
   function rest(state,actor,id,type){const p=requireEdit(state,actor,id);if(!['short','long'].includes(type))throw new Error('Repos inconnu.');if(p.hp<=0)throw new Error('Repos impossible à 0 PV.');for(const r of p.resources){if(type==='long'||r.rest==='short')r.left=r.max;}if(type==='long'){p.hp=p.stats.hp;p.deathSaves={success:0,failure:0};p.exhaustion=Math.max(0,p.exhaustion-1);/* Dés de vie : tous en 2024, la moitié du niveau (au moins 1) en 2014. */p.hitDiceUsed=state.edition==='2024'?0:Math.max(0,(p.hitDiceUsed||0)-Math.max(1,Math.floor((p.level||1)/2)));}log(state,p.name+' · repos '+(type==='long'?'long':'court')+' (ressources appropriées restaurées)');return state;}
   function sharedNotesList(state){if(!Array.isArray(state.sharedNotes))state.sharedNotes=[];return state.sharedNotes;}
   function saveSharedNote(state,actor,id,title,body,baseAt){
@@ -268,5 +307,5 @@
     if(!data||data.schemaVersion!==4||!Array.isArray(data.characters)||!data.combat||!data.characters.every(p=>typeof p.id==='string'&&typeof p.name==='string'&&p.stats&&Number.isFinite(+p.hp)&&Array.isArray(p.abilities)&&Array.isArray(p.resources)&&Array.isArray(p.conditions)&&p.economy))throw new Error('Fichier V0.4 invalide ou non compatible.');
     return true;
   }
-  return {STATES,CORE_ACTIONS,initialState,clone,findPc,actorPc,canViewDetail,canEdit,actionSet,abilityModifier,proficiencyBonus,baseRulesSummary,summary,isBlocked,speedAvailable,abilityAvailable,startCombat,nextTurn,setConditionTimer,saveSharedNote,deleteSharedNote,endCombat,activeId,setInitiative,sortInitiative,moveInitiative,concentrationDC,resolveConcentration,spendType,resetEconomy,useAbility,updateMovement,changeHp,setTempHp,setExhaustion,DAMAGE_TYPES,DEFENSE_STATES,cleanDefenses,adjustDamage,setDefense,toggleCondition,toggleConcentration,changeResource,deathSave,rest,setPrivateNotes,addPc,validImport};
+  return {STATES,CORE_ACTIONS,initialState,clone,findPc,actorPc,canViewDetail,canEdit,actionSet,abilityModifier,proficiencyBonus,baseRulesSummary,summary,isBlocked,speedAvailable,abilityAvailable,startCombat,nextTurn,setConditionTimer,saveSharedNote,deleteSharedNote,endCombat,activeId,setInitiative,sortInitiative,moveInitiative,concentrationDC,resolveConcentration,spendType,resetEconomy,useAbility,updateMovement,changeHp,setTempHp,setExhaustion,setInspiration,delayTurn,actNow,readyAction,readyResolve,DAMAGE_TYPES,DEFENSE_STATES,cleanDefenses,adjustDamage,setDefense,toggleCondition,toggleConcentration,changeResource,deathSave,rest,setPrivateNotes,addPc,validImport};
 });

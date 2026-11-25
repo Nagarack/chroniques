@@ -1,0 +1,24 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const P=require('../src/progression.js');global.ChroniquesProgression=P;const CG=require('../src/class-guide.js');
+const pc=(o={})=>({level:5,job:'Paladin',stats:{abilities:{str:15,dex:10,con:14,int:8,wis:12,cha:14}},progression:{classId:'paladin'},...o});
+test('multiclassage : niveau de lanceur combiné 2014 / 2024',()=>{const p=pc();P.multiclass(p,'add',{classId:'sorcerer',level:2});
+ assert.strictEqual(P.classLabel(p),'Paladin 3 / Ensorceleur 2');assert.deepStrictEqual(P.spellsFor(p,'2014').slots,[4,2]);assert.deepStrictEqual(P.spellsFor(p,'2024').slots,[4,3]);
+ // Une seule classe avec l’aptitude Sorts : sa propre table.
+ const q=pc();P.multiclass(q,'add',{classId:'fighter',level:2});assert.deepStrictEqual(P.spellsFor(q,'2014').slots,P.slotsFor('paladin',3,'2014').slots);
+ assert.deepStrictEqual(P.hitDice(q),[{die:10,count:5}]);});
+test('multiclassage : magie de pacte à part, repos court',()=>{const w={level:6,job:'Occultiste',progression:{classId:'warlock',multiclass:[{classId:'wizard',level:3}],spentSlots:{}}};
+ const sp=P.spellsFor(w,'2014');assert.strictEqual(sp.kind,'mixed');assert.deepStrictEqual(sp.slots,[4,2]);assert.deepStrictEqual(sp.pact,{slots:[2],slotLevel:2});
+ P.spendSlot(w,'2014','pact',1);P.spendSlot(w,'2014','1',1);P.recoverSlots(w,'2014','short');assert.strictEqual(w.progression.spentSlots.pact,undefined);assert.strictEqual(w.progression.spentSlots['1'],1);
+ assert.deepStrictEqual(P.hitDice(w),[{die:8,count:3},{die:6,count:3}]);});
+test('multiclassage : prérequis et limites',()=>{const p=pc();assert.ok(P.canMulticlass(p,'warlock').ok);assert.deepStrictEqual(P.canMulticlass(p,'monk').missing,['Moine : Dextérité 13 et Sagesse 13']);
+ assert.throws(()=>P.multiclass(p,'add',{classId:'paladin'}),/départ/);assert.throws(()=>P.multiclass(p,'add',{classId:'rogue',level:5}),/au moins un niveau/);
+ P.multiclass(p,'add',{classId:'rogue'});assert.throws(()=>P.multiclass(p,'level',{classId:'rogue',level:5}),/au moins un niveau/);P.multiclass(p,'remove',{classId:'rogue'});assert.strictEqual(p.progression.multiclass,undefined);});
+test('multiclassage : aperçu de montée de niveau dans une autre classe',()=>{const p=pc();const v=CG.levelUpPreview(p,'2014','warlock');assert.strictEqual(v.hitDie,8);assert.strictEqual(v.newClass,true);assert.ok(v.changes.some(x=>/Armures légères, armes courantes/.test(x)));});
+test('multiclassage : action serveur et montée de niveau',async t=>{const f=await require('./_fixture.js').fixture(t);
+ const st=(await f.call('/api/state',{cookie:f.gm})).data.state;const a=st.characters.find(p=>p.id===f.a.id);
+ let r=await f.action('levelUp',{id:a.id,hpGain:5,classId:'rogue'},f.pa);assert.strictEqual(r.status,200,JSON.stringify(r.data));
+ let s2=(await f.call('/api/state',{cookie:f.pa})).data.state;let me=s2.characters.find(p=>p.id===a.id);assert.strictEqual(me.level,a.level+1);assert.deepStrictEqual(me.progression.multiclass,[{classId:'rogue',level:1,subclass:''}]);
+ r=await f.action('multiclass',{id:a.id,op:'subclass',classId:'rogue',subclass:'Voleur'},f.pb);assert.strictEqual(r.status,403);
+ r=await f.action('multiclass',{id:a.id,op:'subclass',classId:'rogue',subclass:'Voleur'},f.pa);assert.strictEqual(r.status,200);
+ r=await f.action('levelUp',{id:a.id,hpGain:5,classId:'zzz'},f.pa);assert.strictEqual(r.status,400);
+ s2=(await f.call('/api/state',{cookie:f.pa})).data.state;me=s2.characters.find(p=>p.id===a.id);assert.strictEqual(me.level,a.level+1,'niveau inchangé après une erreur');});

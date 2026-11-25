@@ -1,0 +1,27 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const L=require('../src/logic.js');
+function fight(){const s=L.initialState();s.characters.forEach((p,i)=>p.initiative=20-i);s.combat.npcs=[{id:'npc-a',name:'Gobelin',hp:7,hpMax:7,initiative:5,conditions:[],visibility:'public'}];L.startCombat(s,'mj');return s;}
+test('retarder puis agir maintenant',()=>{const s=fight();const [a,b]=s.characters;assert.strictEqual(L.activeId(s),a.id);
+ assert.throws(()=>L.delayTurn(s,b.owner,b.id),/propre tour/);
+ L.delayTurn(s,a.owner,a.id);assert.strictEqual(L.activeId(s),b.id);assert.ok(s.combat.delayed.some(d=>d.id===a.id));
+ L.actNow(s,a.owner,a.id);assert.strictEqual(L.activeId(s),b.id);const o=s.combat.order;assert.strictEqual(o[o.indexOf(b.id)+1],a.id);
+ L.nextTurn(s,'mj');assert.strictEqual(L.activeId(s),a.id);assert.strictEqual(s.combat.delayed.length,0);});
+test('tour retardé perdu au round suivant',()=>{const s=fight();const [a]=s.characters;L.delayTurn(s,a.owner,a.id);
+ for(let i=0;i<s.combat.order.length-1;i++)L.nextTurn(s,'mj');assert.strictEqual(L.activeId(s),a.id);assert.strictEqual(s.combat.delayed.length,0);assert.ok(s.combat.log.some(e=>/perdu/.test(e.msg)));});
+test('préparer une action : action, puis réaction',()=>{const s=fight();const [a]=s.characters;
+ assert.throws(()=>L.readyAction(s,a.owner,a.id,'','tirer'),/déclencheur/);
+ L.readyAction(s,a.owner,a.id,'si la porte s’ouvre','je tire');assert.strictEqual(a.economy.action,true);
+ assert.throws(()=>L.readyAction(s,a.owner,a.id,'x','y'),/déjà utilisée/);
+ L.nextTurn(s,'mj');L.readyResolve(s,a.owner,a.id,'use');assert.strictEqual(a.economy.reaction,true);assert.strictEqual(s.combat.readied.length,0);});
+test('action préparée perdue au début du tour suivant',()=>{const s=fight();const [a]=s.characters;L.readyAction(s,a.owner,a.id,'x','y');
+ for(let i=0;i<s.combat.order.length;i++)L.nextTurn(s,'mj');assert.strictEqual(L.activeId(s),a.id);assert.strictEqual(s.combat.readied.length,0);});
+test('actions préparées des créatures cachées aux joueurs',async t=>{const f=await require('./_fixture.js').fixture(t);
+ const st=(await f.call('/api/state',{cookie:f.gm})).data.state;
+ let r=await f.action('npcAdd',{values:{name:'Gobelin',kind:'monstre',hpMax:7,ac:13,initiative:30,speed:9,visibility:'public',showHp:false,notes:'',actions:''}});assert.strictEqual(r.status,200,JSON.stringify(r.data));
+ r=await f.action('start',{});assert.strictEqual(r.status,200);
+ const gs=(await f.call('/api/state',{cookie:f.gm})).data.state;const npc=gs.combat.npcs[0];assert.strictEqual(gs.combat.order[gs.combat.index],npc.id);
+ r=await f.action('readyAction',{id:npc.id,trigger:'si quelqu’un entre',what:'attaque'});assert.strictEqual(r.status,200,JSON.stringify(r.data));
+ r=await f.action('readyAction',{id:npc.id,trigger:'x',what:'y'},f.pa);assert.notStrictEqual(r.status,200);
+ const pl=(await f.call('/api/state',{cookie:f.pa})).data.state;assert.strictEqual(pl.combat.readied.length,0);assert.ok(!pl.combat.log.some(e=>/prépare/.test(e.msg)));
+ r=await f.action('charterOptions',{values:{delay:false}});assert.strictEqual(r.status,200);
+ r=await f.action('delayTurn',{id:npc.id});assert.strictEqual(r.status,400);});
