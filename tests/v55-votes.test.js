@@ -1,0 +1,13 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const V=require('../src/table-votes.js');
+test('votes : décompte, changement d’avis, égalité',()=>{const s={};assert.throws(()=>V.start(s,'v1',{question:'Où ?',options:['A']}),/2 à 8/);assert.throws(()=>V.start(s,'v1',{question:'Où ?',options:['A','a']}),/identiques/);
+ V.start(s,'v1',{question:'Où ?',options:['Forêt','Port','Tour']});V.cast(s,'u1','o1');V.cast(s,'u2','o2');V.cast(s,'u2','o1');let t=V.tally(s.votes.active);assert.deepStrictEqual([t.counts.o1,t.counts.o2,t.total],[2,0,2]);
+ V.cast(s,'u3','o3');V.cast(s,'u1',null);t=V.tally(s.votes.active);assert.deepStrictEqual(t.winners,['o1','o3']);const r=V.close(s);assert.strictEqual(r.tally.total,2);assert.strictEqual(s.votes.active,null);});
+test('votes : anonymat et projection',async t=>{const f=await require('./_fixture.js').fixture(t);
+ let r=await f.action('voteStart',{values:{question:'Où ?',options:['Forêt','Port'],anonymous:true}},f.pa);assert.strictEqual(r.status,403);
+ r=await f.action('voteStart',{values:{question:'Où ?',options:['Forêt','Port'],anonymous:true}});assert.strictEqual(r.status,200);
+ r=await f.action('voteCast',{optionId:'o2'},f.pa);assert.strictEqual(r.status,200);r=await f.action('voteCast',{optionId:'o2'},f.pb);assert.strictEqual(r.status,200);
+ const gm=(await f.call('/api/state',{cookie:f.gm})).data.state.votes.active;assert.strictEqual(gm.tally.counts.o2,2);assert.strictEqual(gm.voters,undefined);assert.strictEqual(gm.ballots,undefined);
+ const pa=(await f.call('/api/state',{cookie:f.pa})).data.state.votes.active;assert.strictEqual(pa.mine,'o2');
+ r=await f.action('voteClose',{});assert.strictEqual(r.status,200);const log=(await f.call('/api/state',{cookie:f.gm})).data.state.combat.log;assert.ok(log.some(e=>/Vote · Où \? · Port \(2 voix sur 2\)/.test(e.msg)));
+ r=await f.action('voteStart',{values:{question:'Qui ?',options:['A','B']}});r=await f.action('voteCast',{optionId:'o1'},f.pa);const pb=(await f.call('/api/state',{cookie:f.pb})).data.state.votes.active;assert.strictEqual(pb.voters.o1.length,1);});

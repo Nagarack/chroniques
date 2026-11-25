@@ -20,7 +20,7 @@ function row(pc){const ab=pc.stats?.abilities||{};const pb=prof(pc.level);const 
  return {id:pc.id,name:pc.name,cls,level:pc.level,ac:pc.stats?.ac,hp:pc.hp,hpMax:pc.stats?.hp,tempHp:pc.tempHp||0,speed:pc.speed,
   perception:passive('perception')??(Number.isInteger(pc.stats?.passive)?pc.stats.passive:null),investigation:passive('investigation'),insight:passive('intuition'),
   saves,spellDc:dc,spellAbility:sa||'',conditions:pc.conditions||[],concentration:pc.concentration||'',exhaustion:pc.exhaustion||0,inspiration:!!pc.inspiration,mc:P&&P.isMulticlass&&P.isMulticlass(pc)?P.classLabel(pc):''};}
-function rows(state){return (state.characters||[]).map(row);}
+function rows(state){return (state.characters||[]).filter(p=>!p.fallen).map(row);}
 function partyView({state,h}){const {esc,attr}=h;const list=rows(state);if(!list.length)return '<p class="empty">Aucun personnage.</p>';
  const best=k=>{const v=list.map(r=>r[k]).filter(x=>x!=null);return v.length?Math.max(...v):null;};
  const top={perception:best('perception'),investigation:best('investigation'),insight:best('insight')};

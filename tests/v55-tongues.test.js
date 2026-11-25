@@ -1,0 +1,11 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const T=require('../src/tongues.js');
+test('langues : liste, locuteurs, brouillage',()=>{const pc={};T.setLanguages(pc,['Commun','elfique','Elfique ']);assert.deepStrictEqual(pc.languages,['Commun','elfique']);assert.ok(T.speaks(pc,'ELFIQUE'));
+ const s={};const m=T.send(s,'tg-1',{language:'Elfique',title:'Porte',text:'Mellon, entre ami.'});const g=T.garble(m);assert.strictEqual([...g].length,[...m.text].length);assert.ok(!/[a-z]/i.test(g.replace(/[ ,.]/g,'')));
+ assert.strictEqual(T.projected(s,[pc])[0].text,'Mellon, entre ami.');const other=T.projected(s,[{languages:['Nain']}])[0];assert.strictEqual(other.readable,false);assert.notStrictEqual(other.text,m.text);});
+test('langues : le texte ne part qu’aux locuteurs',async t=>{const f=await require('./_fixture.js').fixture(t);
+ let r=await f.action('languagesSet',{id:f.a.id,languages:['Commun','Draconique']},f.pa);assert.strictEqual(r.status,200);
+ r=await f.action('tongueSend',{values:{language:'Draconique',title:'Inscription',text:'Le trésor est sous la statue.'}},f.pa);assert.strictEqual(r.status,403);
+ r=await f.action('tongueSend',{values:{language:'Draconique',title:'Inscription',text:'Le trésor est sous la statue.'}});assert.strictEqual(r.status,200);
+ const a=(await f.call('/api/state',{cookie:f.pa})).data.state.tongueMessages[0];assert.strictEqual(a.text,'Le trésor est sous la statue.');
+ const raw=JSON.stringify((await f.call('/api/state',{cookie:f.pb})).data.state);assert.ok(!raw.includes('trésor est sous'));});

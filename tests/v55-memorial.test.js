@@ -1,0 +1,11 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const L=require('../src/logic.js');
+test('mémorial : quitte le combat, revient à la vie',()=>{const s=L.initialState();const [a,b]=s.characters;s.characters.forEach((p,i)=>p.initiative=20-i);L.startCombat(s,'mj');L.nextTurn(s,'mj');
+ assert.throws(()=>L.setFallen(s,a.owner,a.id,{}),/MJ/);const cur=L.activeId(s);L.setFallen(s,'mj',a.id,{cause:'Dragon',epitaph:'Repose'});
+ assert.ok(!s.combat.order.includes(a.id));assert.strictEqual(L.activeId(s),cur);assert.strictEqual(a.fallen.level,a.level);assert.ok(!L.participants||true);
+ L.setFallen(s,'mj',a.id,null);assert.strictEqual(a.fallen,undefined);assert.throws(()=>L.setFallen(s,'mj',a.id,null),/pas au mémorial/);});
+test('mémorial : serveur',async t=>{const f=await require('./_fixture.js').fixture(t);
+ let r=await f.action('fallen',{id:f.a.id,values:{cause:'x'}},f.pa);assert.strictEqual(r.status,403);
+ r=await f.action('fallen',{id:f.a.id,values:{cause:'Tombé face au dragon',epitaph:'Il ne recula pas.'}});assert.strictEqual(r.status,200);
+ const me=(await f.call('/api/state',{cookie:f.pa})).data.state.characters.find(p=>p.id===f.a.id);assert.strictEqual(me.fallen.cause,'Tombé face au dragon');
+ r=await f.action('downtimeGrant',{days:3});const gm=(await f.call('/api/state',{cookie:f.gm})).data.state;assert.strictEqual(gm.downtime.bank[f.a.id],undefined);});

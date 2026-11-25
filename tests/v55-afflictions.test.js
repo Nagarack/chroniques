@@ -1,0 +1,14 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const A=require('../src/afflictions.js');
+test('afflictions : exemples du SRD et sauvegardes',()=>{assert.strictEqual(A.catalog().length,17);const pc={};
+ const x=A.add(pc,'a1',{ref:'Fièvre rieuse'});assert.strictEqual(x.dc,13);assert.strictEqual(x.kind,'disease');assert.strictEqual(A.view(x,'en').name,'Cackle Fever');
+ assert.throws(()=>A.add(pc,'a2',{name:''}),/nom/);const y=A.add(pc,'a2',{name:'Fièvre des marais',kind:'disease',dc:12});assert.strictEqual(y.dc,12);
+ A.save(pc,'a1',true);A.save(pc,'a1',false);A.save(pc,'a1',true);assert.deepStrictEqual([x.successes,x.failures],[2,1]);A.undoSave(pc,'a1',true);assert.strictEqual(x.successes,1);
+ A.cure(pc,'a1');A.cure(pc,'a2');assert.strictEqual(pc.afflictions,undefined);});
+test('afflictions : le MJ inflige, le joueur note ses sauvegardes',async t=>{const f=await require('./_fixture.js').fixture(t);
+ let r=await f.action('afflictionAdd',{id:f.a.id,values:{ref:'Venin de serpent'}},f.pa);assert.strictEqual(r.status,403);
+ r=await f.action('afflictionAdd',{id:f.a.id,values:{ref:'Venin de serpent'}});assert.strictEqual(r.status,200);
+ let me=(await f.call('/api/state',{cookie:f.pa})).data.state.characters.find(p=>p.id===f.a.id);const id=me.afflictions[0].id;
+ r=await f.action('afflictionSave',{id:f.a.id,afflictionId:id,success:true},f.pb);assert.strictEqual(r.status,403);
+ r=await f.action('afflictionSave',{id:f.a.id,afflictionId:id,success:true},f.pa);assert.strictEqual(r.status,200);
+ r=await f.action('afflictionCure',{id:f.a.id,afflictionId:id},f.pa);assert.strictEqual(r.status,403);r=await f.action('afflictionCure',{id:f.a.id,afflictionId:id});assert.strictEqual(r.status,200);});

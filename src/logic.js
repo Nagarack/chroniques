@@ -91,7 +91,7 @@
     };
   }
   function log(state,msg){state.combat.log.unshift({id:Math.random().toString(36).slice(2,11),msg,when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});state.combat.log=state.combat.log.slice(0,60);}
-  function participants(state){return [...state.characters,...(state.combat.npcs||[])];}
+  function participants(state){return [...state.characters.filter(p=>!p.fallen),...(state.combat.npcs||[])];}
   function startCombat(state,actor) {
     if(actor!=='mj')throw new Error('Seul le MJ gère l’initiative dans cette démonstration.');
     state.combat.round=1;state.combat.index=0;state.combat.delayed=[];state.combat.readied=[];
@@ -282,6 +282,14 @@
     if(mode==='use'){p.inspiration=false;log(state,p.name+' · utilise son inspiration héroïque');return state;}
     if(mode==='pass'){const t=findPc(state,targetId);if(!t||t.id===p.id)throw new Error('Personnage introuvable.');if(t.inspiration)throw new Error(t.name+' a déjà l’inspiration.');p.inspiration=false;t.inspiration=true;log(state,p.name+' · donne son inspiration à '+t.name);return state;}
     throw new Error('Action d’inspiration inconnue.');}
+  /* 5.5 : mémorial. Un personnage tombé quitte le combat et les listes du groupe, mais sa fiche reste consultable. */
+  function setFallen(state,actor,id,v){if(actor!=='mj')throw new Error('Seul le MJ inscrit un personnage au mémorial.');const p=findPc(state,id);if(!p)throw new Error('Personnage introuvable.');
+    const txt=(x,label,max)=>{const t=String(x??'').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'').trim();if(t.length>max)throw new Error(label+' : '+max+' caractères maximum.');return t;};
+    if(v===null){if(!p.fallen)throw new Error(p.name+' n’est pas au mémorial.');delete p.fallen;log(state,p.name+' revient parmi les vivants');return state;}
+    p.fallen={at:new Date().toISOString(),level:p.level,cause:txt(v?.cause,'Circonstances',200),epitaph:txt(v?.epitaph,'Épitaphe',300)};
+    const c=state.combat;const i=c.order.indexOf(id);if(i>=0){const cur=c.order[c.index];c.order.splice(i,1);const j=c.order.indexOf(cur);c.index=j>=0?j:Math.min(c.index,Math.max(0,c.order.length-1));}
+    c.delayed=(c.delayed||[]).filter(d=>d.id!==id);c.readied=(c.readied||[]).filter(r=>r.id!==id);
+    log(state,'✝ '+p.name+' est tombé'+(p.fallen.cause?' · '+p.fallen.cause:''));return state;}
   function rest(state,actor,id,type){const p=requireEdit(state,actor,id);if(!['short','long'].includes(type))throw new Error('Repos inconnu.');if(p.hp<=0)throw new Error('Repos impossible à 0 PV.');for(const r of p.resources){if(type==='long'||r.rest==='short')r.left=r.max;}if(type==='long'){p.hp=p.stats.hp;p.deathSaves={success:0,failure:0};p.exhaustion=Math.max(0,p.exhaustion-1);/* Dés de vie : tous en 2024, la moitié du niveau (au moins 1) en 2014. */p.hitDiceUsed=state.edition==='2024'?0:Math.max(0,(p.hitDiceUsed||0)-Math.max(1,Math.floor((p.level||1)/2)));}log(state,p.name+' · repos '+(type==='long'?'long':'court')+' (ressources appropriées restaurées)');return state;}
   function sharedNotesList(state){if(!Array.isArray(state.sharedNotes))state.sharedNotes=[];return state.sharedNotes;}
   function saveSharedNote(state,actor,id,title,body,baseAt){
@@ -307,5 +315,5 @@
     if(!data||data.schemaVersion!==4||!Array.isArray(data.characters)||!data.combat||!data.characters.every(p=>typeof p.id==='string'&&typeof p.name==='string'&&p.stats&&Number.isFinite(+p.hp)&&Array.isArray(p.abilities)&&Array.isArray(p.resources)&&Array.isArray(p.conditions)&&p.economy))throw new Error('Fichier V0.4 invalide ou non compatible.');
     return true;
   }
-  return {STATES,CORE_ACTIONS,initialState,clone,findPc,actorPc,canViewDetail,canEdit,actionSet,abilityModifier,proficiencyBonus,baseRulesSummary,summary,isBlocked,speedAvailable,abilityAvailable,startCombat,nextTurn,setConditionTimer,saveSharedNote,deleteSharedNote,endCombat,activeId,setInitiative,sortInitiative,moveInitiative,concentrationDC,resolveConcentration,spendType,resetEconomy,useAbility,updateMovement,changeHp,setTempHp,setExhaustion,setInspiration,delayTurn,actNow,readyAction,readyResolve,DAMAGE_TYPES,DEFENSE_STATES,cleanDefenses,adjustDamage,setDefense,toggleCondition,toggleConcentration,changeResource,deathSave,rest,setPrivateNotes,addPc,validImport};
+  return {STATES,CORE_ACTIONS,initialState,clone,findPc,actorPc,canViewDetail,canEdit,actionSet,abilityModifier,proficiencyBonus,baseRulesSummary,summary,isBlocked,speedAvailable,abilityAvailable,startCombat,nextTurn,setConditionTimer,saveSharedNote,deleteSharedNote,endCombat,activeId,setInitiative,sortInitiative,moveInitiative,concentrationDC,resolveConcentration,spendType,resetEconomy,useAbility,updateMovement,changeHp,setTempHp,setExhaustion,setInspiration,setFallen,delayTurn,actNow,readyAction,readyResolve,DAMAGE_TYPES,DEFENSE_STATES,cleanDefenses,adjustDamage,setDefense,toggleCondition,toggleConcentration,changeResource,deathSave,rest,setPrivateNotes,addPc,validImport};
 });

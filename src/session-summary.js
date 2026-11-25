@@ -10,7 +10,16 @@ const XP={'0':10,'1/8':25,'1/4':50,'1/2':100,'1':200,'2':450,'3':700,'4':1100,'5
 function blank(now){return {id:'seance-'+now.toString(36),startedAt:new Date(now).toISOString(),lastAt:new Date(now).toISOString(),published:false,combats:0,rounds:0,pcs:{},defeated:[],events:[]};}
 function pcStats(ss,pc){return ss.pcs[pc.id]||(ss.pcs[pc.id]={name:pc.name,damage:0,healing:0,downs:0});}
 function event(ss,text,audience){ss.events.push({at:new Date().toISOString(),text:String(text).slice(0,200),...(audience==='gm'?{audience:'gm'}:{})});if(ss.events.length>MAX_EVENTS)ss.events.splice(0,ss.events.length-MAX_EVENTS);}
-function archive(state){const ss=state.sessionStats;if(!ss)return;const meaningful=ss.combats||ss.events.length||ss.defeated.length||Object.values(ss.pcs||{}).some(p=>p.damage||p.healing||p.downs);if(meaningful){if(!Array.isArray(state.sessionHistory))state.sessionHistory=[];state.sessionHistory.unshift({...ss,endedAt:ss.lastAt});state.sessionHistory=state.sessionHistory.slice(0,MAX_HISTORY);}state.sessionStats=null;}
+// 5.5 : totaux de campagne, cumulés à chaque fin de séance (les anciennes séances servent de point de départ).
+function addSession(t,ss){t.sessions++;const a=Date.parse(ss.startedAt),b=Date.parse(ss.endedAt||ss.lastAt);if(b>a)t.minutes+=Math.round((b-a)/60000);t.combats+=ss.combats||0;t.rounds+=ss.rounds||0;
+ for(const d of ss.defeated||[]){t.defeated++;t.xp+=d.xp||0;}for(const [id,p] of Object.entries(ss.pcs||{})){const x=t.pcs[id]||(t.pcs[id]={name:p.name,damage:0,healing:0,downs:0});x.name=p.name;x.damage+=p.damage||0;x.healing+=p.healing||0;x.downs+=p.downs||0;}
+ if(!t.firstAt||String(ss.startedAt)<t.firstAt)t.firstAt=ss.startedAt;return t;}
+function emptyTotals(){return {sessions:0,minutes:0,combats:0,rounds:0,defeated:0,xp:0,pcs:{},firstAt:null};}
+function seedTotals(state){if(state.campaignTotals)return state.campaignTotals;const t=emptyTotals();for(const ss of state.sessionHistory||[])addSession(t,ss);return state.campaignTotals=t;}
+// Totaux affichés : séances terminées + séance en cours.
+function totals(state){const base=JSON.parse(JSON.stringify(state.campaignTotals||(()=>{const t=emptyTotals();for(const ss of state.sessionHistory||[])addSession(t,ss);return t;})()));const ss=state.sessionStats;
+ if(ss&&(ss.combats||ss.events.length||ss.defeated.length))addSession(base,ss);return base;}
+function archive(state){const ss=state.sessionStats;if(!ss)return;const meaningful=ss.combats||ss.events.length||ss.defeated.length||Object.values(ss.pcs||{}).some(p=>p.damage||p.healing||p.downs);if(meaningful){seedTotals(state);addSession(state.campaignTotals,{...ss,endedAt:ss.lastAt});if(!Array.isArray(state.sessionHistory))state.sessionHistory=[];state.sessionHistory.unshift({...ss,endedAt:ss.lastAt});state.sessionHistory=state.sessionHistory.slice(0,MAX_HISTORY);}state.sessionStats=null;}
 function current(state,now=Date.now()){let ss=state.sessionStats;if(ss&&now-Date.parse(ss.lastAt)>GAP_MS){archive(state);ss=null;}if(!ss)ss=state.sessionStats=blank(now);return ss;}
 function startNew(state,now=Date.now()){archive(state);state.sessionStats=blank(now);return state.sessionStats;}
 const pcHp=p=>Number(p&&p.hp)||0;
@@ -57,5 +66,5 @@ function text(ss,opts={}){if(!ss)return '';const l=lines(ss,opts);return 'Résum
 function projected(state){const keep=ss=>ss&&ss.published?{id:ss.id,startedAt:ss.startedAt,lastAt:ss.lastAt,published:true,combats:ss.combats,rounds:ss.rounds,pcs:ss.pcs,defeated:ss.defeated.filter(d=>d.visible).map(d=>({name:d.name,visible:true})),events:ss.events.filter(e=>e.audience!=='gm')}:null;
  return {sessionStats:keep(state.sessionStats),sessionHistory:(state.sessionHistory||[]).map(keep).filter(Boolean)};}
 function publish(state,id,value){const ss=state.sessionStats&&state.sessionStats.id===id?state.sessionStats:(state.sessionHistory||[]).find(x=>x.id===id);if(!ss){const e=new Error('Séance introuvable.');e.status=400;throw e;}ss.published=!!value;return ss;}
-return {observe,current,startNew,lines,text,projected,publish,XP,GAP_MS};
+return {observe,current,startNew,lines,text,projected,publish,totals,XP,GAP_MS};
 });

@@ -19,6 +19,18 @@ function validate(v){if(!v||typeof v!=='object'||Array.isArray(v))throw new Erro
  if(chargesMax&&recharge){out.recharge=recharge;if(rechargeDice)out.rechargeDice=rechargeDice;}return out;
 }
 const RECHARGE=['dawn','long','short'];
+// 5.5 : objets mystérieux. name/description = ce que voit le joueur ; secret = vraie nature (MJ seulement).
+function setSecret(item,v){if(v===null){delete item.secret;delete item.unidentified;delete item.curseRevealed;return item;}
+ const t=(x,label,max)=>{const r=String(x??'').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'').trim();if(r.length>max)throw new Error(label+' : '+max+' caractères maximum.');return r;};
+ const name=t(v?.name,'Vrai nom',85),description=t(v?.description,'Vraie description',280),curse=t(v?.curse,'Malédiction',280);
+ if(!name&&!curse)throw new Error('Indiquez le vrai nom ou la malédiction.');item.secret={name,description,curse};item.unidentified=!!name;if(!curse)delete item.curseRevealed;return item;}
+function identify(item){if(!item.secret||!item.unidentified)throw new Error('Cet objet est déjà identifié.');item.name=item.secret.name;if(item.secret.description)item.description=item.secret.description;item.unidentified=false;
+ if(!item.secret.curse)delete item.secret;return item;}
+function revealCurse(item){if(!item.secret?.curse)throw new Error('Cet objet n’est pas maudit.');item.curseRevealed=true;return item;}
+function liftCurse(item){if(!item.secret?.curse)throw new Error('Cet objet n’est pas maudit.');item.secret.curse='';delete item.curseRevealed;if(!item.unidentified)delete item.secret;return item;}
+// Objet maudit porté ou harmonisé : impossible de s’en séparer (sauf MJ).
+function curseLocked(item){return !!(item&&item.secret&&item.secret.curse&&(item.attuned||item.equipped));}
+function playerView(item){const out={...item};const s=item.secret;delete out.secret;if(s&&s.curse&&item.curseRevealed)out.curse=s.curse;return out;}
 // Après un repos : recharge complète automatique, ou objet « à recharger » (dés à lancer) si une formule est indiquée.
 function restRecharge(pc,type){const done=[],pending=[];for(const it of list(pc)){if(!it.recharge||!it.chargesMax||it.charges>=it.chargesMax)continue;
   const ok=type==='long'?['dawn','long','short'].includes(it.recharge):type==='short'&&it.recharge==='short';if(!ok)continue;
@@ -36,5 +48,5 @@ function stash(state){if(!Array.isArray(state.lootStash))state.lootStash=[];retu
 function lootAdd(state,id,v){const arr=stash(state);if(arr.length>=100)throw new Error('Maximum 100 lots de trésor.');const item={id,...validate(v)};arr.push(item);return item;}
 function lootRemove(state,id){const arr=stash(state),i=arr.findIndex(x=>x.id===id);if(i<0)throw new Error('Lot introuvable.');return arr.splice(i,1)[0];}
 function give(state,pc,lootId,newId,quantity){const arr=stash(state),source=arr.find(x=>x.id===lootId);if(!source)throw new Error('Lot introuvable.');integer(quantity,1,999,'Quantité attribuée');if(quantity>source.quantity)throw new Error('Quantité insuffisante.');const item=add(pc,newId,{...source,quantity});source.quantity-=quantity;if(source.quantity===0)arr.splice(arr.indexOf(source),1);return item;}
-return {CATEGORIES,LABELS,MONEY,RECHARGE,restRecharge,rechargeRange,recharge,list,items,validate,add,update,adjust,money,stash,lootAdd,lootRemove,give};
+return {CATEGORIES,LABELS,MONEY,RECHARGE,setSecret,identify,revealCurse,liftCurse,curseLocked,playerView,restRecharge,rechargeRange,recharge,list,items,validate,add,update,adjust,money,stash,lootAdd,lootRemove,give};
 });

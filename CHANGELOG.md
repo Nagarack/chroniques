@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 5.5.0 — Votes, objets mystérieux, maladies et poisons, langues, mémorial, statistiques, spectateur, hexagones
+**À la table**
+- **Votes de table** : le MJ pose une question (2 à 8 réponses) depuis la page Combat ou Séance du jour ; chacun vote depuis son appareil et peut changer d’avis. Vote anonyme possible : personne, pas même le MJ, ne voit qui a voté quoi. Résultat noté au journal.
+- **Objets non identifiés ou maudits** : sur un objet d’inventaire, le MJ indique la vraie nature et une éventuelle malédiction. Le joueur voit le nom apparent (« ❔ ») jusqu’à l’identification ; un objet maudit porté ou harmonisé ne peut plus être retiré, donné ni déposé. Boutons Identifier, Révéler la malédiction, Lever la malédiction. La vraie nature n’est jamais envoyée au joueur avant l’identification.
+- **Maladies et poisons** : les 3 maladies et 14 poisons d’exemple du SRD 5.1 (ou une affliction personnalisée), avec DD et texte de la règle sur la fiche ; le joueur note chaque sauvegarde réussie ou ratée (vrai dé), le MJ déclare la guérison.
+- **Langues secrètes** : chaque fiche a ses langues ; le MJ envoie un message dans une langue. Seuls les personnages qui la parlent lisent le texte, les autres voient des signes ; le texte n’est jamais envoyé aux autres joueurs.
+
+**Campagne**
+- **Mémorial** : le MJ inscrit un personnage tombé (circonstances, épitaphe). Il quitte le combat et les listes du groupe ; sa fiche reste consultable dans la nouvelle page Mémorial, et il peut être ramené à la vie.
+- **Statistiques de la campagne** (Chronique) : séances, temps de jeu, combats, rounds, créatures vaincues, XP, quêtes terminées, niveau moyen, héros tombés, et dégâts / soins / chutes par personnage, cumulés au fil des séances.
+- **Carte en hexagones** : grille « Hexagones » pour les cartes du monde (échelle en km, miles ou lieues). Outil « Hexagones » : marquer les hexagones explorés, cacher les autres aux joueurs, déplacer le groupe (🚩) ; le trajet est exploré et la durée de marche, selon l’allure, notée au journal (et l’heure du monde avancée si vous le souhaitez).
+
+**Partager**
+- **Accès spectateur** (Paramètres) : un lien en lecture seule, avec QR code, pour un ami ou un public en diffusion. Il montre l’écran de table (carte, initiative, résumé partagé) sans fiche, secret du MJ, message privé ni vote. Le lien se remplace ou se désactive à tout moment.
+
+**Limites connues** : l’anonymat des votes vaut dans l’application (le fichier de la campagne, sur le serveur du MJ, garde les bulletins) ; le spectateur se met à jour toutes les 4 secondes.
+
 ## 5.4.0 — Murs et portes, pièges, tests de groupe, folie, recharges, agenda
 **Cartes**
 - **Murs et portes** : nouvel outil « Murs et portes » (MJ) pour tracer des murs et des portes, aimantés à la grille. La vision des jetons s’arrête aux murs et aux portes fermées ; une porte s’ouvre ou se ferme d’un clic sur la carte, et le brouillard se lève alors derrière elle. Les murs restent invisibles pour les joueurs.

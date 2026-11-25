@@ -1,0 +1,17 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const I=require('../src/inventory.js');
+test('objets mystérieux : identification, malédiction, vue joueur',()=>{const pc={inventoryItems:[]};const it=I.add(pc,'i1',{name:'Anneau d’argent',description:'Un anneau terne.',category:'treasure'});
+ I.setSecret(it,{name:'Anneau de protection',description:'+1 à la CA',curse:'Impossible à retirer'});assert.ok(it.unidentified);
+ let v=I.playerView(it);assert.strictEqual(v.secret,undefined);assert.strictEqual(v.curse,undefined);assert.strictEqual(v.name,'Anneau d’argent');
+ it.attuned=true;assert.ok(I.curseLocked(it));I.identify(it);assert.strictEqual(it.name,'Anneau de protection');assert.ok(it.secret.curse);
+ I.revealCurse(it);v=I.playerView(it);assert.strictEqual(v.curse,'Impossible à retirer');I.liftCurse(it);assert.ok(!I.curseLocked(it));assert.strictEqual(it.secret,undefined);});
+test('objets mystérieux : serveur, secret et verrou',async t=>{const f=await require('./_fixture.js').fixture(t);
+ let r=await f.action('itemAdd',{id:f.a.id,values:{name:'Anneau d’argent',description:'',category:'treasure',quantity:1,weight:0,chargesMax:0,charges:0,equipped:false,attuned:true}});assert.strictEqual(r.status,200);
+ let me=(await f.call('/api/state',{cookie:f.gm})).data.state.characters.find(p=>p.id===f.a.id);const it=me.inventoryItems.find(x=>x.name==='Anneau d’argent');
+ r=await f.action('itemSecret',{id:f.a.id,itemId:it.id,op:'set',values:{name:'Anneau de faiblesse',curse:'Force réduite à 8'}},f.pa);assert.strictEqual(r.status,403);
+ r=await f.action('itemSecret',{id:f.a.id,itemId:it.id,op:'set',values:{name:'Anneau de faiblesse',curse:'Force réduite à 8'}});assert.strictEqual(r.status,200);
+ const pv=(await f.call('/api/state',{cookie:f.pa})).data.state.characters.find(p=>p.id===f.a.id).inventoryItems.find(x=>x.id===it.id);assert.strictEqual(pv.secret,undefined);assert.ok(pv.unidentified);assert.ok(!JSON.stringify(pv).includes('faiblesse'));
+ r=await f.action('itemUpdate',{id:f.a.id,itemId:it.id,values:{name:'Anneau d’argent',description:'',category:'treasure',quantity:1,weight:0,chargesMax:0,charges:0,equipped:false,attuned:false}},f.pa);assert.strictEqual(r.status,400);assert.match(r.data.error,/quelque chose/);
+ r=await f.action('itemRemove',{id:f.a.id,itemId:it.id},f.pa);assert.strictEqual(r.status,400);
+ r=await f.action('itemSecret',{id:f.a.id,itemId:it.id,op:'identify'});assert.strictEqual(r.status,200);
+ const after=(await f.call('/api/state',{cookie:f.pa})).data.state.characters.find(p=>p.id===f.a.id).inventoryItems.find(x=>x.id===it.id);assert.strictEqual(after.name,'Anneau de faiblesse');});

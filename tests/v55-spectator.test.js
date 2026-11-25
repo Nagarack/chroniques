@@ -1,0 +1,12 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');
+test('spectateur : lien en lecture seule, sans secrets, révocable',async t=>{const f=await require('./_fixture.js').fixture(t);
+ let r=await fetch(f.base+'/api/spectate-state?t=aaaaaaaaaaaaaaaaaaaaaaaaaaaa');assert.strictEqual(r.status,404);
+ r=await f.call('/api/spectator',{method:'POST',cookie:f.pa,body:{op:'create'}});assert.strictEqual(r.status,403);
+ r=await f.call('/api/spectator',{method:'POST',cookie:f.gm,body:{op:'create'}});assert.strictEqual(r.status,200);const token=r.data.token;assert.ok(token.length>=30);
+ await f.action('tongueSend',{values:{language:'Elfique',text:'Secret elfique'}});await f.action('whisperSend',{charId:f.a.id,text:'Chut'}).catch(()=>{});
+ r=await fetch(f.base+'/api/spectate-state?t='+token);assert.strictEqual(r.status,200);assert.match(r.headers.get('set-cookie')||'',/chroniques_spectateur=/);const j=await r.json();
+ assert.strictEqual(j.viewer.role,'spectator');const raw=JSON.stringify(j);assert.ok(!raw.includes('Secret elfique'));assert.ok(!('whispers' in j.state));assert.ok(!('gmNotes' in j.state));
+ r=await fetch(f.base+'/api/action',{method:'POST',headers:{'content-type':'application/json',cookie:'chroniques_spectateur='+token},body:JSON.stringify({kind:'next',baseVersion:j.version})});assert.strictEqual(r.status,401);
+ r=await f.call('/api/spectator',{method:'POST',cookie:f.gm,body:{op:'revoke'}});assert.strictEqual(r.status,200);
+ r=await fetch(f.base+'/api/spectate-state?t='+token);assert.strictEqual(r.status,404);});

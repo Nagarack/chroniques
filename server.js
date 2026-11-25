@@ -53,6 +53,9 @@ const TCH=require('./src/table-charter.js');
 const DT=require('./src/downtime.js');
 const MAD=require('./src/madness.js');
 const GC=require('./src/group-checks.js');
+const TV=require('./src/table-votes.js');
+const AFF=require('./src/afflictions.js');
+const TG=require('./src/tongues.js');
 const AD=require('./src/area-damage.js');
 const WA=require('./src/webauthn.js');
 const I18N=require('./src/i18n-core.js');
@@ -108,6 +111,11 @@ const allowedStatic=new Map([
  ['/src/data/srd-madness.js',['src/data/srd-madness.js','text/javascript; charset=utf-8']],
  ['/src/madness.js',['src/madness.js','text/javascript; charset=utf-8']],
  ['/src/group-checks.js',['src/group-checks.js','text/javascript; charset=utf-8']],
+ ['/src/table-votes.js',['src/table-votes.js','text/javascript; charset=utf-8']],
+ ['/src/data/srd-afflictions.js',['src/data/srd-afflictions.js','text/javascript; charset=utf-8']],
+ ['/src/afflictions.js',['src/afflictions.js','text/javascript; charset=utf-8']],
+ ['/src/tongues.js',['src/tongues.js','text/javascript; charset=utf-8']],
+ ['/src/hex.js',['src/hex.js','text/javascript; charset=utf-8']],
  ['/src/spells.js',['src/spells.js','text/javascript; charset=utf-8']],
  ['/src/spell-guide.js',['src/spell-guide.js','text/javascript; charset=utf-8']],
  ['/src/creatures.js',['src/creatures.js','text/javascript; charset=utf-8']],
@@ -231,6 +239,7 @@ function createServer(opts={}){
   for(const m of recs){if(move){m.entityId=toItem;m.characterId=toChar;continue;}if(M.list(s).length>=M.MAX_MEDIA)break;
    if(m.builtinId){s.media.push({...m,id:'img-'+random(12),entityId:toItem,characterId:toChar});continue;}
    const rec=copyLibraryImage(s,m);if(rec)s.media.push({id:'img-'+random(12),kind:'item',entityId:toItem,characterId:toChar,visibility:m.visibility,caption:m.caption||'',featured:!!m.featured,...rec});}}
+ function curseMsg(it){return it&&it.curseRevealed?'Malédiction : vous ne pouvez pas vous séparer de cet objet.':'Impossible : quelque chose vous empêche de vous séparer de cet objet.';}
  // 5.4 : proportions d’une carte importée avant la 5.4 (lues dans l’en-tête de l’image).
  function ensureAspect(map){if(!map||map.aspect||!map.filename||!/^[A-Za-z0-9_-]{32}\.(png|webp)$/.test(map.filename))return;try{const fd=fs.openSync(path.join(mediaDir,map.filename),'r');const buf=Buffer.alloc(64);fs.readSync(fd,buf,0,64,0);fs.closeSync(fd);const sz=CM.imageSize(buf);if(sz&&sz.w&&sz.h)map.aspect=Math.round(sz.w/sz.h*10000)/10000;}catch{}}
  // 5.3 : vision dans le noir d’un personnage (traits d’espèce), en mètres.
@@ -289,6 +298,11 @@ function createServer(opts={}){
    activeCampaignId:c.id,viewMode:mode};
  }
  function requireUser(req){const u=who(req);if(!u)throw Object.assign(new Error('Connexion nécessaire.'),{status:401});return u;}
+ // 5.5 : accès spectateur (lien en lecture seule). Le jeton n’est conservé que sous forme d’empreinte.
+ const SPECTATOR={id:'__spectator__',name:'Spectateur',role:'player',characterId:'__table__',lang:'fr'};
+ function spectator(req){const q=new URL(req.url,'http://x').searchParams.get('t')||'';const t=q||cookie(req,'chroniques_spectateur');if(!t||!/^[A-Za-z0-9_-]{20,80}$/.test(t))return null;const h=sha(t);
+  const c=(db.campaigns||[]).find(x=>x.spectator&&x.spectator.hash===h);return c?{c,u:{...SPECTATOR},token:t}:null;}
+ function viewerOrSpectator(req){const u=who(req);if(u)return {u,c:currentCampaign(u)};const sp=spectator(req);if(sp)return sp;throw Object.assign(new Error('Connexion nécessaire.'),{status:401});}
  function currentCampaign(u){const c=db.campaigns.find(x=>x.id===u.activeCampaignId);if(!c||!memberOf(c,u.id))throw sleepBlock('Vous ne participez pas à cette campagne.');return c;}
  function requireGm(u){if(u.assistantElevated)return;const c=currentCampaign(u);if(u.role!=='gm'||memberOf(c,u.id)?.role!=='gm')throw sleepBlock('Accès réservé au MJ.');}
  function requireOwner(u){const c=currentCampaign(u);if(u.role!=='gm'||c.ownerId!==u.id)throw sleepBlock('Accès réservé au MJ propriétaire.');}
@@ -331,8 +345,12 @@ function createServer(opts={}){
  }
  if(u.role!=='gm')full=N.project(full);
  full.media=M.projected(c.state,u);
+ if(c.state.votes){const nameOf=uid=>{const m=c.members.find(x=>x.userId===uid);const pc=m&&m.characterId&&c.state.characters.find(p=>p.id===m.characterId);return pc?pc.name:(db.users.find(x=>x.id===uid)?.name||'?');};full.votes=TV.projected(c.state,u.id,nameOf);} // Votes anonymes : qui a voté quoi n’est jamais envoyé.
  full.ambience=AMB.projected(c.state); // Jamais les noms de fichiers sur disque.
  if(u.role!=='gm')full.randomTables=RT.projected(c.state); // Tables privées du MJ : jamais envoyées.
+ if(u.role!=='gm')for(const pc of full.characters||[])if(Array.isArray(pc.inventoryItems))pc.inventoryItems=pc.inventoryItems.map(I.playerView);
+ if(u.role!=='gm'&&full.partyStash&&Array.isArray(full.partyStash.inventoryItems))full.partyStash.inventoryItems=full.partyStash.inventoryItems.map(I.playerView); // Vraie nature des objets mystérieux : MJ seulement.
+ if(u.role!=='gm'&&c.state.tongueMessages){const mine=(c.state.characters||[]).filter(p=>u.characterId&&p.id===u.characterId);full.tongueMessages=TG.projected(c.state,mine);} // Messages en langue : le texte clair seulement pour qui la parle.
  if(u.role!=='gm'&&c.state.groupChecks)full.groupChecks=GC.projected(c.state,u.characterId?[u.characterId]:[]); // DD caché et totaux des autres non transmis.
  if(u.role!=='gm'&&c.state.downtime)full.downtime=DT.projected(c.state,u.characterId); // Intermèdes des autres personnages : non transmis.
  if(u.role!=='gm'&&c.state.tableCharter)full.tableCharter=TCH.projected(c.state); // Signaux (carte X) et règles du MJ : jamais envoyés.
@@ -414,7 +432,7 @@ function createServer(opts={}){
   if(Array.isArray(c.history))pc.history=c.history.slice(-CH.MAX).map(e=>({id:random(8),at:/^\d{4}-\d\d-\d\dT/.test(String(e?.at||''))?String(e.at).slice(0,30):new Date().toISOString(),world:String(e?.world||'').slice(0,60),session:null,text:String(e?.text||'').replace(/[\u0000-\u001f]/g,' ').slice(0,300)})).filter(e=>e.text.trim());
   (pc.history??=[]).push({id:random(8),at:new Date().toISOString(),world:'',session:null,text:'Rejoint la campagne'+(data.from?.campaign?' (venant de « '+String(data.from.campaign).slice(0,60)+' »)':'')+'.'});
   logPublic(s,'Personnage importé : '+pc.name+(skipped.length?' ('+skipped.length+' élément(s) ignoré(s) : '+[...new Set(skipped)].slice(0,6).join(', ')+')':'')+'.');return pc;}
- const UNDOABLE={hp:'PV',areaDamage:'dégâts de zone',tableRemove:'suppression de table',exhaustion:'épuisement',inspiration:'inspiration',charterRuleRemove:'règle de la table',downtimeRemove:'activité d’intermède',madnessRemove:'folie',charterLimitRemove:'limite de la table',npcLegendary:'action légendaire',defense:'défense',npcDefense:'défense de créature',npcHp:'PV créature',tempHp:'PV temporaires',condition:'état',npcCondition:'état créature',next:'tour suivant',conditionTimer:'durée d’état',start:'début du combat',end:'fin du combat',deathSave:'jet contre la mort',init:'initiative',sortInitiative:'tri de l’initiative',move:'déplacement',moveInitiative:'ordre d’initiative',resetTurn:'réinitialisation du tour',spend:'dépense d’action',slot:'emplacement de sort',castSpell:'sort lancé',resource:'ressource',concentration:'concentration',resolveConcentration:'concentration',rest:'repos',npcAdd:'ajout de créature',npcUpdate:'modification de créature',npcRemove:'retrait de créature',libItemDelete:'objet maison supprimé',handoutDelete:'document supprimé',shopDelete:'marchand supprimé',shopItemRemove:'article retiré',mapAreaClear:'zones effacées',scheduleClear:'dates effacées',scheduleRemove:'date retirée',templateDelete:'monstre supprimé',encounterDelete:'rencontre supprimée',restLongAll:'repos long du groupe',xpAward:'XP distribuée',milestone:'jalon'};
+ const UNDOABLE={hp:'PV',areaDamage:'dégâts de zone',tableRemove:'suppression de table',exhaustion:'épuisement',inspiration:'inspiration',charterRuleRemove:'règle de la table',downtimeRemove:'activité d’intermède',madnessRemove:'folie',fallen:'mémorial',afflictionCure:'affliction',itemSecret:'objet mystérieux',charterLimitRemove:'limite de la table',npcLegendary:'action légendaire',defense:'défense',npcDefense:'défense de créature',npcHp:'PV créature',tempHp:'PV temporaires',condition:'état',npcCondition:'état créature',next:'tour suivant',conditionTimer:'durée d’état',start:'début du combat',end:'fin du combat',deathSave:'jet contre la mort',init:'initiative',sortInitiative:'tri de l’initiative',move:'déplacement',moveInitiative:'ordre d’initiative',resetTurn:'réinitialisation du tour',spend:'dépense d’action',slot:'emplacement de sort',castSpell:'sort lancé',resource:'ressource',concentration:'concentration',resolveConcentration:'concentration',rest:'repos',npcAdd:'ajout de créature',npcUpdate:'modification de créature',npcRemove:'retrait de créature',libItemDelete:'objet maison supprimé',handoutDelete:'document supprimé',shopDelete:'marchand supprimé',shopItemRemove:'article retiré',mapAreaClear:'zones effacées',scheduleClear:'dates effacées',scheduleRemove:'date retirée',templateDelete:'monstre supprimé',encounterDelete:'rencontre supprimée',restLongAll:'repos long du groupe',xpAward:'XP distribuée',milestone:'jalon'};
  const undoStacks=new Map();
  function canUndo(c){const st=undoStacks.get(c.id);const top=st&&st[st.length-1];return Boolean(top&&top.version===c.version);}
  function undo(c,u){requireGm(u);const st=undoStacks.get(c.id)||[];const top=st[st.length-1];if(!top||top.version!==c.version){undoStacks.delete(c.id);badRequest('Rien à annuler : l’état a changé depuis la dernière action.');}
@@ -452,6 +470,12 @@ function createServer(opts={}){
   case 'mapAreaClear':{requireGm(u);CM.areaClear(s,id);break;}
   case 'mapMarkerAdd':{requireGm(u);CM.markerAdd(s,id,'pin-'+random(10),b.values);break;}
   case 'mapMarkerUpdate':{requireGm(u);const before=CM.markerRead(s,id,String(b.markerId||''))?.image;const after=CM.markerUpdate(s,id,String(b.markerId||''),b.values);if(before?.source==='upload'&&before.filename!==after.image?.filename)deletedMapFiles.push(before.filename);break;}
+  case 'mapHexToggle':{requireGm(u);ensureAspect(CM.read(s,id));CM.hexToggle(s,id,String(b.hex||''));break;}
+  case 'mapHexFog':{requireGm(u);CM.hexFog(s,id,b.on===true);break;}
+  case 'mapHexParty':{requireGm(u);ensureAspect(CM.read(s,id));const r=CM.hexMove(s,id,String(b.hex||''));if(r.steps>0){const TRm=require('./src/travel.js');const pace=TRm.PACES[b.pace]?b.pace:(s.travel?.pace&&TRm.PACES[s.travel.pace]?s.travel.pace:'normal');const p=TRm.PACES[pace];
+   const km=r.km?Math.round(r.km*r.steps*10)/10:null;const minutes=km!==null?Math.round(km/p.kmh*60):null;
+   logPublic(s,'🧭 Le groupe parcourt '+r.steps+' hexagone'+(r.steps>1?'s':'')+(km!==null?' ('+String(km).replace('.',',')+' km, environ '+Math.floor(minutes/60)+' h '+String(minutes%60).padStart(2,'0')+' de marche, allure '+({lent:'lente',normal:'normale',rapide:'rapide'})[pace]+')':''));
+   if(b.advanceTime===true&&minutes&&s.worldTime?.enabled){const reached=WT.advance(s,minutes);logEvents(s,reached);}}break;}
   case 'mapWallAdd':{requireGm(u);ensureAspect(CM.read(s,id));CM.wallAdd(s,id,'wall-'+random(8),b.values);break;}
   case 'mapWallRemove':{requireGm(u);CM.wallRemove(s,id,String(b.wallId||''));break;}
   case 'mapWallClear':{requireGm(u);CM.wallClear(s,id);break;}
@@ -519,8 +543,12 @@ function createServer(opts={}){
    const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cet inventaire.');
    if(b.values?.attuned&&GEAR.attunedCount(pc)>=GEAR.MAX_ATTUNED)badRequest('Déjà '+GEAR.MAX_ATTUNED+' objets harmonisés : retirez une harmonisation d’abord.');
    try{I.add(pc,'item-'+random(8),b.values||{name:b.name,description:b.description||''});}catch(e){badRequest(e.message);}break;}
+  case 'itemSecret':{requireGm(u);const pc=L.findPc(s,id);const it=pc&&I.list(pc).find(x=>x.id===String(b.itemId||''));if(!it)badRequest('Objet introuvable.');const op=String(b.op||'');
+   if(op==='set')I.setSecret(it,b.values||{});else if(op==='clear')I.setSecret(it,null);else if(op==='identify'){I.identify(it);logPublic(s,pc.name+' · objet identifié : '+it.name);}
+   else if(op==='revealCurse'){I.revealCurse(it);logPublic(s,pc.name+' · '+it.name+' est maudit');}else if(op==='liftCurse'){I.liftCurse(it);logPublic(s,pc.name+' · malédiction levée : '+it.name);}else badRequest('Opération inconnue.');break;}
   case 'itemUpdate':case 'itemAdjust':{
    const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cet inventaire.');
+   if(b.kind==='itemUpdate'&&u.role!=='gm'){const cur=I.list(pc).find(x=>x.id===String(b.itemId||''));if(I.curseLocked(cur)&&((cur.attuned&&!b.values?.attuned)||(cur.equipped&&!b.values?.equipped)))badRequest(curseMsg(cur));}
    if(b.kind==='itemUpdate'&&b.values?.attuned){const cur=I.list(pc).find(x=>x.id===String(b.itemId||''));if(!cur?.attuned&&GEAR.attunedCount(pc,cur?.id)>=GEAR.MAX_ATTUNED)badRequest('Déjà '+GEAR.MAX_ATTUNED+' objets harmonisés : retirez une harmonisation d’abord.');}
    try{if(b.kind==='itemUpdate')I.update(pc,String(b.itemId||''),b.values);else I.adjust(pc,String(b.itemId||''),b.field,b.delta);}catch(e){badRequest(e.message);}break;}
   case 'itemUse':{
@@ -532,7 +560,7 @@ function createServer(opts={}){
   case 'setAc':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');const before=pc.stats.ac;pc.stats.ac=intValue(b.value,'Classe d’armure',1,40);logPublic(s,pc.name+' · CA '+before+' → '+pc.stats.ac+' (équipement).');break;}
   case 'itemTransfer':{
    const from=L.findPc(s,id);if(!from||!L.canEdit(s,a,id))throw sleepBlock('Vous ne pouvez donner que vos propres objets.');const to=L.findPc(s,String(b.toId||''));if(!to||to.id===from.id)badRequest('Destinataire introuvable.');
-   const item=I.list(from).find(x=>x.id===String(b.itemId||''));if(!item)badRequest('Objet introuvable.');const qty=intValue(b.quantity??1,'Quantité',1,999);if(qty>(item.quantity??1))badRequest('Quantité insuffisante.');
+   const item=I.list(from).find(x=>x.id===String(b.itemId||''));if(!item)badRequest('Objet introuvable.');if(u.role!=='gm'&&I.curseLocked(item))badRequest(curseMsg(item));const qty=intValue(b.quantity??1,'Quantité',1,999);if(qty>(item.quantity??1))badRequest('Quantité insuffisante.');
    const newId='item-'+random(8);const whole=qty===(item.quantity??1);
    try{I.add(to,newId,{...item,quantity:qty,equipped:false,attuned:false});}catch(e){badRequest(e.message);}
    if(whole){from.inventoryItems=I.list(from).filter(x=>x.id!==item.id);}else item.quantity-=qty;
@@ -595,6 +623,7 @@ function createServer(opts={}){
   case 'itemRemove':{
    const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cet inventaire.');
    const old=I.items(pc),idx=old.findIndex(x=>x.id===b.itemId);if(idx<0)badRequest('Objet introuvable.');
+   if(u.role!=='gm'&&I.curseLocked(old[idx]))badRequest(curseMsg(old[idx]));
    old.splice(idx,1);s.media=M.list(s).filter(x=>!(x.kind==='item'&&x.entityId===b.itemId&&x.characterId===id));break;}
   case 'start':L.startCombat(s,a);break;
   case 'npcAdd':{requireGm(u);try{N.add(s,'npc-'+random(9),b.values);L.sortInitiative(s,a);}catch(e){badRequest(e.message);}break;}
@@ -640,7 +669,7 @@ function createServer(opts={}){
   // Carnet personnel : visible du joueur du personnage et du MJ seulement (les autres reçoivent une fiche réduite).
   case 'pcNotesSave':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');const t=String(b.text??'').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'');if(t.length>6000)badRequest('Carnet : 6 000 caractères maximum.');pc.privateNotes=t;pc.privateNotesAt=new Date().toISOString();break;}
   // Coffre commun du groupe.
-  case 'stashDeposit':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Vous ne pouvez déposer que vos propres objets.');const r=PS.deposit(s,pc,b.itemId,b.quantity,'item-'+random(8));if(r.newId)cloneItemMedia(s,pc.id,r.item.id,'party-stash',r.newId,r.whole);logPublic(s,'🧰 '+pc.name+' dépose '+(r.count>1?r.count+' × ':'')+r.item.name+' dans le coffre du groupe.');break;}
+  case 'stashDeposit':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Vous ne pouvez déposer que vos propres objets.');if(u.role!=='gm'&&I.curseLocked(I.list(pc).find(x=>x.id===String(b.itemId||''))))badRequest(curseMsg(I.list(pc).find(x=>x.id===String(b.itemId||''))));const r=PS.deposit(s,pc,b.itemId,b.quantity,'item-'+random(8));if(r.newId)cloneItemMedia(s,pc.id,r.item.id,'party-stash',r.newId,r.whole);logPublic(s,'🧰 '+pc.name+' dépose '+(r.count>1?r.count+' × ':'')+r.item.name+' dans le coffre du groupe.');break;}
   case 'stashWithdraw':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cet inventaire.');const r=PS.withdraw(s,pc,b.itemId,b.quantity,'item-'+random(8),u.role==='gm');if(r.newId)cloneItemMedia(s,'party-stash',r.item.id,pc.id,r.newId,r.whole);logPublic(s,'🧰 '+pc.name+' prend '+(r.count>1?r.count+' × ':'')+r.item.name+' dans le coffre du groupe.');break;}
   case 'stashCoins':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette bourse.');const dir=String(b.direction||'');const amt=PS.coins(s,pc,b.amounts,dir,u.role==='gm');const txt=I.MONEY.filter(k=>amt[k]).map(k=>amt[k]+' '+GEAR.COIN_FR[k]).join(' ');logPublic(s,'🧰 '+pc.name+(dir==='in'?' dépose ':' prend ')+txt+(dir==='in'?' dans':' dans')+' le coffre du groupe.');break;}
   case 'stashAdd':{requireGm(u);const it=PS.add(s,'item-'+random(8),b.values||{});logPublic(s,'🧰 Le MJ place '+it.name+' dans le coffre du groupe.');break;}
@@ -696,12 +725,23 @@ function createServer(opts={}){
   case 'ability':L.useAbility(s,a,id,String(b.abilityId||''));break;
   case 'move':L.updateMovement(s,a,id,n(b.value,0,1000));break;
   case 'hp':if(b.damageType&&!L.DAMAGE_TYPES.includes(String(b.damageType)))badRequest('Type de dégâts inconnu.');L.changeHp(s,a,id,n(b.delta,-10000,10000),String(b.damageType||''));break;
-  case 'downtimeGrant':{requireGm(u);const days=DT.grant(s,s.characters.map(p=>p.id),b.days);logPublic(s,'⏳ Intermède : '+days+' jour'+(days>1?'s':'')+' accordé'+(days>1?'s':'')+' à chaque personnage');
+  case 'downtimeGrant':{requireGm(u);const days=DT.grant(s,s.characters.filter(p=>!p.fallen).map(p=>p.id),b.days);logPublic(s,'⏳ Intermède : '+days+' jour'+(days>1?'s':'')+' accordé'+(days>1?'s':'')+' à chaque personnage');
    if(b.world===true&&s.worldTime?.enabled){const reached=WT.advance(s,days*1440);logPublic(s,'⏳ '+days+' jour'+(days>1?'s':'')+' passent · '+WT.format(s.worldTime,s.worldTime.minutes));logEvents(s,reached);}break;}
   case 'downtimeAdd':{const pcId=String(b.pcId||'');if(!L.findPc(s,pcId))badRequest('Personnage introuvable.');if(!L.canEdit(s,a,pcId))throw sleepBlock('Accès refusé à cette fiche.');DT.add(s,'dt-'+random(10),pcId,b.values);break;}
   case 'downtimeUpdate':case 'downtimeRemove':case 'downtimeSpend':{const act=(s.downtime?.activities||[]).find(x=>x.id===id);if(!act)badRequest('Activité introuvable.');if(!L.canEdit(s,a,act.pcId))throw sleepBlock('Accès refusé à cette fiche.');
    if(b.kind==='downtimeUpdate')DT.update(s,id,b.values);else if(b.kind==='downtimeRemove')DT.remove(s,id);
    else{const r=DT.spend(s,id,b.days);const pc=L.findPc(s,act.pcId);if(r.finished)logPublic(s,(pc?.name||'Personnage')+' · intermède terminé : '+act.title);}break;}
+  case 'languagesSet':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');TG.setLanguages(pc,b.languages);break;}
+  case 'tongueSend':{requireGm(u);const m=TG.send(s,'tg-'+random(8),b.values);logPublic(s,'✉ Message en '+m.language+(m.title?' · '+m.title:''));break;}
+  case 'tongueRemove':{requireGm(u);TG.remove(s,String(b.messageId||''));break;}
+  case 'afflictionAdd':{requireGm(u);const pc=L.findPc(s,id);if(!pc)badRequest('Personnage introuvable.');const x=AFF.add(pc,'aff-'+random(8),b.values);logPublic(s,pc.name+' · '+(x.kind==='poison'?'empoisonné':'malade')+' : '+x.name);break;}
+  case 'afflictionSave':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');const x=b.undo===true?AFF.undoSave(pc,String(b.afflictionId||''),b.success===true):AFF.save(pc,String(b.afflictionId||''),b.success===true);if(b.undo!==true)logPublic(s,pc.name+' · '+x.name+' : sauvegarde '+(b.success===true?'réussie':'ratée')+' ('+x.successes+' réussite'+(x.successes>1?'s':'')+', '+x.failures+' échec'+(x.failures>1?'s':'')+')');break;}
+  case 'afflictionCure':{requireGm(u);const pc=L.findPc(s,id);if(!pc)badRequest('Personnage introuvable.');const x=AFF.cure(pc,String(b.afflictionId||''));logPublic(s,pc.name+' · guéri : '+x.name);break;}
+  case 'fallen':{requireGm(u);L.setFallen(s,a,id,b.values===null?null:(b.values||{}));break;}
+  case 'voteStart':{requireGm(u);TV.start(s,'vote-'+random(8),b.values);break;}
+  case 'voteCast':{TV.cast(s,u.id,b.optionId===null?null:String(b.optionId||''));break;}
+  case 'voteClose':{requireGm(u);const r=TV.close(s);const w=r.vote.options.filter(o=>r.tally.winners.includes(o.id)).map(o=>o.text);logPublic(s,'🗳 Vote · '+r.vote.question+' · '+(w.length?(w.length>1?'égalité : ':'')+w.join(' / ')+' ('+r.tally.counts[r.tally.winners[0]]+' voix sur '+r.tally.total+')':'aucune voix'));break;}
+  case 'voteCancel':{requireGm(u);TV.cancel(s);break;}
   case 'groupCheckStart':{requireGm(u);GC.start(s,'gc-'+random(8),b.values);break;}
   case 'groupCheckAnswer':{const pcId=String(b.pcId||'');if(!L.findPc(s,pcId)||!L.canEdit(s,a,pcId))throw sleepBlock('Vous répondez uniquement pour votre personnage.');GC.answer(s,pcId,b.total);break;}
   case 'groupCheckClose':{requireGm(u);const r=GC.close(s);const c0=r.check,v=r.verdict;const name=id=>L.findPc(s,id)?.name||'?';const ok=c0.ids.filter(id=>c0.results[id]!==undefined&&c0.results[id]>=c0.dc).map(name),ko=c0.ids.filter(id=>c0.results[id]!==undefined&&c0.results[id]<c0.dc).map(name);
@@ -952,7 +992,7 @@ function createServer(opts={}){
    if(req.method==='GET'&&iconFiles.has(pathname)){res.writeHead(200,{'content-type':'image/svg+xml','cache-control':'public, max-age=604800'});fs.createReadStream(path.join(root,'assets/icons',pathname.slice('/assets/icons/'.length))).pipe(res);return;}
     if(req.method==='GET'&&allowedStatic.has(pathname)){const [file,type]=allowedStatic.get(pathname);res.writeHead(200,{'content-type':type,'cache-control':'no-store'});fs.createReadStream(path.join(root,file)).pipe(res);return;}
    if(req.method==='GET'&&pathname.startsWith('/api/media/')){
-    const u=requireUser(req),c=currentCampaign(u),key=pathname.slice('/api/media/'.length);
+    const {u,c}=viewerOrSpectator(req),key=pathname.slice('/api/media/'.length);
     const media=M.list(c.state).find(x=>x.id===key);
     if(!media||!media.filename||!M.canReadFile(c.state,u,media))throw Object.assign(new Error('Illustration non disponible.'),{status:404});
     if(!/^[A-Za-z0-9_-]{32}\.(png|webp)$/.test(media.filename))throw Object.assign(new Error('Illustration non disponible.'),{status:404});
@@ -1002,7 +1042,7 @@ function createServer(opts={}){
     send(res,200,data,{'content-disposition':'attachment; filename="'+name+'"'});return;
    }
    if(req.method==='GET'&&pathname.startsWith('/api/map-image/')){
-    const u=requireUser(req),c=currentCampaign(u),id=pathname.slice('/api/map-image/'.length),map=CM.read(c.state,id);
+    const {u,c}=viewerOrSpectator(req),id=pathname.slice('/api/map-image/'.length),map=CM.read(c.state,id);
     if(!CM.canRead(u,map)||!map.filename||!map.mime)throw Object.assign(new Error('Carte non disponible.'),{status:404});
     if(!/^[A-Za-z0-9_-]{32}\.(png|webp)$/.test(map.filename))throw Object.assign(new Error('Carte non disponible.'),{status:404});
     const file=path.join(mediaDir,map.filename);if(!fs.existsSync(file))throw Object.assign(new Error('Carte absente.'),{status:404});
@@ -1032,6 +1072,13 @@ function createServer(opts={}){
     res.writeHead(200,{'content-type':'application/vnd.android.package-archive','content-disposition':'attachment; filename="Chroniques-'+APP_VERSION+'.apk"','content-length':fs.statSync(apkFile).size,'cache-control':'no-store'});fs.createReadStream(apkFile).pipe(res);return;}
    if(req.method==='GET'&&pathname==='/api/me'){const u=who(req);send(res,200,u?{authenticated:true,name:u.name,role:u.role,characterId:u.characterId||null,campaignId:u.activeCampaignId}:{authenticated:false});return;}
    if(req.method==='GET'&&pathname==='/api/campaigns'){const u=requireUser(req);send(res,200,listCampaigns(u));return;}
+   // Spectateur : même vue que l’écran de table, sans compte.
+   if(req.method==='GET'&&pathname==='/api/spectate-state'){const sp=spectator(req);if(!sp)throw Object.assign(new Error('Lien spectateur invalide ou révoqué.'),{status:404});
+    res.setHeader('Set-Cookie',`chroniques_spectateur=${sp.token}; HttpOnly; SameSite=Lax; Path=/api; Max-Age=86400${secureCookies?'; Secure':''}`);
+    const out=projected(sp.c,sp.u);out.state.tableMapId=sp.c.state.tableMapId||null;out.state.recapTable=sp.c.state.recap?.table&&sp.c.state.recap?.text?sp.c.state.recap.text:null;
+    delete out.state.whispers;delete out.state.tongueMessages;delete out.state.votes;delete out.state.groupChecks;delete out.state.tableCharter;delete out.state.downtime;
+    out.viewer={role:'spectator',name:'Spectateur'};send(res,200,out);return;}
+   if(req.method==='GET'&&pathname==='/api/spectator'){const u=requireUser(req),c=currentCampaign(u);requireGm(u);send(res,200,{enabled:!!c.spectator,createdAt:c.spectator?.createdAt||null});return;}
    if(req.method==='GET'&&pathname==='/api/table-state'){const u=requireUser(req),c=currentCampaign(u);requireGm(u);
     // Écran de table : exactement ce qu'un joueur sans personnage verrait, plus la carte choisie par le MJ.
     const out=projected(c,{...u,role:'player',characterId:'__table__'});out.state.tableMapId=c.state.tableMapId||null;out.state.recapTable=c.state.recap?.table&&c.state.recap?.text?c.state.recap.text:null;out.viewer={...out.viewer,role:'table'};send(res,200,out);return;}
@@ -1090,6 +1137,9 @@ function createServer(opts={}){
     }
     if(ct!=='application/json'&&pathname!=='/api/logout')throw Object.assign(new Error('Le contenu JSON est obligatoire.'),{status:415});
     const b=await readBody(req,['/api/media/change','/api/map/upload','/api/map-pin/upload'].includes(pathname)?2_850_000:pathname==='/api/action'?200_000:MAX_BODY);
+    if(pathname==='/api/spectator'){const u=requireUser(req),c=currentCampaign(u);requireGm(u);
+     if(b.op==='revoke'){delete c.spectator;persist();send(res,200,{enabled:false});return;}
+     if(b.op!=='create')throw Object.assign(new Error('Opération inconnue.'),{status:400});const token=crypto.randomBytes(24).toString('base64url');c.spectator={hash:sha(token),createdAt:new Date().toISOString()};persist();send(res,200,{enabled:true,token,createdAt:c.spectator.createdAt});return;}
     if(pathname==='/api/push/subscribe'){const u=requireUser(req);limit(req,'media');const sub=WP.cleanSubscription(b.subscription,pushOpts);const st=pushStore();
      st.subs=st.subs.filter(x=>x.endpoint!==sub.endpoint);if(st.subs.filter(x=>x.userId===u.id).length>=10)badRequest('Maximum 10 appareils par compte.');
      st.subs.push({id:random(9),userId:u.id,...sub,createdAt:new Date().toISOString()});persist();send(res,200,{ok:true,devices:st.subs.filter(x=>x.userId===u.id).length});return;}

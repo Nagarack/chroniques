@@ -995,6 +995,22 @@ table.srd-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--c
 .map-walls .wall-door.open{stroke:#378f42}
 .map-door{border:2px solid #c38613;background:#f3ede6d9;color:#99690f}
 .map-door.open{border-color:#378f42;color:#2e7a39}
+.vote-btn{border:1px solid var(--rule);background:transparent;color:inherit}
+.vote-btn i{background:var(--gold,#9d763e)}
+.vote-btn.mine{border-color:var(--gold,#9d763e)}
+.fallen-banner{border:1px solid var(--rule);border-left:4px solid var(--muted,#9f886f)}
+.fallen-banner blockquote,.memorial-epitaph{border-left:2px solid var(--rule)}
+.stat-tile{border:1px solid var(--rule-soft,var(--rule))}
+.stat-tile small{color:var(--muted,inherit)}
+.stats-table th,.stats-table td{border-bottom:1px solid var(--rule-soft,var(--rule))}
+.mystery-note.curse{color:var(--red,#872b21)}
+.mystery-gm{border:1px dashed var(--rule)}
+.affliction-item{border-top:1px solid var(--rule-soft,var(--rule))}
+.lang-chips li{border:1px solid var(--rule-soft,var(--rule))}
+.map-hex .hex-line{fill:none;stroke:#18151059}
+.map-hex .hex-fog{fill:#f3f0ec}
+.map-hex .hex-explored{fill:#378f42}
+.hex-party{filter:drop-shadow(0 1px 2px #000000cc)}
 :root{color-scheme:light;--grain:none;--c-bg:#f4efe4;--c-bg-2:#ede5d6;--c-surface:#fbf8f1;--c-surface-2:#f0e9dc;--c-line:#dcd1be;--c-line-soft:#e7dfcf;--c-text:#2b2118;--c-muted:#5c4b37;--c-accent:#9a3a26;--c-accent-strong:#8c2f1f;--c-on-accent:#fffaf3;--c-ok:#3d6a4c;--c-warn:#a8741a;--c-danger:#b3402c;--c-focus:#8c2f1f}
 .workspace-parchment :is(p,span,small,li,strong,em,h1,h2,h3,h4,label,div){color:#3d2f1d}
 .workspace-parchment .muted,.workspace-parchment .muted *{color:#6b5a42}
