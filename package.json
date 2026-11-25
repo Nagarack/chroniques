@@ -1,6 +1,6 @@
 {
   "name": "chroniques",
-  "version": "5.0.2",
+  "version": "5.1.0",
   "private": true,
   "description": "Chroniques : assistant de table D&D 5e (dés physiques), serveur Node.js sans dépendance.",
   "main": "server.js",

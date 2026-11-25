@@ -1,0 +1,20 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const {fixture}=require('./_fixture.js');
+const st=async(f,cookie)=>(await f.call('/api/state',{cookie})).data.state;
+test('scènes : une ambiance sonore se lance quand la scène passe « en cours »',async t=>{
+ const f=await fixture(t);
+ const ogg=Buffer.concat([Buffer.from('OggS'),Buffer.alloc(4000,1)]);
+ assert.equal((await fetch(f.base+'/api/audio/upload?name=Crypte&category=ambiance',{method:'POST',headers:{'Content-Type':'audio/ogg',Cookie:f.gm,Origin:f.base},body:ogg})).status,200);
+ const tr=(await st(f,f.gm)).ambience.tracks[0];
+ const base={title:'La crypte',summary:'',gmNotes:'',status:'planned',visibility:'shared',links:[]};
+ assert.equal((await f.action('sceneAdd',{values:{...base,trackId:'inconnue'}})).status,400);
+ assert.equal((await f.action('sceneAdd',{values:{...base,trackId:tr.id}})).status,200);
+ const sc=(await st(f,f.gm)).sessionFlow[0];assert.equal(sc.trackId,tr.id);assert.equal((await st(f,f.gm)).ambience.playing,null,'scène prévue : rien ne joue');
+ assert.equal((await st(f,f.pa)).sessionFlow[0].trackId,undefined,'jamais transmis aux joueurs');
+ assert.equal((await f.action('sceneUpdate',{id:sc.id,values:{...base,status:'active',trackId:tr.id}})).status,200);
+ assert.equal((await st(f,f.gm)).ambience.playing.trackId,tr.id);
+ assert.equal((await f.action('ambienceDelete',{trackId:tr.id})).status,200);
+ assert.equal((await st(f,f.gm)).sessionFlow[0].trackId,undefined,'piste supprimée : lien retiré');
+ assert.equal((await f.action('sceneUpdate',{id:sc.id,values:{...base,status:'completed'}})).status,200);
+});

@@ -47,6 +47,9 @@ const CTPL=require('./src/campaign-template.js');
 const WP=require('./src/web-push.js');
 const SD=require('./src/state-diff.js');
 const TR=require('./src/travel.js');
+const RT=require('./src/random-tables.js');
+const AD=require('./src/area-damage.js');
+const WA=require('./src/webauthn.js');
 const FA=require('./src/factions.js');
 const AI=require('./src/scenario-ai');
 const root=__dirname;
@@ -84,6 +87,8 @@ const allowedStatic=new Map([
  ['/src/app-chronicle.js',['src/app-chronicle.js','text/javascript; charset=utf-8']],
  ['/src/travel.js',['src/travel.js','text/javascript; charset=utf-8']],
  ['/src/factions.js',['src/factions.js','text/javascript; charset=utf-8']],
+ ['/src/random-tables.js',['src/random-tables.js','text/javascript; charset=utf-8']],
+ ['/src/area-damage.js',['src/area-damage.js','text/javascript; charset=utf-8']],
  ['/src/spells.js',['src/spells.js','text/javascript; charset=utf-8']],
  ['/src/spell-guide.js',['src/spell-guide.js','text/javascript; charset=utf-8']],
  ['/src/creatures.js',['src/creatures.js','text/javascript; charset=utf-8']],
@@ -290,6 +295,7 @@ function createServer(opts={}){
  if(u.role!=='gm')full=N.project(full);
  full.media=M.projected(c.state,u);
  full.ambience=AMB.projected(c.state); // Jamais les noms de fichiers sur disque.
+ if(u.role!=='gm')full.randomTables=RT.projected(c.state); // Tables privées du MJ : jamais envoyées.
  full.maps=CM.projected(c.state,u);
  // Le projecteur commun ne doit jamais transmettre les données de la fiche source
  // si la créature est masquée. Le MJ choisit librement le titre public.
@@ -368,7 +374,7 @@ function createServer(opts={}){
   if(Array.isArray(c.history))pc.history=c.history.slice(-CH.MAX).map(e=>({id:random(8),at:/^\d{4}-\d\d-\d\dT/.test(String(e?.at||''))?String(e.at).slice(0,30):new Date().toISOString(),world:String(e?.world||'').slice(0,60),session:null,text:String(e?.text||'').replace(/[\u0000-\u001f]/g,' ').slice(0,300)})).filter(e=>e.text.trim());
   (pc.history??=[]).push({id:random(8),at:new Date().toISOString(),world:'',session:null,text:'Rejoint la campagne'+(data.from?.campaign?' (venant de « '+String(data.from.campaign).slice(0,60)+' »)':'')+'.'});
   logPublic(s,'Personnage importé : '+pc.name+(skipped.length?' ('+skipped.length+' élément(s) ignoré(s) : '+[...new Set(skipped)].slice(0,6).join(', ')+')':'')+'.');return pc;}
- const UNDOABLE={hp:'PV',exhaustion:'épuisement',npcLegendary:'action légendaire',defense:'défense',npcDefense:'défense de créature',npcHp:'PV créature',tempHp:'PV temporaires',condition:'état',npcCondition:'état créature',next:'tour suivant',conditionTimer:'durée d’état',start:'début du combat',end:'fin du combat',deathSave:'jet contre la mort',init:'initiative',sortInitiative:'tri de l’initiative',move:'déplacement',moveInitiative:'ordre d’initiative',resetTurn:'réinitialisation du tour',spend:'dépense d’action',slot:'emplacement de sort',castSpell:'sort lancé',resource:'ressource',concentration:'concentration',resolveConcentration:'concentration',rest:'repos',npcAdd:'ajout de créature',npcUpdate:'modification de créature',npcRemove:'retrait de créature',libItemDelete:'objet maison supprimé',handoutDelete:'document supprimé',shopDelete:'marchand supprimé',shopItemRemove:'article retiré',mapAreaClear:'zones effacées',scheduleClear:'dates effacées',scheduleRemove:'date retirée',templateDelete:'monstre supprimé',encounterDelete:'rencontre supprimée',restLongAll:'repos long du groupe',xpAward:'XP distribuée',milestone:'jalon'};
+ const UNDOABLE={hp:'PV',areaDamage:'dégâts de zone',tableRemove:'suppression de table',exhaustion:'épuisement',npcLegendary:'action légendaire',defense:'défense',npcDefense:'défense de créature',npcHp:'PV créature',tempHp:'PV temporaires',condition:'état',npcCondition:'état créature',next:'tour suivant',conditionTimer:'durée d’état',start:'début du combat',end:'fin du combat',deathSave:'jet contre la mort',init:'initiative',sortInitiative:'tri de l’initiative',move:'déplacement',moveInitiative:'ordre d’initiative',resetTurn:'réinitialisation du tour',spend:'dépense d’action',slot:'emplacement de sort',castSpell:'sort lancé',resource:'ressource',concentration:'concentration',resolveConcentration:'concentration',rest:'repos',npcAdd:'ajout de créature',npcUpdate:'modification de créature',npcRemove:'retrait de créature',libItemDelete:'objet maison supprimé',handoutDelete:'document supprimé',shopDelete:'marchand supprimé',shopItemRemove:'article retiré',mapAreaClear:'zones effacées',scheduleClear:'dates effacées',scheduleRemove:'date retirée',templateDelete:'monstre supprimé',encounterDelete:'rencontre supprimée',restLongAll:'repos long du groupe',xpAward:'XP distribuée',milestone:'jalon'};
  const undoStacks=new Map();
  function canUndo(c){const st=undoStacks.get(c.id);const top=st&&st[st.length-1];return Boolean(top&&top.version===c.version);}
  function undo(c,u){requireGm(u);const st=undoStacks.get(c.id)||[];const top=st[st.length-1];if(!top||top.version!==c.version){undoStacks.delete(c.id);badRequest('Rien à annuler : l’état a changé depuis la dernière action.');}
@@ -421,8 +427,8 @@ function createServer(opts={}){
   case 'storyAdd':{requireGm(u);SP.add(s,'story-'+random(10),b.values);break;}
   case 'storyUpdate':{requireGm(u);SP.update(s,id,b.values);break;}
   case 'storyDelete':{requireGm(u);SP.remove(s,id);break;}
-  case 'sceneAdd':{requireGm(u);F.add(s,'sc-'+random(10),b.values);break;}
-  case 'sceneUpdate':{requireGm(u);F.update(s,id,b.values);break;}
+  case 'sceneAdd':{requireGm(u);const sc=F.add(s,'sc-'+random(10),b.values);if(sc.status==='active'&&sc.trackId)AMB.play(s,sc.trackId,s.ambience?.playing?.volume);break;}
+  case 'sceneUpdate':{requireGm(u);const before=(s.sessionFlow||[]).find(x=>x.id===id)?.status;const sc=F.update(s,id,b.values);if(sc.status==='active'&&before!=='active'&&sc.trackId){AMB.play(s,sc.trackId,s.ambience?.playing?.volume);const t=AMB.projected(s).tracks?.find(x=>x.id===sc.trackId);logGm(s,'♫ Ambiance de la scène « '+sc.title+' » : '+(t?.name||'piste')+'.');}break;}
   case 'sceneDelete':{requireGm(u);F.remove(s,id);break;}
   case 'plannerAdd':{requireGm(u);C.add(s,String(b.section||''),'cp-'+random(10),b.values);break;}
   case 'plannerUpdate':{requireGm(u);C.update(s,String(b.section||''),id,b.values);break;}
@@ -580,7 +586,7 @@ function createServer(opts={}){
   case 'ambienceVolume':{requireGm(u);AMB.volume(s,b.volume);break;}
   case 'ambienceUpdate':{requireGm(u);AMB.update(s,String(b.trackId||''),b.values);break;}
   case 'ambiencePlayers':{requireGm(u);AMB.setPlayers(s,b.on===true);break;}
-  case 'ambienceDelete':{requireGm(u);const t=AMB.remove(s,String(b.trackId||''));if(t?.filename&&AMB.FILE.test(t.filename))deletedMapFiles.push(t.filename);break;}
+  case 'ambienceDelete':{requireGm(u);const t=AMB.remove(s,String(b.trackId||''));for(const sc of s.sessionFlow||[])if(sc.trackId===t?.id)delete sc.trackId;if(t?.filename&&AMB.FILE.test(t.filename))deletedMapFiles.push(t.filename);break;}
   // --- Personnage importé d'une autre campagne ---
   // Carnet personnel : visible du joueur du personnage et du MJ seulement (les autres reçoivent une fiche réduite).
   case 'pcNotesSave':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');const t=String(b.text??'').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'');if(t.length>6000)badRequest('Carnet : 6 000 caractères maximum.');pc.privateNotes=t;pc.privateNotesAt=new Date().toISOString();break;}
@@ -598,6 +604,17 @@ function createServer(opts={}){
    logPublic(s,'🧭 '+hours+' h de marche · '+String(s.travel.doneKm).replace('.',',')+(s.travel.distanceKm?' / '+String(s.travel.distanceKm).replace('.',','):'')+' km'+(s.worldTime?.enabled?' · '+WT.format(s.worldTime,s.worldTime.minutes):''));for(const m of msgs)logPublic(s,m.text);break;}
   case 'travelCamp':{requireGm(u);for(const m of TR.camp(s))logPublic(s,'⛺ '+m.text);break;}
   case 'travelRations':{requireGm(u);const missing=TR.eatRations(s,I);logPublic(s,'🍞 Une ration décomptée pour chacun'+(missing.length?' · '+missing.join(', '):'')+'.');break;}
+  case 'areaDamage':{requireGm(u);const type=String(b.damageType||'');if(type&&!L.DAMAGE_TYPES.includes(type))badRequest('Type de dégâts inconnu.');
+   const lookup=(kind,tid)=>kind==='pc'?(()=>{const p=L.findPc(s,tid);return p?{name:p.name,defenses:p.defenses||{}}:null;})():kind==='npc'?(()=>{const n=N.find(s,tid);return n?{name:n.name,defenses:n.defenses||{}}:null;})():null;
+   let rows;try{rows=AD.plan({amount:b.amount,type,onSave:String(b.onSave||'half'),targets:(Array.isArray(b.targets)?b.targets:[]).map(t=>({kind:String(t?.kind||''),id:String(t?.id||''),saved:t?.saved===true})),lookup});}catch(e){badRequest(e.message);}
+   const label=String(b.label||'').replace(/[\u0000-\u001f]/g,' ').trim().slice(0,60);
+   logPublic(s,'💥 '+(label||'Dégâts de zone')+' : '+Number(b.amount)+(type?' '+type.toLowerCase():'')+' · '+rows.length+' cible'+(rows.length>1?'s':'')+(String(b.onSave)==='none'?' (aucun dégât si sauvegarde réussie)':' (moitié si sauvegarde réussie)'));
+   for(const r of rows){if(!r.base)continue;if(r.kind==='pc')L.changeHp(s,a,r.id,-r.base,type);else{N.hp(s,r.id,-r.base,type);CMP.syncFromNpc(s,N.find(s,r.id));}}
+   break;}
+  case 'tableAdd':{requireGm(u);RT.add(s,'rt-'+random(10),b.values||{});break;}
+  case 'tableUpdate':{requireGm(u);RT.update(s,String(b.tableId||''),b.values||{});break;}
+  case 'tableRemove':{requireGm(u);RT.remove(s,String(b.tableId||''));break;}
+  case 'tableRoll':{requireGm(u);const r=RT.roll(s,String(b.tableId||''),b.total,b.shared===true);const msg='🎲 '+r.table.name+' ('+r.table.die+' : '+r.entry.total+') → '+(r.row?r.row.text:'aucune ligne');if(r.entry.shared)logPublic(s,msg);else logGm(s,msg);break;}
   case 'travelEnd':{requireGm(u);TR.end(s);logPublic(s,'🧭 Fin du voyage.');break;}
   case 'lightAdd':{requireGm(u);const pc=b.values?.pcId?L.findPc(s,String(b.values.pcId)):null;if(b.values?.pcId&&!pc)badRequest('Personnage introuvable.');const l=TR.lightAdd(s,'li-'+random(8),{...b.values,pcId:pc?.id||''},pc?.name||'');logPublic(s,'🕯 '+l.label+(l.owner?' ('+l.owner+')':'')+' allumée — '+TR.fmtMin(l.minutesLeft)+'.');break;}
   case 'lightRemove':{requireGm(u);TR.lightRemove(s,String(b.lightId||''));break;}
@@ -835,6 +852,7 @@ function createServer(opts={}){
   if(publicOrigin){if(origin!==publicOrigin)throw sleepBlock('Origine HTTPS non autorisée.');}
   else if(origin&&origin!==`http://${req.headers.host}`)throw sleepBlock('Origine non autorisée.');
  }
+ const passkeyChallenges=new Map();
  const sessionFile=dataFile+'.sessions';let lastSessions='[]';
   function sessionSnapshot(){const now=Date.now();return JSON.stringify([...sessions].filter(([,v])=>v&&v.expires>=now));}
   function saveSessions(force){const snap=sessionSnapshot();if(!force&&snap===lastSessions)return;lastSessions=snap;try{fs.mkdirSync(path.dirname(sessionFile),{recursive:true,mode:0o700});const tmp=sessionFile+'.tmp';fs.writeFileSync(tmp,snap,{mode:0o600});fs.renameSync(tmp,sessionFile);}catch(e){console.warn('Sessions non enregistrées :',e.message);}}
@@ -1019,6 +1037,32 @@ function createServer(opts={}){
      const name=normalizeName(b.name);validPassword(b.password);const {salt,hash}=passwordHash(b.password),id=random(12);
      const u={id,name,slug:name.toLocaleLowerCase('fr'),role:'gm',salt,passHash:hash};db.users.push(u);
      db.campaigns.push({id:'camp-'+random(9),ownerId:id,version:1,members:[{userId:id,role:'gm'}],state:L.initialState()});persist();login(res,u);send(res,200,{ok:true});return;
+    }
+    // 5.1 — clés d'accès (WebAuthn). L'origine attendue est celle que le serveur accepte déjà (sameOrigin).
+    if(pathname.startsWith('/api/passkey/')){
+     const origin=publicOrigin||`http://${req.headers.host}`,rpId=new URL(origin).hostname;
+     const challengeOf=cred=>{try{return JSON.parse(WA.b64u.dec(cred?.response?.clientDataJSON).toString('utf8')).challenge;}catch{return '';}};
+     const take=(ch,kind)=>{const p=passkeyChallenges.get(ch);if(!p||p.kind!==kind||p.expires<Date.now()||p.origin!==origin)throw sleepBlock('Défi expiré : recommencez.');passkeyChallenges.delete(ch);return p;};
+     const issue=(kind,extra)=>{for(const [k,v] of passkeyChallenges)if(v.expires<Date.now())passkeyChallenges.delete(k);if(passkeyChallenges.size>500)throw Object.assign(new Error('Trop de demandes en cours : réessayez dans quelques minutes.'),{status:429});const ch=WA.b64u.enc(crypto.randomBytes(32));passkeyChallenges.set(ch,{kind,origin,expires:Date.now()+300000,...extra});return ch;};
+     const mine=u=>{const rec=db.users.find(x=>x.id===u.id);if(!Array.isArray(rec.passkeys))rec.passkeys=[];return rec;};
+     const pub=k=>({id:k.id,name:k.name,rpId:k.rpId,createdAt:k.createdAt,lastUsedAt:k.lastUsedAt||null,here:k.rpId===rpId});
+     if(pathname==='/api/passkey/register/options'){const u=requireUser(req);limit(req,'passkey');const rec=mine(u);if(rec.passkeys.length>=10)throw sleepBlock('10 clés d’accès au maximum : supprimez-en une.');
+      const ch=issue('reg',{uid:u.id});send(res,200,{publicKey:{challenge:ch,rp:{name:'Chroniques',id:rpId},user:{id:WA.b64u.enc(Buffer.from(u.id)),name:u.name,displayName:u.name},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],timeout:120000,attestation:'none',authenticatorSelection:{residentKey:'required',requireResidentKey:true,userVerification:'required'},excludeCredentials:rec.passkeys.filter(k=>k.rpId===rpId).map(k=>({type:'public-key',id:k.id}))}});return;}
+     if(pathname==='/api/passkey/register'){const u=requireUser(req);limit(req,'passkey');const p=take(challengeOf(b.credential),'reg');if(p.uid!==u.id)throw sleepBlock('Défi d’un autre compte.');
+      const k=WA.verifyRegistration({credential:b.credential,challenge:challengeOf(b.credential),origin,rpId});
+      if(db.users.some(x=>(x.passkeys||[]).some(y=>y.id===k.id)))throw sleepBlock('Cette clé d’accès est déjà enregistrée.');
+      const rec=mine(u);if(rec.passkeys.length>=10)throw sleepBlock('10 clés d’accès au maximum.');
+      const name=String(b.name||'').replace(/[\u0000-\u001f]/g,' ').trim().slice(0,40)||'Clé du '+new Date().toLocaleDateString('fr-FR');
+      rec.passkeys.push({id:k.id,alg:k.alg,jwk:k.jwk,signCount:k.signCount,rpId,name,createdAt:new Date().toISOString()});persist();send(res,200,{ok:true,passkeys:rec.passkeys.map(pub)});return;}
+     if(pathname==='/api/passkey/login/options'){limit(req,'login');const ch=issue('auth',{});send(res,200,{publicKey:{challenge:ch,rpId,timeout:120000,userVerification:'required',allowCredentials:[]}});return;}
+     if(pathname==='/api/passkey/login'){limit(req,'login');const ch=challengeOf(b.credential);take(ch,'auth');const id=String(b.credential?.id||'');
+      const user=db.users.find(x=>(x.passkeys||[]).some(k=>k.id===id&&k.rpId===rpId));const key=user&&user.passkeys.find(k=>k.id===id);
+      if(!key)throw Object.assign(new Error('Clé d’accès inconnue sur ce serveur : connectez-vous avec votre mot de passe, puis créez une clé dans Mon compte.'),{status:401});
+      if(b.credential?.response?.userHandle&&b.credential.response.userHandle!==WA.b64u.enc(Buffer.from(user.id)))throw Object.assign(new Error('Clé d’accès incohérente.'),{status:401});
+      const r=WA.verifyAssertion({credential:b.credential,challenge:ch,origin,rpId,stored:key});key.signCount=r.signCount;key.lastUsedAt=new Date().toISOString();persist();login(res,user);send(res,200,{ok:true});return;}
+     if(pathname==='/api/passkey/list'){const u=requireUser(req);send(res,200,{passkeys:mine(u).passkeys.map(pub),rpId});return;}
+     if(pathname==='/api/passkey/remove'){const u=requireUser(req);const rec=mine(u);const n=rec.passkeys.length;rec.passkeys=rec.passkeys.filter(k=>k.id!==String(b.id||''));if(n===rec.passkeys.length)throw Object.assign(new Error('Clé introuvable.'),{status:404});persist();send(res,200,{passkeys:rec.passkeys.map(pub)});return;}
+     throw Object.assign(new Error('Introuvable.'),{status:404});
     }
     if(pathname==='/api/login'){
      limit(req,'login');const slug=String(b.name||'').trim().toLocaleLowerCase('fr'),u=db.users.find(x=>x.slug===slug);

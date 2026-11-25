@@ -967,6 +967,13 @@ table.srd-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--c
 .rep-bar{background:linear-gradient(90deg,#b75f57,#a38e75 50%,#55aa4e)}
 .rep-bar span{background:#533b10;border:1px solid #e9e3dd}
 .fa-members{border:1px solid var(--c-line,#cabdaf)}
+.rt-card{border:1px solid var(--c-line,#cabdaf);background:var(--c-bg-2,transparent)}
+.rt-result{border-left:3px solid var(--gold,#957638);background:#9576381a}
+.rt-table td,.rt-table th{border-bottom:1px solid var(--c-line,#cabdaf)}
+.ad-targets{border:1px solid var(--c-line,#cabdaf)}
+.ad-row{border-bottom:1px dotted var(--c-line,#cabdaf)}
+.pk-list li{border-bottom:1px dotted var(--c-line,#cabdaf)}
+.rt-card .rt-result{color:inherit}
 :root{color-scheme:light;--grain:none;--c-bg:#f4efe4;--c-bg-2:#ede5d6;--c-surface:#fbf8f1;--c-surface-2:#f0e9dc;--c-line:#dcd1be;--c-line-soft:#e7dfcf;--c-text:#2b2118;--c-muted:#5c4b37;--c-accent:#9a3a26;--c-accent-strong:#8c2f1f;--c-on-accent:#fffaf3;--c-ok:#3d6a4c;--c-warn:#a8741a;--c-danger:#b3402c;--c-focus:#8c2f1f}
 .workspace-parchment :is(p,span,small,li,strong,em,h1,h2,h3,h4,label,div){color:#3d2f1d}
 .workspace-parchment .muted,.workspace-parchment .muted *{color:#6b5a42}

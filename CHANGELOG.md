@@ -1,5 +1,17 @@
 # Journal des modifications
 
+## 5.1.0 — Téléphones corrigés, tables aléatoires, dégâts de zone, clés d’accès
+**Correction importante (téléphones et application Android)**
+- Sur les écrans étroits et avec la taille du texte « Grande », l’en-tête débordait à droite : « Mon affichage » (MJ / joueur) et « Mon compte » devenaient inaccessibles, et la barre du bas était coupée. L’en-tête passe sur deux lignes (logo et boutons, puis « Mon affichage »), « Mon compte » devient un bouton ☰, et plus aucune page ne déborde en largeur (vérifié sur toutes les pages, MJ et joueur, de 320 à 412 px de large).
+
+**Nouveautés**
+- **🎲 Tables aléatoires** (Séance du jour, ou Ctrl+K) : vos tables de rencontres, butin, rumeurs, météo… Écrivez « 1-3 : … » ou une ligne par résultat, lancez votre vrai dé, saisissez le total : Chroniques lit la ligne. Dés d4 à d100, 2d6, 3d6… ; trous et chevauchements signalés ; tables privées ou visibles des joueurs ; résultats annoncés ou non ; incluses dans les modèles de campagne. Aucun tirage n’est fait par l’outil.
+- **💥 Dégâts de zone** : une seule saisie pour plusieurs cibles (Bureau de combat, Ctrl+K, ou « 💥 Dégâts » sous une zone posée sur la carte, qui pré-coche les jetons touchés). Pour chaque cible : sauvegarde réussie ou ratée ; moitié ou aucun dégât selon le sort, puis résistance, vulnérabilité ou immunité. Aperçu avant validation, annulable.
+- **Zones de sort** : la liste des zones posées indique maintenant les créatures et personnages touchés.
+- **🔑 Clés d’accès** (Paramètres) : connexion par empreinte, visage ou code de l’appareil, sans mot de passe (WebAuthn, sans dépendance). Le secret reste sur l’appareil ; vérification de l’utilisateur obligatoire ; défis à usage unique ; détection des clés copiées. Disponible dans les navigateurs sur l’adresse HTTPS (ou localhost) ; pas dans l’application Android.
+- **♫ Ambiance des scènes** : une scène peut lancer une piste d’ambiance quand elle passe « en cours ».
+- **Hors connexion** : les emplacements de sorts dépensés et les objets utilisés (potion, munition, charge) sont aussi notés sur l’appareil pendant une coupure, puis envoyés au retour du réseau (le serveur revérifie).
+
 ## 5.0.2 — Relecture complète des textes
 - **Vouvoiement partout** : aide rapide, premiers pas, visite guidée, messages d’erreur, écrans vides, combat (« À vous de jouer ! »), cartes, butin, préparation de séance et guides imprimables s’adressent désormais tous à l’utilisateur avec « vous ». Seul le message d’invitation à copier pour un ami reste au tutoiement, plus naturel entre joueurs.
 - **Textes périmés retirés** : mentions de « V0.3 », de « prototype » et de « migrations pas encore disponibles » dans les Paramètres ; l’encadré d’installation sur téléphone présente maintenant l’application Android ; la page « Serveur inaccessible » explique quoi vérifier.

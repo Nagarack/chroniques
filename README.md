@@ -54,6 +54,9 @@ Historique : voir `CHANGELOG.md`. Recette de test : `GUIDE_TESTEURS.md`.
 - **Portraits** : sans image choisie, chaque aventurier affiche l’icône de sa classe.
 - **Raccourcis** : `?` aide de l'écran, `/` recherche, `Échap` fermer ; en combat, pour le MJ, `N` tour suivant et `U` annuler.
 - **Résistances et vulnérabilités** : réglables sur chaque fiche et chaque créature ; choisir le type de dégâts avant de les enregistrer.
+- **Tables aléatoires** (5.1) : vos tables, votre dé, le total saisi, la ligne affichée.
+- **Dégâts de zone** (5.1) : plusieurs cibles en une saisie, sauvegardes et résistances appliquées ; cibles touchées par une zone de la carte.
+- **Clés d’accès** (5.1) : connexion par empreinte, visage ou code de l’appareil (Paramètres).
 
 ## Mettre à jour
 
@@ -86,7 +89,7 @@ Venant d'une version antérieure à 3.9 (sans METTRE_A_JOUR.bat) : utilisez une 
 
 ## Sécurité
 
-Les permissions sont vérifiées **côté serveur** par campagne et par rôle : un joueur ne reçoit jamais les données réservées au MJ, et le MJ est en lecture seule sur les notes partagées des joueurs. Les mots de passe sont hachés (scrypt). Aucune base, clé, image personnelle ni URL privée n'est incluse dans l'archive. Les fonctions IA sont désactivées tant qu'aucune clé n'est configurée.
+Les permissions sont vérifiées **côté serveur** par campagne et par rôle : un joueur ne reçoit jamais les données réservées au MJ, et le MJ est en lecture seule sur les notes partagées des joueurs. Les mots de passe sont hachés (scrypt). Les clés d’accès (WebAuthn) ne stockent sur le serveur qu’une clé publique ; la vérification de l’utilisateur est obligatoire. Aucune base, clé, image personnelle ni URL privée n'est incluse dans l'archive. Les fonctions IA sont désactivées tant qu'aucune clé n'est configurée.
 
 ## Structure
 

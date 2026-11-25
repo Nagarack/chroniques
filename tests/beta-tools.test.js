@@ -43,7 +43,7 @@ test('Interface : signalement accessible à tous, mot de passe oublié expliqué
 test('Hors connexion : seules les actions additives ou protégées contre les conflits sont mises de côté',()=>{
  const ui=fs.readFileSync(path.join(__dirname,'../src/online-app.js'),'utf8');
  const m=/const QUEUEABLE=new Set\((\[[^\]]*\])\)/.exec(ui);assert.ok(m);const kinds=JSON.parse(m[1].replace(/'/g,'"'));
- assert.deepEqual(kinds.sort(),['companionHp','deathSave','exhaustion','hp','npcHp','pcNotesSave','resource','sharedNoteSave','tempHp','whisperSend']);
+ assert.deepEqual(kinds.sort(),['companionHp','deathSave','exhaustion','hp','itemUse','npcHp','pcNotesSave','resource','sharedNoteSave','slot','tempHp','whisperSend']);
  for(const k of ['condition','next','undo','npcRemove'])assert.ok(!kinds.includes(k),k+' ne doit jamais être rejoué en différé');
  for(const k of ['function flushOutbox()','outboxSave()',"window.addEventListener('online'",'id="outbox-count"'])assert.ok(ui.includes(k),k);
 });
