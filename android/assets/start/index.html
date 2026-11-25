@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chroniques</title><link rel="stylesheet" href="start.css"></head>
+<body><main>
+<div class="logo"><img src="../app/assets/icon-192.png" alt=""><h1>Chroniques</h1><p class="sub">La table de votre campagne, dans votre poche.</p></div>
+<section class="card" aria-labelledby="t-connect">
+ <h2 id="t-connect">Se connecter au serveur du MJ</h2>
+ <form id="f"><label for="url">Adresse du serveur</label>
+ <input id="url" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder="https://…" required>
+ <button class="primary" type="submit" id="go">Se connecter</button>
+ <p class="err" id="err" role="alert"></p></form>
+ <p class="hint">C’est la même adresse que celle du site, celle que votre MJ vous a envoyée avec l’invitation (elle commence en général par <b>https://</b>). Vous vous connectez ensuite avec votre compte Chroniques, comme sur le site.</p>
+</section>
+<section class="card" id="known-card" hidden aria-labelledby="t-known"><h2 id="t-known">Serveurs déjà utilisés</h2><ul id="known"></ul></section>
+<p class="foot" id="foot"></p>
+</main>
+<script src="start.js"></script></body></html>

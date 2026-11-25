@@ -1,0 +1,17 @@
+data/*
+!data/.gitkeep
+config/*
+!config/.gitkeep
+backups/*
+!backups/.gitkeep
+.env
+*.log
+node_modules/
+updates/*
+*.pem
+android/build/
+*.jks
+*.keystore
+android/chroniques.apk
+dist/
+update-source.local.json

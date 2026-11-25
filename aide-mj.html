@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aide-mémoire du MJ — Chroniques</title>
+<style>
+:root{--ink:#2b2118;--muted:#6b5a45;--rule:#d9cdb6;--accent:#8c2f1f;--paper:#fbf8f1}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 'Alegreya Sans','Gill Sans','Trebuchet MS',system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:28px 24px}
+h1{font:400 30px/1.15 'IM Fell English',Georgia,serif;margin:0 0 4px}h2{font:400 19px/1.2 'IM Fell English',Georgia,serif;color:var(--accent);margin:0 0 6px}
+.lede{color:var(--muted);margin:0 0 18px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px}
+section{border-top:1px solid var(--rule);padding-top:10px}ul,ol{margin:0;padding-left:18px}li{margin:2px 0}
+kbd{border:1px solid var(--rule);border-bottom-width:2px;border-radius:3px;padding:0 5px;font:inherit;font-size:13px}
+.print{margin:18px 0 0;color:var(--muted)}.foot{margin-top:16px;color:var(--muted);font-size:13px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+@media print{@page{size:A4;margin:12mm}body{background:#fff;font-size:12px}main{padding:0}.print{display:none}}
+</style></head><body><main>
+<h1>Aide-mémoire du Maître du Jeu</h1>
+<p class="lede">Le serveur tourne sur votre PC : laissez la fenêtre <strong>DEMARRER_CHRONIQUES</strong> ouverte pendant la partie. Les dés restent physiques.</p>
+<div class="grid">
+<section><h2>Avant la séance</h2><ol>
+<li><strong>Campagne → Inviter ce joueur</strong> (ou toute la table) : QR code à scanner, ou lien à envoyer.</li>
+<li><strong>Personnages</strong> : vérifiez PV, CA, résistances et ressources avec chaque joueur.</li>
+<li><strong>Combat → Monstres et PNJ</strong> : ajoutez les créatures (bestiaire SRD ou fiche libre).</li>
+<li><strong>Bibliothèque MJ</strong> : vos monstres et objets maison, vos rencontres et leur difficulté selon le niveau du groupe.</li>
+<li><b>Séance du jour</b> (Préparation) : scènes, rencontres, PNJ, quêtes et documents sur une page, à imprimer.</li>
+<li><b>📜 Précédemment dans…</b> (Séance du jour) : composer, relire, publier ; affichable sur l’écran de table.</li>
+<li><b>🧭 Voyage</b> (Journal &amp; quêtes → Calendrier) : distance, rythme, campement, rations, lumières.</li>
+<li><b>⚜ Factions &amp; relations</b> (Carnet) : réputation du groupe −5 à +5 sur chaque faction, membres, relations PNJ ↔ personnages.</li>
+<li><b>⚡ PNJ express</b> (Journal &amp; quêtes → PNJ récurrents) : nom, rôle, trait, voix, secret, avec des idées à choisir.</li>
+<li>Sauvegardez : bouton « Sauvegarder maintenant » ou SAUVEGARDER_CHRONIQUES.bat.</li></ol></section>
+<section><h2>Pendant le combat</h2><ul>
+<li><b>📖 Fiche</b> parmi les actions d’une créature du SRD : son bloc de statistiques officiel en français.</li>
+<li><b>✉ Chuchotements</b> : un message privé à un joueur (« tu remarques… ») sans que les autres le voient.</li>
+<li><b>Règles du jeu</b> et <b>états cliquables</b> : la règle officielle en français en deux clics.</li>
+<li>Saisissez les initiatives lancées aux dés, puis <strong>Commencer le combat</strong>.</li>
+<li><kbd>N</kbd> tour suivant · <kbd>U</kbd> annuler la dernière action (10 niveaux).</li>
+<li><strong>Durées d’états</strong> : fin ou début de tour, tour du lanceur, rappel de sauvegarde à chaque fin de tour (⏳ sur l’état).</li>
+<li><b>Vue du groupe</b> : sauvegardes, Perception passive et DD des sorts de toute la table. <b>Minuteur de tour</b> ⏱ facultatif.</li>
+<li><b>Poste co-MJ</b> (<code>/#poste-comj</code>) : un écran pour gérer les créatures sur une tablette ; rôle « Co-MJ créatures » pour un ami sans accès à vos secrets.</li>
+<li>Choisissez le <strong>type de dégâts</strong> : résistance ÷ 2, vulnérabilité × 2, immunité 0.</li>
+<li>Concentration (aventuriers <em>et</em> créatures) : le DD de sauvegarde est rappelé à chaque dégât.</li>
+<li>Créatures en groupe : une seule initiative ; boutons d’action et compteur d’actions légendaires sous chaque créature.</li>
+<li><strong>Écran du MJ</strong> : règles courantes, depuis le combat.</li>
+<li><strong>Écran de table</strong> : carte et initiative pour la TV, sans secrets.</li>
+<li><kbd>Ctrl</kbd>+<kbd>K</kbd> : rechercher partout et lancer une commande.</li></ul></section>
+<section><h2>Ce que voient les joueurs</h2><ul>
+<li>Créatures <em>masquées</em> : invisibles pour eux. <em>Visibles</em> : nom et états seulement.</li>
+<li>Caractéristiques, défenses et notes des monstres : jamais transmises.</li>
+<li>Notes partagées : écrites par les joueurs, lisibles par vous.</li>
+<li>Historique du personnage : vos notes <em>secrètes</em> n’y apparaissent jamais pour eux.</li>
+<li>« Mon affichage → Joueur » pour vérifier leur point de vue.</li></ul></section>
+<section><h2>Mises à jour et sauvegardes</h2><ul>
+<li><b>Mettre à jour</b> : Paramètres → « Mettre à jour Chroniques » → envoyer le ZIP → « Installer et redémarrer » (serveur lancé par DEMARRER_CHRONIQUES.bat).</li>
+<li><b>Restaurer une sauvegarde</b> : Paramètres → choisir une date → « Tester » (rien n’est modifié) puis « Restaurer… ». L’état actuel est sauvegardé juste avant.</li>
+<li><b>Copie miroir</b> : indiquez un dossier de clé USB ou OneDrive / Google Drive dans Paramètres ; chaque sauvegarde y est recopiée. Une sauvegarde quotidienne est faite automatiquement.</li>
+<li><b>Mises à jour automatiques</b> (facultatif) : <code>config/update-source.json</code> ; la version signée est téléchargée et vérifiée, vous confirmez l’installation.</li>
+<li><b>Modèle de campagne</b> (Paramètres) : exporter / importer votre préparation.</li>
+<li>Fermez le serveur, puis glissez le nouveau ZIP sur <strong>METTRE_A_JOUR.bat</strong>.</li>
+<li>Sauvegarde, vérification et retour arrière sont automatiques.</li>
+<li>Souci ? <strong>REVENIR_VERSION_PRECEDENTE.bat</strong>.</li>
+<li>Copiez le dossier <code>backups</code> ailleurs de temps en temps.</li></ul></section>
+<section><h2>Jouer à distance</h2><ul>
+<li>CONFIGURER_URL_HTTPS.bat enregistre l’adresse du tunnel Cloudflare.</li>
+<li>Sans adresse HTTPS, les liens d’invitation ne marchent que sur votre PC.</li>
+<li>PROTEGER_CLOUDFLARE_ACCESS.bat pour restreindre l’accès au site.</li></ul></section>
+<section><h2>Raccourcis</h2><ul>
+<li><kbd>?</kbd> aide de l’écran · <kbd>/</kbd> rechercher · <kbd>Échap</kbd> fermer</li>
+<li>Visite guidée : Aide &amp; tutoriel → Lancer la visite.</li>
+<li>Campagne d’entraînement : Mes campagnes, pour tester sans risque.</li></ul></section>
+</div>
+<p class="print">Pour imprimer : <kbd>Ctrl</kbd> + <kbd>P</kbd>.</p>
+<p class="foot">Chroniques · assistant de table D&amp;D 5e (règles 2014 et 2024) · Référence SRD 5.2.1.</p>
+</main></body></html>

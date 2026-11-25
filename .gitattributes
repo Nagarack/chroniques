@@ -1,0 +1,3 @@
+# Aucune conversion de fin de ligne : les fichiers restent identiques sous Windows, macOS et Linux
+# (les .bat gardent leurs CRLF, les tests comparent des fichiers octet par octet).
+* -text

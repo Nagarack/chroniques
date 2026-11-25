@@ -1,0 +1,88 @@
+# Chroniques — publication automatique d'une version.
+# Déclenchement : une étiquette « vX.Y.Z » envoyée sur GitHub (le script PUBLIER_VERSION.bat le fait pour vous).
+# Étapes : tests → application Android signée → ZIP → fiche de version signée → version GitHub
+# (Chroniques_VX_Y_Z.zip, Chroniques-X.Y.Z.apk, chroniques-maj.json). Les serveurs configurés la trouvent seuls.
+# Secrets du dépôt (créés par PREPARER_GITHUB.bat) :
+#   CHRONIQUES_UPDATE_KEY     clé privée Ed25519 de signature des mises à jour (PEM)
+#   CHRONIQUES_KEYSTORE_B64   clé Android (.jks) en base64
+#   CHRONIQUES_KEYSTORE_PASS  mot de passe de la clé Android
+name: Publication
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publication
+  cancel-in-progress: false
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node --test
+  publier:
+    needs: tests
+    runs-on: ubuntu-latest
+    env:
+      # Mêmes outils Android que ceux utilisés pour la version 5.0 (paquets Ubuntu), sans Gradle.
+      ANDROID_HOME: /usr/lib/android-sdk
+      ANDROID_SDK_ROOT: /usr/lib/android-sdk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Version
+        run: |
+          V=$(node -p "require('./package.json').version")
+          echo "VERSION=$V" >> "$GITHUB_ENV"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "v$V" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::L'étiquette ${GITHUB_REF_NAME} ne correspond pas à package.json ($V)."; exit 1; fi
+          if gh release view "v$V" >/dev/null 2>&1; then echo "::error::La version v$V existe déjà sur GitHub."; exit 1; fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Secrets présents ?
+        env:
+          A: ${{ secrets.CHRONIQUES_UPDATE_KEY }}
+          B: ${{ secrets.CHRONIQUES_KEYSTORE_B64 }}
+          C: ${{ secrets.CHRONIQUES_KEYSTORE_PASS }}
+        run: |
+          [ -n "$A" ] || { echo "::error::Secret CHRONIQUES_UPDATE_KEY manquant (relancez PREPARER_GITHUB.bat)."; exit 1; }
+          [ -n "$B" ] || { echo "::error::Secret CHRONIQUES_KEYSTORE_B64 manquant."; exit 1; }
+          [ -n "$C" ] || { echo "::error::Secret CHRONIQUES_KEYSTORE_PASS manquant."; exit 1; }
+      - name: Outils Android
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends android-sdk-platform-23 aapt apksigner dalvik-exchange zipalign
+      - name: Application Android
+        env:
+          CHRONIQUES_KEYSTORE_PASS: ${{ secrets.CHRONIQUES_KEYSTORE_PASS }}
+          KS_B64: ${{ secrets.CHRONIQUES_KEYSTORE_B64 }}
+        run: |
+          printf '%s' "$KS_B64" | base64 -d > "$RUNNER_TEMP/chroniques.jks"
+          CHRONIQUES_KEYSTORE="$RUNNER_TEMP/chroniques.jks" node scripts/dev/build-android.js
+          rm -f "$RUNNER_TEMP/chroniques.jks"
+      - name: ZIP et fiche de version signée
+        env:
+          CHRONIQUES_UPDATE_KEY: ${{ secrets.CHRONIQUES_UPDATE_KEY }}
+        run: |
+          printf '%s\n' "$CHRONIQUES_UPDATE_KEY" > "$RUNNER_TEMP/maj.pem"
+          # Chaque installation saura où chercher les versions suivantes (ce dépôt) et avec quelle clé les vérifier.
+          node scripts/dev/write-update-source.js "$GITHUB_REPOSITORY" "$RUNNER_TEMP/maj.pem"
+          ZIP=$(node scripts/dev/package.js dist)
+          node scripts/dev/release-notes.js "$VERSION" > dist/notes.md
+          node scripts/dev/sign-release.js signer "$ZIP" --cle "$RUNNER_TEMP/maj.pem" --url "$(basename "$ZIP")" --notes "$(node scripts/dev/release-notes.js "$VERSION" --court)" --sortie dist/chroniques-maj.json
+          rm -f "$RUNNER_TEMP/maj.pem"
+          cp android/chroniques.apk "dist/Chroniques-${VERSION}.apk"
+          ls -la dist
+      - name: Version GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${VERSION}" dist/*.zip dist/*.apk dist/chroniques-maj.json \
+            --title "Chroniques ${VERSION}" --notes-file dist/notes.md --target "${GITHUB_SHA}"

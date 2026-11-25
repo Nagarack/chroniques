@@ -1,0 +1,100 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),vm=require('node:vm');
+const {createServer}=require('../server'),CM=require('../src/campaign-maps'),MT=require('../src/map-treasure'),I=require('../src/inventory'),L=require('../src/logic');
+const values=(name,quantity=1,description='Note MJ privée')=>({name,description,category:'treasure',quantity,weight:0,chargesMax:0,charges:0,equipped:false,attuned:false});
+test('V2.7 : migration douce des anciens repères et transfert sans duplication',()=>{
+ const s=L.initialState(),pc=s.characters[0];CM.add(s,'map-abcdefgh',{title:'Région',summary:'',visibility:'shared'});CM.markerAdd(s,'map-abcdefgh','pin-abcdefgh',{title:'Coffre',description:'',visibility:'shared',x:200,y:300,symbol:'chest'});
+ const pin=CM.markerRead(s,'map-abcdefgh','pin-abcdefgh');assert(!('loot' in pin));assert.equal(MT.list(pin).length,0);
+ I.lootAdd(s,'loot-abcdefghi',values('Rubis',5));
+ MT.fromStash(s,'map-abcdefgh','pin-abcdefgh','loot-abcdefghi','chest-abcdefgh',3);
+ assert.equal(s.lootStash[0].quantity,2);assert.equal(MT.list(pin)[0].quantity,3);
+ MT.toCharacter(s,'map-abcdefgh','pin-abcdefgh','chest-abcdefgh',pc,'item-abcdefghi',2);
+ assert.equal(MT.list(pin)[0].quantity,1);assert.equal(pc.inventoryItems.at(-1).quantity,2);
+ MT.toStash(s,'map-abcdefgh','pin-abcdefgh','chest-abcdefgh','loot-bbbbbbbbb',1);
+ assert.equal(MT.list(pin).length,0);assert.equal(s.lootStash.reduce((n,it)=>n+it.quantity,0),3);
+ assert.equal(pc.inventoryItems.at(-1).name,'Rubis');
+});
+test('V2.7 : projection indépendante repère/contenu et protection des notes',()=>{
+ const s={};CM.add(s,'map-abcdefgh',{title:'Caverne',summary:'',visibility:'shared'});
+ CM.markerAdd(s,'map-abcdefgh','pin-abcdefgh',{title:'Coffre révélé',description:'Coquille',visibility:'shared',symbol:'chest',x:1,y:1});
+ CM.markerAdd(s,'map-abcdefgh','pin-secretaaaa',{title:'Piège caché',description:'Caché',visibility:'private',symbol:'trap',x:2,y:2});
+ MT.add(s,'map-abcdefgh','pin-abcdefgh','chest-abcdefgh',values('Amulette du vent',2,'Emplacement secret du boss'));
+ MT.add(s,'map-abcdefgh','pin-secretaaaa','chest-bbbbbbbb',values('Clé du démon',1,'SECRET ABSOLU'));
+ const player={role:'player'},gm={role:'gm'};
+ const before=CM.projected(s,player);assert.equal(before[0].markers.length,1);assert(!JSON.stringify(before).includes('Amulette'));assert(!JSON.stringify(before).includes('SECRET ABSOLU'));assert(!JSON.stringify(before).includes('Clé du démon'));
+ assert.equal(CM.projected(s,gm)[0].markers[0].loot[0].description,'Emplacement secret du boss');
+ MT.reveal(s,'map-abcdefgh','pin-abcdefgh',true);
+ const after=CM.projected(s,player);assert.equal(after[0].markers[0].publicLoot[0].name,'Amulette du vent');assert.equal(after[0].markers[0].publicLoot[0].quantity,2);
+ assert(!JSON.stringify(after).includes('Emplacement secret'));assert(!JSON.stringify(after).includes('chest-abcdefgh'));
+ assert.throws(()=>MT.reveal(s,'map-abcdefgh','pin-abcdefgh','true'),/Visibilité/);
+});
+test('V2.7 : anti-perte de butin et validations d’actions',()=>{
+ const s={};CM.add(s,'map-abcdefgh',{title:'Ruines',summary:'',visibility:'private'});CM.markerAdd(s,'map-abcdefgh','pin-abcdefgh',{title:'Coffre',description:'',visibility:'private',x:100,y:100});
+ MT.add(s,'map-abcdefgh','pin-abcdefgh','chest-abcdefgh',values('Orbe',2));
+ assert.throws(()=>CM.remove(s,'map-abcdefgh'),/contient des trésors/);
+ assert.throws(()=>CM.markerRemove(s,'map-abcdefgh','pin-abcdefgh'),/contient des trésors/);
+ assert.throws(()=>MT.toStash(s,'map-abcdefgh','pin-abcdefgh','chest-abcdefgh','loot-abcdefgh',3),/insuffisante/);
+ assert.throws(()=>MT.toCharacter(s,'map-abcdefgh','pin-abcdefgh','chest-abcdefgh',{inventoryItems:[]},'item-abcdefgh',0),/Quantité/);
+ assert.throws(()=>MT.fromStash(s,'map-abcdefgh','pin-abcdefgh','inconnu','chest-bbbbbbbb',1),/introuvable/);
+ assert.equal(MT.list(CM.markerRead(s,'map-abcdefgh','pin-abcdefgh'))[0].quantity,2);
+ MT.toStash(s,'map-abcdefgh','pin-abcdefgh','chest-abcdefgh','loot-abcdefgh',2);
+ assert.equal(CM.markerRemove(s,'map-abcdefgh','pin-abcdefgh').title,'Coffre');assert.equal(CM.remove(s,'map-abcdefgh').title,'Ruines');
+});
+async function fixture(t){
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'chroniques-v27-')),dataFile=path.join(dir,'db.json'),app=createServer({publicOrigin:null,dataFile,setupKey:'v27-test-key'});
+ await new Promise(ok=>app.server.listen(0,'127.0.0.1',ok));t.after(async()=>{await app.close();fs.rmSync(dir,{recursive:true,force:true});});
+ const base='http://127.0.0.1:'+app.server.address().port;
+ async function call(route,b,auth=''){const res=await fetch(base+'/api/'+route,{method:b===undefined?'GET':'POST',headers:{...(b===undefined?{}:{'Content-Type':'application/json'}),...(auth?{Cookie:auth}:{})},body:b===undefined?undefined:JSON.stringify(b)});return {status:res.status,value:await res.json(),cookie:res.headers.get('set-cookie')?.split(';')[0]};}
+ const gm=(await call('setup',{name:'MJ V27',password:'owner-password-27',setupKey:'v27-test-key'})).cookie;
+ const inv=(await call('invites',{characterId:'aelin'},gm)).value;
+ const player=(await call('join',{name:'Player V27',password:'player-password-27',code:inv.code})).cookie;
+ const action=async(session,kind,args={})=>call('action',{baseVersion:(await call('state',undefined,session)).value.version,kind,...args},session);
+ return {dir,dataFile,call,gm,player,action};
+}
+test('V2.7 : API serveur privée, distribution atomique et état sauvegardé',async t=>{
+ const f=await fixture(t);
+ const add=await f.action(f.gm,'mapAdd',{values:{title:'Carte aux trésors',summary:'',visibility:'shared'}});assert.equal(add.status,200);
+ const map=add.value.state.maps[0].id;
+ const pinAdd=await f.action(f.gm,'mapMarkerAdd',{id:map,values:{title:'Coffre ouvert',description:'',visibility:'shared',x:100,y:200,symbol:'chest'}});assert.equal(pinAdd.status,200);
+ const pin=pinAdd.value.state.maps[0].markers[0].id;
+ assert.equal((await f.action(f.player,'mapLootAdd',{id:map,markerId:pin,values:values('Hack')})).status,403);
+ assert.equal((await f.action(f.gm,'lootAdd',{values:values('Potion étoilée',4,'Réservé aux MJ')})).status,200);
+ const stash=(await f.call('state',undefined,f.gm)).value.state.lootStash;
+ assert.equal((await f.action(f.gm,'mapLootFromStash',{id:map,markerId:pin,lootId:stash[0].id,quantity:3})).status,200);
+ let state=(await f.call('state',undefined,f.gm)).value.state;
+ let item=state.maps[0].markers[0].loot[0];assert.equal(item.quantity,3);assert.equal(state.lootStash[0].quantity,1);
+ const playerBefore=(await f.call('state',undefined,f.player)).value;
+ assert(!JSON.stringify(playerBefore).includes('Potion étoilée'));
+ assert(!JSON.stringify(playerBefore).includes('Réservé aux MJ'));
+ assert.equal((await f.action(f.player,'mapLootReveal',{id:map,markerId:pin,revealed:true})).status,403);
+ assert.equal((await f.action(f.gm,'mapLootReveal',{id:map,markerId:pin,revealed:true})).status,200);
+ const playerAfter=(await f.call('state',undefined,f.player)).value;
+ assert.equal(playerAfter.state.maps[0].markers[0].publicLoot[0].name,'Potion étoilée');
+ assert(!JSON.stringify(playerAfter).includes('Réservé aux MJ'));
+ assert(!JSON.stringify(playerAfter).includes('lootStash'));
+ assert.equal((await f.action(f.gm,'mapMarkerDelete',{id:map,markerId:pin})).status,400);
+ assert.equal((await f.action(f.gm,'mapDelete',{id:map})).status,400);
+ assert.equal((await f.action(f.player,'mapLootGive',{id:map,markerId:pin,lootId:item.id,characterId:'aelin',quantity:1})).status,403);
+ assert.equal((await f.action(f.gm,'mapLootGive',{id:map,markerId:pin,lootId:item.id,characterId:'aelin',quantity:2})).status,200);
+ state=(await f.call('state',undefined,f.gm)).value.state;assert.equal(state.maps[0].markers[0].loot[0].quantity,1);
+ assert.equal(state.characters.find(p=>p.id==='aelin').inventoryItems.at(-1).quantity,2);
+ assert.equal((await f.action(f.gm,'mapLootGive',{id:map,markerId:pin,lootId:item.id,characterId:'aelin',quantity:3})).status,400);
+ assert.equal((await f.action(f.gm,'mapLootToStash',{id:map,markerId:pin,lootId:item.id,quantity:1})).status,200);
+ assert.equal((await f.action(f.gm,'mapMarkerDelete',{id:map,markerId:pin})).status,200);
+ assert.equal(JSON.parse(fs.readFileSync(f.dataFile,'utf8')).format,5);
+});
+test('V2.7 : un co-MJ peut gérer les coffres, perd ses droits après rétrogradation',async t=>{
+ const f=await fixture(t);const created=await f.action(f.gm,'mapAdd',{values:{title:'Refuge',summary:'',visibility:'private'}});const map=created.value.state.maps[0].id;
+ const pinRes=await f.action(f.gm,'mapMarkerAdd',{id:map,values:{title:'Réserve',description:'',visibility:'private',x:500,y:500}});const pin=pinRes.value.state.maps[0].markers[0].id;
+ const management=(await f.call('management',undefined,f.gm)).value;const uid=management.roleAssignments.find(m=>m.role==='player').userId;
+ assert.equal((await f.call('member/role',{userId:uid,role:'gm'},f.gm)).status,200);
+ assert.equal((await f.action(f.player,'mapLootAdd',{id:map,markerId:pin,values:values('Gemme de quartz',1)})).status,200);
+ assert.equal((await f.call('member/role',{userId:uid,role:'player'},f.gm)).status,200);
+ assert.equal((await f.action(f.player,'mapLootReveal',{id:map,markerId:pin,revealed:true})).status,403);
+ const player=(await f.call('state',undefined,f.player)).value;assert(!JSON.stringify(player).includes('Gemme de quartz'));
+});
+test('V2.7 : intégration interface, cache public et parcours guidé',()=>{
+ const root=path.join(__dirname,'..');const app=fs.readFileSync(path.join(root,'src/online-app.js'),'utf8'),sw=fs.readFileSync(path.join(root,'sw.js'),'utf8'),onboarding=require('../src/onboarding');
+ for(const label of ['mapLootAdd','mapLootGive','mapLootToStash','mapLootFromStash','mapLootReveal','map-loot-create','map-loot-public'])assert(app.includes(label),label);
+ assert(!app.includes('Math.random('));assert(!sw.includes('/api/state'));assert(!sw.includes('/api/map-pin-image'));assert(onboarding.steps('gm').some(x=>x.description.includes('coffre')));
+});

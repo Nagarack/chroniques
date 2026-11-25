@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chroniques — serveur injoignable</title><link rel="stylesheet" href="start.css"></head>
+<body><main>
+<div class="logo"><img src="../app/assets/icon-192.png" alt=""><h1>Chroniques</h1></div>
+<section class="card"><h2>Serveur injoignable</h2>
+<p>Impossible de joindre <b id="srv"></b>.</p>
+<p class="hint">Vérifiez que le PC du MJ est allumé et que Chroniques y est lancé, puis que votre téléphone est connecté à Internet.</p>
+<button class="primary" type="button" id="retry">Réessayer</button>
+<button type="button" id="change" style="width:100%;margin-top:10px">Changer de serveur</button></section>
+</main>
+<script>
+var A=window.ChroniquesAndroid,q=new URLSearchParams(location.search);document.getElementById('srv').textContent=q.get('serveur')||'le serveur';
+document.getElementById('retry').onclick=function(){A&&A.retry();};document.getElementById('change').onclick=function(){A&&A.changeServer();};
+</script></body></html>

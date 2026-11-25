@@ -1,0 +1,14 @@
+{
+  "name": "chroniques",
+  "version": "5.0.1",
+  "private": true,
+  "description": "Chroniques : assistant de table D&D 5e (dés physiques), serveur Node.js sans dépendance.",
+  "main": "server.js",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/",
+    "backup": "node scripts/backup.js",
+    "preflight": "node scripts/preflight-beta.js"
+  }
+}

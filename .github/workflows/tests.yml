@@ -1,0 +1,27 @@
+# Chroniques — tests automatiques à chaque envoi (Linux et Windows ; macOS coûte 10 fois plus de minutes
+# sur un dépôt privé : lancez-le à la main depuis l'onglet Actions si besoin).
+name: Tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      macos:
+        description: 'Inclure macOS'
+        type: boolean
+        default: false
+jobs:
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(github.event.inputs.macos == 'true' && '["ubuntu-latest","windows-latest","macos-latest"]' || '["ubuntu-latest","windows-latest"]') }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Tests
+        run: node --test

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#11141e">
+  <meta name="description" content="Chroniques V0.4 — prototype autonome de tableau de bord MJ pour D&D 5e 2024, 2014 et règles personnalisées.">
+  <title>Chroniques V0.8 — Démonstration hors ligne</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="assets/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <div id="app" aria-live="off"><p style="font-family:sans-serif;padding:2rem">Chargement de Chroniques…</p></div>
+  <script src="src/logic.js"></script>
+  <script src="src/offline-app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>

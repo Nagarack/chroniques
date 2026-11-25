@@ -1,0 +1,7 @@
+{
+  "_aide": "Copiez ce fichier dans config/update-source.json (ou, pour l'éditeur, à la racine sous le nom update-source.json, sans jeton). Voir PUBLIER_UNE_VERSION.md.",
+  "manifest": "github:VOTRE-COMPTE/VOTRE-DEPOT",
+  "publicKey": "COLLEZ-ICI-LA-CLE-PUBLIQUE-AFFICHEE-PAR-sign-release.js",
+  "token": "",
+  "autoDownload": true
+}
