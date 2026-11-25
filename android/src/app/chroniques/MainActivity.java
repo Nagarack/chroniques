@@ -58,7 +58,7 @@ public class MainActivity extends Activity {
 
     @Override protected void onCreate(android.os.Bundle saved) {
         super.onCreate(saved);
-        store = new Store(this);
+        store = new Store(this); if (store.lang() != null) Compat.lang = store.lang();
         bundle = new Bundle(this);
         Compat.channels(this);
         WebView.setWebContentsDebuggingEnabled((getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0);
@@ -117,10 +117,10 @@ public class MainActivity extends Activity {
     /** Le serveur a une autre version que l'application : l'interface du serveur est utilisée ; on propose la mise à jour. */
     void versionNotice(final String serverVersion) {
         if (serverVersion.equals(store.dismissedVersion()) || compare(serverVersion, bundle.version) <= 0) return;
-        new AlertDialog.Builder(this).setTitle("Nouvelle version disponible")
-            .setMessage("Le serveur de votre MJ utilise Chroniques " + serverVersion + " (application : " + bundle.version + "). Tout fonctionne déjà avec l'interface du serveur. Mettez l'application à jour pour retrouver le démarrage rapide et le mode hors connexion : Android vous demandera de confirmer l'installation.")
-            .setPositiveButton("Mettre à jour", new android.content.DialogInterface.OnClickListener() { public void onClick(android.content.DialogInterface d, int w) { updateApp(); } })
-            .setNegativeButton("Plus tard", new android.content.DialogInterface.OnClickListener() { public void onClick(android.content.DialogInterface d, int w) { store.setDismissedVersion(serverVersion); } })
+        new AlertDialog.Builder(this).setTitle(Compat.t("Nouvelle version disponible", "New version available"))
+            .setMessage(Compat.t("Le serveur de votre MJ utilise Chroniques " + serverVersion + " (application : " + bundle.version + "). Tout fonctionne déjà avec l'interface du serveur. Mettez l'application à jour pour retrouver le démarrage rapide et le mode hors connexion : Android vous demandera de confirmer l'installation.", "Your GM’s server runs Chroniques " + serverVersion + " (app: " + bundle.version + "). Everything already works with the server’s interface. Update the app to get the quick start and offline mode back: Android will ask you to confirm the installation."))
+            .setPositiveButton(Compat.t("Mettre à jour", "Update"), new android.content.DialogInterface.OnClickListener() { public void onClick(android.content.DialogInterface d, int w) { updateApp(); } })
+            .setNegativeButton(Compat.t("Plus tard", "Later"), new android.content.DialogInterface.OnClickListener() { public void onClick(android.content.DialogInterface d, int w) { store.setDismissedVersion(serverVersion); } })
             .show();
     }
 
@@ -133,12 +133,12 @@ public class MainActivity extends Activity {
             boolean allowed = true;
             try { allowed = (Boolean) getPackageManager().getClass().getMethod("canRequestPackageInstalls").invoke(getPackageManager()); } catch (Exception ignored) { }
             if (!allowed) {
-                toast("Autorisez Chroniques à installer des applications, puis revenez et touchez à nouveau « Mettre à jour ».");
+                toast(Compat.t("Autorisez Chroniques à installer des applications, puis revenez et touchez à nouveau « Mettre à jour ».", "Allow Chroniques to install apps, then come back and tap “Update” again."));
                 try { startActivity(new Intent("android.settings.MANAGE_UNKNOWN_APP_SOURCES", Uri.parse("package:" + getPackageName()))); } catch (Exception ignored) { }
                 return;
             }
         }
-        toast("Téléchargement de la nouvelle version…");
+        toast(Compat.t("Téléchargement de la nouvelle version…", "Downloading the new version…"));
         new Thread(new Runnable() { public void run() {
             try {
                 java.net.HttpURLConnection con = (java.net.HttpURLConnection) new java.net.URL(server + "/android/chroniques.apk").openConnection();
@@ -154,7 +154,7 @@ public class MainActivity extends Activity {
                         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
                     try { startActivity(i); } catch (Exception e) { external(server + "/android/chroniques.apk"); }
                 } });
-            } catch (Exception e) { toast("Téléchargement impossible : réessayez, ou ouvrez " + server + "/android dans le navigateur."); }
+            } catch (Exception e) { toast(Compat.t("Téléchargement impossible : réessayez, ou ouvrez " + server + "/android dans le navigateur.", "Download failed: try again, or open " + server + "/android in the browser.")); }
         } }).start();
     }
 
@@ -240,7 +240,7 @@ public class MainActivity extends Activity {
                 String name = android.webkit.URLUtil.guessFileName(url, disposition, mime);
                 final byte[] bytes = out.toByteArray(); final String fname = name; final String type = mime == null ? "application/octet-stream" : mime;
                 runOnUiThread(new Runnable() { public void run() { saveAs(fname, type, bytes); } });
-            } catch (Exception e) { toast("Téléchargement impossible."); }
+            } catch (Exception e) { toast(Compat.t("Téléchargement impossible.", "Download failed.")); }
         } }).start();
     }
 
@@ -248,7 +248,7 @@ public class MainActivity extends Activity {
         pendingBytes = bytes;
         String type = mime == null || mime.isEmpty() ? "application/octet-stream" : mime.split(";")[0].trim();
         Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType(type).putExtra(Intent.EXTRA_TITLE, name);
-        try { startActivityForResult(i, REQ_SAVE); } catch (Exception e) { pendingBytes = null; toast("Aucune application pour enregistrer le fichier."); }
+        try { startActivityForResult(i, REQ_SAVE); } catch (Exception e) { pendingBytes = null; toast(Compat.t("Aucune application pour enregistrer le fichier.", "No app available to save the file.")); }
     }
 
     void toast(final String msg) {
@@ -261,8 +261,8 @@ public class MainActivity extends Activity {
             fileCallback = null;
         } else if (req == REQ_SAVE) {
             if (result == RESULT_OK && data != null && data.getData() != null && pendingBytes != null) {
-                try { OutputStream o = getContentResolver().openOutputStream(data.getData()); o.write(pendingBytes); o.close(); toast("Fichier enregistré."); }
-                catch (Exception e) { toast("Enregistrement impossible."); }
+                try { OutputStream o = getContentResolver().openOutputStream(data.getData()); o.write(pendingBytes); o.close(); toast(Compat.t("Fichier enregistré.", "File saved.")); }
+                catch (Exception e) { toast(Compat.t("Enregistrement impossible.", "Could not save.")); }
             }
             pendingBytes = null;
         } else super.onActivityResult(req, result, data);
@@ -282,20 +282,20 @@ public class MainActivity extends Activity {
     /** Fonctions offertes à la page (objet window.ChroniquesAndroid). */
     final class Bridge {
         @JavascriptInterface public String info() {
-            try { return new JSONObject().put("version", appVersion()).put("bundle", bundle.version).put("server", store.server()).put("notify", store.notifyOn()).put("live", store.live()).put("known", store.known()).toString(); }
+            try { return new JSONObject().put("version", appVersion()).put("bundle", bundle.version).put("server", store.server()).put("notify", store.notifyOn()).put("live", store.live()).put("known", store.known()).put("lang", Compat.t("fr", "en")).toString(); }
             catch (Exception e) { return "{}"; }
         }
         @JavascriptInterface public String connect(String raw) {
             String url = normalize(raw);
-            if (url == null) return "Adresse invalide. Exemple : https://chroniques.exemple.fr";
+            if (url == null) return Compat.t("Adresse invalide. Exemple : https://chroniques.exemple.fr", "Invalid address. Example: https://chroniques.example.com");
             try {
                 JSONObject st = new JSONObject(Poller.get(url + "/api/status", null, 6000));
-                if (!st.has("version")) return "Ce serveur ne semble pas être un serveur Chroniques.";
+                if (!st.has("version")) return Compat.t("Ce serveur ne semble pas être un serveur Chroniques.", "This server does not seem to be a Chroniques server.");
                 store.setServer(url); store.setServerVersion(st.optString("version"));
                 runOnUiThread(new Runnable() { public void run() { openServer(true); } });
                 return "";
             } catch (Exception e) {
-                return "Serveur injoignable à cette adresse. Vérifiez l'adresse (celle du site, en https), votre connexion Internet, et que le PC du MJ est allumé avec Chroniques lancé.";
+                return Compat.t("Serveur injoignable à cette adresse. Vérifiez l'adresse (celle du site, en https), votre connexion Internet, et que le PC du MJ est allumé avec Chroniques lancé.", "Server unreachable at this address. Check the address (the website’s, in https), your Internet connection, and that the GM’s PC is on with Chroniques running.");
             }
         }
         @JavascriptInterface public void open(String url) { store.setServer(url); runOnUiThread(new Runnable() { public void run() { openServer(true); } }); }
@@ -303,17 +303,18 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void changeServer() { runOnUiThread(new Runnable() { public void run() { TableService.stop(MainActivity.this); web.loadUrl(START); } }); }
         @JavascriptInterface public void retry() { runOnUiThread(new Runnable() { public void run() { openServer(false); } }); }
         @JavascriptInterface public void setNotify(boolean b) { store.setNotify(b); }
+        @JavascriptInterface public void setLang(String l) { if ("fr".equals(l) || "en".equals(l)) { Compat.lang = l; store.setLang(l); } }
         @JavascriptInterface public void setLive(boolean b) { store.setLive(b); }
         @JavascriptInterface public void gameState(boolean combat) { gameActive = combat; }
         @JavascriptInterface public void openExternal(String url) { if (url != null && url.matches("^https?://.*")) external(url); }
         @JavascriptInterface public void print(final String title) { runOnUiThread(new Runnable() { public void run() { MainActivity.this.print(title); } }); }
         @JavascriptInterface public void saveFile(final String name, final String mime, String base64) {
             final byte[] bytes;
-            try { bytes = Base64.decode(base64, Base64.DEFAULT); } catch (Exception e) { toast("Fichier illisible."); return; }
+            try { bytes = Base64.decode(base64, Base64.DEFAULT); } catch (Exception e) { toast(Compat.t("Fichier illisible.", "Unreadable file.")); return; }
             runOnUiThread(new Runnable() { public void run() { saveAs(name, mime, bytes); } });
         }
         @JavascriptInterface public void updateApp() { runOnUiThread(new Runnable() { public void run() { MainActivity.this.updateApp(); } }); }
-        @JavascriptInterface public void testNotification() { Poller.show(MainActivity.this, "Chroniques", "Les notifications fonctionnent sur ce téléphone.", "essai"); }
+        @JavascriptInterface public void testNotification() { Poller.show(MainActivity.this, "Chroniques", Compat.t("Les notifications fonctionnent sur ce téléphone.", "Notifications work on this phone."), "essai"); }
     }
 
     static String normalize(String raw) {

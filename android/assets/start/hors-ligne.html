@@ -10,5 +10,6 @@
 </main>
 <script>
 var A=window.ChroniquesAndroid,q=new URLSearchParams(location.search);document.getElementById('srv').textContent=q.get('serveur')||'le serveur';
+var info={};try{info=JSON.parse(A?A.info():'{}');}catch(e){}if((info.lang||String(navigator.language||'fr').slice(0,2))!=='fr'){document.documentElement.lang='en';document.title='Chroniques — server unreachable';document.querySelector('h2').textContent='Server unreachable';document.querySelector('.card p').innerHTML='Cannot reach <b id="srv"></b>.';document.getElementById('srv').textContent=q.get('serveur')||'the server';document.querySelector('.hint').textContent='Check that the GM’s PC is on and that Chroniques is running on it, then that your phone is connected to the Internet.';document.getElementById('retry').textContent='Try again';document.getElementById('change').textContent='Change server';}
 document.getElementById('retry').onclick=function(){A&&A.retry();};document.getElementById('change').onclick=function(){A&&A.changeServer();};
 </script></body></html>

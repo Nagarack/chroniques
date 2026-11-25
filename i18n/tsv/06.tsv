@@ -1,0 +1,300 @@
+1460	Combat or an area placed on the map: one total, one saving throw per target, resistances applied. Can be undone.
+1461	Combat over
+1462	Combats
+1463	Front-line fighter, soaks up a huge amount thanks to rage.
+1464	Command
+1465	Start
+1466	Start a new session
+1467	Start by creating a place, a quest or an encounter if you want to link them.
+1468	Start with the hook and the stakes, then prepare three key moments and the links with your places, quests or encounters. You can also start from a local writing lead, fully editable.
+1469	Common
+1470	Shared by the whole group: everyone sees its contents. {0} To deposit an item, use “Give to…” then “Party chest” in the pack.
+1471	Speak with Animals
+1472	Companion added to combat.
+1473	Animal companion
+1474	Companion saved.
+1475	Companion not found.
+1476	Companions and familiars
+1477	companions per character.
+1478	-
+1479	-
+1480	-
+1481	-
+1482	-
+1483	-
+1484	Compare the information and reach a compromise.
+1485	Invalid skill or proficiency.
+1486	Skills
+1487	Skills granted: {0}.
+1488	Background skills:
+1489	Complication
+1490	Components
+1491	Comprehend Languages
+1492	Understand your actions
+1493	Account unavailable
+1494	Account not found.
+1495	Linked account
+1496	Accounts / sync
+1497	Manual counters and equipment, without virtual dice or automatic combat bonuses.
+1498	Counters synced with the campaign.
+1499	Conc.:
+1500	Concentration
+1501	CONCENTRATION
+1502	Concentration:
+1503	Concentration (one effect tracked)
+1504	Current concentration: {0}. It will be replaced.
+1505	Concentration,
+1506	Unknown condition.
+1507	Conditional
+1508	Conditions
+1509	Conditions or rule reminder
+1510	-
+1511	Cone
+1512	18 m cone bright, 18 m dim
+1513	Set up the character’s origin
+1514	First set up the species and background in “Origins” to show the automatic racial features.
+1515	Confirmation required.
+1516	Confirm
+1517	Confirm casting without a slot: has this exception been approved by the GM?
+1518	Confirm the concentration replacement
+1519	Comfort
+1520	Reading comfort
+1521	Stonecunning
+1522	Knows the entrance to a secret passage
+1523	Then sign in to access the assigned sheet.
+1524	Sign in, then create invitations from My campaigns.
+1525	Sign in
+1526	Sign in to the campaign
+1527	Cannot reach the AI service. Check the server PC’s network.
+1528	Remote connection
+1529	HTTPS connection through a Cloudflare link, with account and invitation.
+1530	Sign-in required.
+1531	Sign in with the fingerprint, face or code of your phone or PC, without typing a password. The secret stays on the device; the server only keeps a public key. Your password remains valid.
+1532	Connection lost: action noted on this device, it will be sent when the network is back.
+1533	Connection lost: this action was not saved. Try again when the network is back.
+1534	Connection restored.
+1535	Connecting…
+1536	Known
+1537	Consequence
+1538	Consequence: {0}
+1539	Consequence of the act
+1540	Consequences / leads to follow
+1541	Session consequences
+1542	Possible consequences
+1543	Visible consequences
+1544	Keep the current illustration
+1545	Record the manual total
+1546	Instructions: 1,200 characters maximum.
+1547	Instructions to pass on (optional, 1,200 characters maximum)
+1548	Instructions explicitly provided by the GM:
+1549	Consumable
+1550	Constitution
+1551	Built automatically from what was recorded during the game. No AI, nothing leaves your server. A new session starts by itself after 6 hours without activity.
+1552	See the slots →
+1553	See the illustrations
+1554	See the settings
+1555	See your spells
+1556	See the turn order, actions and conditions of your character.
+1557	Check the log to remember important decisions.
+1558	See the maps and places revealed by your GM.
+1559	See the maps, markers and chest contents revealed by the GM.
+1560	Chill Touch
+1561	-
+1562	-
+1563	Contents
+1564	Contents already marked as revealed, but the place is still hidden.
+1565	Contents private to the GMs until explicitly revealed. Revealing the marker does not automatically reveal its contents.
+1566	Context too long: select fewer fields.
+1567	Bludgeoning
+1568	Go around an obstacle or negotiate access.
+1569	Smuggler
+1570	Counterspell
+1571	Check prepared spells, slots and concentration.
+1572	Image conversion unavailable.
+1573	Automatic copy to another folder
+1574	Copy impossible: select the text.
+1575	Copy impossible here: select the text manually.
+1576	Mirror copy disabled.
+1577	Copy unavailable: the message is selected, copy it.
+1578	Copy unavailable: select the code.
+1579	Copy unavailable: select the text.
+1580	Copy unavailable in this browser.
+1581	Copy unavailable.
+1582	Copied.
+1583	Copy
+1584	Copy into my items
+1585	Copy and edit
+1586	Copy the suggestion
+1587	Copy the code only
+1588	Copy the link
+1589	Copy the message
+1590	Copy the invitation message
+1591	Copy all messages
+1592	Copy all reports
+1593	cosmetic
+1594	Cosmetic: display, text
+1595	Colour
+1596	Unknown colour.
+1597	Slam: +3, 1d6+1 bludgeoning.
+1598	Brave but reckless
+1599	Short (1 h)
+1600	-
+1601	creature
+1602	Creature
+1603	Creature: {0}
+1604	Creature added ·
+1605	Construct
+1606	Sample creature: edit or delete it freely.
+1607	Starting creature not found.
+1608	Reference creature not found.
+1609	Creature saved.
+1610	Creature not found.
+1611	Summoned creature
+1612	Monstrosity
+1613	Creature removed ·
+1614	Source creature
+1615	creature(s) placed at the top of the map
+1616	creatures
+1617	Creatures (animal form, lycanthrope, disguise…) · {0}
+1618	Creatures shown
+1619	Creatures added. Enter the initiatives rolled with your dice.
+1620	SRD creatures ready to use: add them to your templates in one click, then build your encounters. The dice to roll are shown, nothing is rolled by the app.
+1621	Creatures in play
+1622	creatures)
+1623	-
+1624	Created on {0}{1}{2}
+1625	Create the item
+1626	Create the campaign
+1627	Create the map
+1628	Create the table
+1629	Create the scenario
+1630	Create my GM space
+1631	Create my character
+1632	Create an adventurer
+1633	Create a monster
+1634	Create a homebrew monster or NPC
+1635	Create an item
+1636	Create a practice campaign
+1637	Create a practice campaign (with a few sample monsters)? Your real campaign is not changed.
+1638	Create a key on this device
+1639	Create a new independent campaign:
+1640	First create a character to link a portrait to it.
+1641	Create scenes in
+1642	Create the GM account in local mode before any HTTPS publication.
+1643	Create a place or a quest in Journal & quests, or simply start with an unlinked scene.
+1644	Create a map, then import a PNG, JPG or WebP image.
+1645	Create an encounter, add one or more template groups, then place all their copies in the initiative. You can still adjust the values with the physical dice. Creatures already present are not erased.
+1646	Create a scene with a title, a summary and GM-only notes.
+1647	Create a private scene, add your notes and publish only the summary you want.
+1648	Create your homebrew monsters and items, or start from an SRD sheet.
+1649	Create your own creatures with their full sheet (ability scores, actions, legendary actions, defences) or start from an SRD creature. They are used in your encounters and appear in the bestiary search in combat. Never sent to players.
+1650	Create your GM account with a personal password.
+1651	Criminal
+1652	Crypts and ruins
+1653	Ctrl+K (or the magnifying glass) searches everywhere: characters, monsters, items, spells, maps, handouts and commands such as “GM screen” or “Long rest for the whole party”.
+1654	Ctrl+K or the magnifying glass: characters, monsters, items, spells, maps, handouts, commands.
+1655	Ctrl+K also finds the rules from any screen.
+1656	Cube
+1657	Gelatinous cube
+1658	Cultist
+1659	Curious about everything
+1660	-
+1661	from a player
+1662	Icily polite
+1663	D&D 5e · Modifiers
+1664	d20 with no modifier: 10 or more = success, under 10 = failure.
+1665	Dagger: +4, 1d4+2 piercing. Sling: +4 (9/36 m), 1d4+2 bludgeoning.
+1666	Dagger: +5, 1d4+2 piercing.
+1667	Lady Ysolde
+1668	In Campaign maps, create a private map, import an image, add your markers by tapping the map, then share the map and the chosen markers.
+1669	In this campaign
+1670	In Combat, start with the GM board: HP, AC, resources and alerts. Switch to “Initiative and details” to change the order or resolve a monster. Dice stay physical.
+1671	In Sheet, use In play, Actions & resources, then Progression & rules. Dice stay physical.
+1672	In Journal & quests, record decisions, clues and their consequences. Only share the memories useful to the players.
+1673	In the scenario assistant, set a hook, the stakes and three key moments. Then link your places and scenes.
+1674	in the party chest.
+1675	In the spellbook, 📖 Description shows the full text of each spell.
+1676	In My campaigns, choose a character then “Invite this player”: a QR code to scan and a link to send, valid for 24 h.
+1677	In any case, the Chroniques server must stay reachable during the game. No digital dice rolling is included: dice stay physical.
+1678	Date
+1679	Date (optional)
+1680	Date in the world
+1681	Date saved.
+1682	Date and time
+1683	Date set
+1684	Date not found.
+1685	Invalid date (YYYY-MM-DD).
+1686	Invalid date (day and time expected).
+1687	Invalid date.
+1688	Date proposed: players can answer.
+1689	date removed
+1690	Date removed.
+1691	Date, time, seasons and events of the fiction.
+1692	dates cleared
+1693	Dates and answers cleared.
+1694	Proposed dates, availability, next session on the home page.
+1695	proposed dates.
+1696	DC {0} · {1} damage · real d20
+1697	Spell save DC
+1698	Spell DCs
+1699	Spell DC
+1700	die
+1701	Die
+1702	Hit die
+1703	Hit die: d{0}
+1704	Unknown die.
+1705	from the campaign? Their account will be deleted and they will be signed out. Their sheet stays in the campaign.
+1706	What is this adventure about?
+1707	of life: +
+1708	-
+1709	-
+1710	Standing
+1711	start
+1712	Start of turn ·
+1713	start of combat
+1714	December
+1715	Rampage: after reducing a creature to 0 HP, move and bite as a bonus action.
+1716	Eldritch Blast
+1717	Decision
+1718	Decisions and consequences
+1719	Decisions and consequences still open
+1720	Decisions, clues, events and consequences — a manual record, without AI.
+1721	Declare the initiatives rolled with real dice. The GM breaks ties with ↑ and ↓. Chroniques rolls no dice.
+1722	Trigger needed: being hit by an attack or targeted by Magic Missile.
+1723	Use one ration each
+1724	Sign out
+1725	Discovered
+1726	Guided discovery of the marker
+1727	Discover the scenes the GM decided to share.
+1728	Discover Chroniques step by step
+1729	Discover your sheet
+1730	Describe the problem in a few words.
+1731	-
+1732	defence
+1733	creature defence
+1734	Unknown defence.
+1735	Unarmoured defence 10 + Dex
+1736	Party defences, passive scores and saving throws
+1737	Challenge from another account.
+1738	Challenge expired: try again.
+1739	Set the stakes, the secrets and three key moments of the adventure.
+1740	damage
+1741	Damage — dice total
+1742	Damage:
+1743	Damage: a whole number from 0 to 10,000.
+1744	Extra fire damage on an attack that hits.
+1745	Cold damage and slowing on an attack that hits.
+1746	area damage
+1747	Area damage
+1748	damage taken
+1749	Damage taken
+1750	Damage or healing (real total)
+1751	Damage taken
+1752	Damage/healing
+1753	Already
+1754	Already in your templates
+1755	AI service timed out.
+1756	Ask the GM for a valid invitation code.
+1757	GM’s request:
+1758	Invalid AI request.
+1759	Start a journey to track distance, forced march, rations and lights. Time also advances in the world calendar if it is enabled.

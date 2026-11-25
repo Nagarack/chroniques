@@ -1,0 +1,300 @@
+860	Assign
+861	Assign {0} × {1} to {2}?
+862	Assign the loot
+863	Assign an item and its quantity; check the remaining stock and the character’s inventory.
+864	at the start
+865	instead of
+866	at level
+867	At level 1:
+868	On a long rest, all HP return; Hit Dice return {0}.
+869	Turn of
+870	Beyond high
+871	Beyond 8 h of travel: forced march (Constitution saving throws every hour).
+872	Innkeeper
+873	None — player preview only
+874	None — standalone idea
+875	No device accepted the notification.
+876	No items.
+877	No adventurer in this filter. Choose “All” to see the party again.
+878	No combat
+879	No companions. A familiar, a mount or an animal companion is tracked here, with its HP and its turn in combat.
+880	No damage
+881	None available
+882	No item available for this shortcut.
+883	Nothing created yet.
+884	No slot to give back.
+885	No slots to track for this class, edition and level.
+886	No spell slots available at this level for this class. Special features stay manual.
+887	No slots tracked
+888	No exhaustion.
+889	No condition
+890	No events yet. Start a combat or edit a sheet.
+891	No events planned.
+892	No pending story thread.
+893	No map background imported
+894	No place linked to scenes.
+895	No merchants yet.
+896	No messages yet.
+897	No items
+898	No item to illustrate.
+899	No homebrew items yet.
+900	No items for this marker. Prepare a treasure below.
+901	No item found.
+902	No items. Add your first piece of equipment below.
+903	No participants.
+904	No character
+905	No linked character.
+906	No character available.
+907	No characters or creatures.
+908	No characters.
+909	No NPC linked to scenes.
+910	No results in the rules or spells.
+911	No results.
+912	No reports yet.
+913	No matching spell.
+914	No spells in the spellbook.
+915	No spell saved
+916	No spells saved: add one below.
+917	No spell maintained
+918	No memories for these filters. Try another search.
+919	No automatic tracking active.
+920	No treasure in reserve.
+921	No journey in progress.
+922	None
+923	None (manual illustration possible later)
+924	No priority alerts
+925	No adventures yet. Use the form above to prepare the first one.
+926	No shop open. Prepare your merchants in the GM Library, then open them at the right time.
+927	No automatic feature listed.
+928	No custom feature entered.
+929	No maps yet
+930	No target ticked.
+931	No condition
+932	No creature
+933	No creatures added. Load an encounter or create monsters from the detailed view.
+934	No rated creature
+935	No creatures in play.
+936	No creatures saved yet.
+937	No homebrew creatures yet. “Create a monster”, or “Add to templates” from the SRD bestiary below.
+938	No creatures for this filter.
+939	No creatures. Prepare an encounter or add an NPC.
+940	No date set (Journal & quests → Session planning).
+941	No description to share.
+942	No description.
+943	No duration running.
+944	No entries for this filter.
+945	No entries yet.
+946	No sheet available in this category. First add a character, a creature, a spell or an item.
+947	No linked sheet.
+948	No grid
+949	No illustration (quick icon)
+950	No illustration saved
+951	No image imported
+952	No pending invitations.
+953	No link
+954	no line for this total
+955	No light lit.
+956	No pending update.
+957	No notes yet: create the first one.
+958	No new version announced.
+959	No automated origin saved. The current ability scores are not changed until you confirm.
+960	no coins
+961	No tracks. Add your MP3, OGG, WAV or M4A files (20 MB max each).
+962	No quest in progress.
+963	No encounters prepared.
+964	No manual resource tracked
+965	No resource tracked.
+966	No backup of your campaigns has been made yet.
+967	No backup found. Use “Back up now”.
+968	No scene in this filter
+969	No scene planned. Create some in “Prepare the session”.
+970	No scene published yet
+971	No update source configured (config/update-source.json file).
+972	No tables yet.
+973	Nothing is sent without your confirmation
+974	No use to restore.
+975	today
+976	-
+977	Automatic
+978	Automatic (before a change)
+979	Autumn
+980	Exceptionally allow this unprepared spell
+981	Allow HP to be shown if revealed
+982	Other
+983	Other / long
+984	Other / custom (manual)
+985	Other / custom (manual entry)
+986	Other result
+987	Other shortcuts
+988	Other sections
+989	with dice; on a failure, 1 level of exhaustion.
+990	Advance
+991	Before deleting the map or the marker, put its items back in the GM’s reserve to avoid losing loot.
+992	Advantage on saving throws against poison and resistance to poison.
+993	Advantage on INT, WIS and CHA saving throws.
+994	Martial Advantage: +2d6 damage once per turn if an ally is within 1.5 m of the target.
+995	Advantage to escape Grappled; carrying capacity increased.
+996	Miserly
+997	Character avatar
+998	with the GM
+999	with the players
+1000	with your dice (result between {0} and {1}).
+1001	Adventurer
+1002	Adventurers (classes and species)
+1003	Blinded
+1004	April
+1005	Bandit
+1006	Barbarian
+1007	Bearded
+1008	Bard
+1009	Bard (lyre)
+1010	Base = ability + proficiency (or expertise ×2). Equipment bonuses, effects and other exceptions are not included.
+1011	Incompatible database. Version 0.7.1 keeps the V0.5/V0.6/V0.7 format.
+1012	Basilisk
+1013	-
+1014	Stammers when lying
+1015	-
+1016	Bless
+1017	Need more details?
+1018	Bestiary {0}SRD {1}
+1019	Bestiary in official French
+1020	Homebrew bestiary
+1021	Bestiary by environment
+1022	GM’s private bestiary · {0} creature(s)
+1023	SRD bestiary
+1024	SRD bestiary: {0}{1}, CR {2} ({3} XP). Initiative: 1d20 {4} {5}.
+1025	SRD bestiary unavailable.
+1026	Beast
+1027	Librarian
+1028	Library & settings
+1029	Library of existing illustrations
+1030	Library and campaign
+1031	Library limited to
+1032	Library limited to 60 templates.
+1033	GM Library
+1034	Library changed in the meantime.
+1035	Well regarded
+1036	Welcome!
+1037	Welcome to Chroniques
+1038	Welcome, Game Master
+1039	Summary
+1040	Summary per character
+1041	Blue
+1042	Stat block
+1043	Official SRD 5.1 stat block (Wizards of the Coast, CC BY 4.0). Dice are still rolled at the table.
+1044	Official stat block
+1045	Blocking: impossible to play
+1046	Drink
+1047	Drink and heal {0}
+1048	Hello! You are invited to join “{0}” on Chroniques, with the character {1}. 1. Open this link: {2} (the invitation code is already filled in) 2. Choose your username and password (12 characters minimum). Already have an account? Sign in first, then open the link. The link is valid for 24 h and can only be used once. Backup code: {3}
+1049	Have a good game!
+1050	Bonus
+1051	Bonus: {0}
+1052	Attack bonus
+1053	Spell attack bonus
+1054	Spell attack bonus
+1055	Proficiency bonus
+1056	Proficiency bonus: +
+1057	Shield
+1058	Candle
+1059	Fireball
+1060	Purse: {0}
+1061	{0}’s purse: {1}
+1062	Purse changed: +
+1063	Purse changed: −
+1064	Shop closed
+1065	Shop closed.
+1066	Shop open
+1067	Shop open: players see it in their inventory.
+1068	Brave
+1069	Swashbuckler
+1070	Swashbuckler
+1071	Tinkering and expertise with items: to fill in
+1072	Fog enabled: tap the map to reveal areas.
+1073	Fog of war
+1074	Draft
+1075	Draft, invisible to players
+1076	Fire Bolt
+1077	Brunehilde Sablefer
+1078	Brunna Forgepierre
+1079	Brute: one extra damage die in melee. Surprise Attack: +2d6 against a surprised creature.
+1080	Customisable combat desk
+1081	Game Master’s desk
+1082	GM’s customisable desk
+1083	Loot added to the inventory of
+1084	Loot assigned to the character.
+1085	Loot shared: see the log for details.
+1086	Loot to hand out and rewards obtained
+1087	-
+1088	Drink a potion (roll the dice shown), equip armour and shield to compute your AC, give an item to another player or put it in the party chest, and buy from the merchants opened by the GM.
+1089	-
+1090	-
+1091	C:\Users\you\OneDrive\Chroniques
+1092	Let’s go!
+1093	AC from equipment
+1094	Equipment AC: {0} ({1})
+1095	Hidden from players
+1096	Hides a magic item in his cellar
+1097	Hide
+1098	Hide the contents
+1099	Computed from the sheets: ability scores, level and class (saving throw proficiencies of the starting class). Feats, items or multiclassing are not taken into account: check special cases. ★ = proficient.
+1100	Basic calculations for class spells; you roll the dice, the GM checks the exceptions.
+1101	Indicative calculations: proficiencies, expertise, feats and temporary effects are not applied. Does not replace the final value entered on the sheet.
+1102	Calendar
+1103	Calendar (month, year, era)
+1104	Calendar applied.
+1105	Session calendar, summaries and events
+1106	World calendar
+1107	World calendar enabled.
+1108	Gregorian calendar (365 days)
+1109	Unknown calendar.
+1110	Campaign
+1111	Active campaign
+1112	Practice campaign
+1113	Current campaign
+1114	Campaign unavailable.
+1115	Campaign not found.
+1116	Campaign not set up.
+1117	Campaign restored. Safety backup:
+1118	Campaigns
+1119	-
+1120	-
+1121	Camp
+1122	Camp: everyone eats 0.5 kg of food and
+1123	feature “
+1124	Feature added.
+1125	Feature already used up.
+1126	Unknown feature.
+1127	Feature not found.
+1128	Special feature
+1129	Feature locked or not tracked.
+1130	Features:
+1131	My character’s features & spells
+1132	Tracked features & spells
+1133	Available features
+1134	Special features to fill in manually
+1135	Bandit captain
+1136	Militia captain
+1137	characters maximum.
+1138	characters.
+1139	characters).
+1140	Ability
+1141	Ability {0} of the custom background
+1142	Spellcasting ability (class)
+1143	Main ability: {0}
+1144	Ability scores
+1145	Ability scores:
+1146	Ability scores (optional: all six or none)
+1147	Allowed abilities: {0}.
+1148	Invalid ability scores.
+1149	Missing ability scores.
+1150	Ability scores not filled in on the sheet: approximate calculation.
+1151	Ability scores not entered, features, items, feats, racial spells and multiclassing can change these values.
+1152	Notebook
+1153	Notebook: 6,000 characters maximum.
+1154	Campaign notebook
+1155	Campaign notebook: factions, NPCs and their attitude towards the group.
+1156	Notebook saved.
+1157	Personal notebook
+1158	{0}’s personal notebook
+1159	Square (avatar)

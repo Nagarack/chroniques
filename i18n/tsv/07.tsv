@@ -1,0 +1,300 @@
+1760	Half-elf
+1761	Half-orc
+1762	Resolution
+1763	Resolution:
+1764	Resolution and possible follow-ups
+1765	-
+1766	Setting out:
+1767	Quick start (editable):
+1768	would exceed 20 with the origin bonus.
+1769	spends
+1770	Spends
+1771	Spent: at the start of its turn, roll 1d6; on {0}{1}, tap to mark it recharged.
+1772	action spent
+1773	Spend {0}
+1774	Spend Hit Dice to recover HP.
+1775	Spend a slot ({0} possible choices)
+1776	Spend a level {0} slot
+1777	movement
+1778	Movement
+1779	Move outside the list.
+1780	Not enough movement.
+1781	Moving not allowed during this round: only the order of the coming turns can change.
+1782	Movement used
+1783	Move
+1784	Drag and drop to move {0}
+1785	Move on a computer
+1786	Move a treasure from the GM’s reserve
+1787	Move the panels with the handle or the arrows; the order is remembered on this device.
+1788	Move the panels or use the arrows; your choices are kept for this campaign on this device.
+1789	Deploy
+1790	deposits
+1791	Deposits in the chest
+1792	Deposits in the party chest:
+1793	Deposited in the party chest.
+1794	Deposit ({0}’s purse)
+1795	Since the session of {0}
+1796	Last modified by
+1797	Last backup {0} days ago.
+1798	Latest GitHub version unreachable (
+1799	Latest castings
+1800	Latest recorded results
+1801	Latest totals: {0}
+1802	Dice to set with the GM (custom spell).
+1803	Hit Dice
+1804	Hit Dice spent
+1805	Simple steps to follow in order. Your choices and data are never changed automatically.
+1806	Opposing interests threaten the balance of a city.
+1807	Physical dice — game aid
+1808	Physical dice to roll (optional)
+1809	Automatic backups are also kept on the server (Settings → Backups). Keep a copy off the PC, for example on a USB stick.
+1810	Deactivation impossible.
+1811	Disable
+1812	Disable this tracking? Automatic spending will be cleared but manual resources stay intact.
+1813	Disable the world calendar? The date is kept.
+1814	Disable spell tracking
+1815	Disable on this device
+1816	Disadvantage on attacks and saving throws
+1817	Disadvantage on attack rolls and ability checks.
+1818	Disadvantage on ability checks
+1819	Disadvantage on ability checks and attacks while the source of its fear is in sight; can’t willingly move closer to it.
+1820	Disadvantage to attack it; its attacks have advantage.
+1821	Move {0} down
+1822	Description
+1823	Description (visible to players)
+1824	Feat description
+1825	Marker description
+1826	Description unavailable (offline?).
+1827	Description for players
+1828	Description too long: with the rarity, 280 characters at most (
+1829	Recipient
+1830	Recipient not found.
+1831	Destination
+1832	Unknown destination
+1833	intended for the AI service. Fixed GM-assistance instructions are also attached. Nothing has been sent yet.
+1834	Detach
+1835	details the credits.
+1836	-
+1837	Detect Magic
+1838	Two extra +1 bonuses to fill in manually
+1839	Two languages of your choice
+1840	Two minutes: the app shows you the real buttons, screen by screen. Nothing is changed.
+1841	Dark Devotion: advantage on saving throws against charm and fear.
+1842	Dexterity
+1843	differences spotted automatically. The spell text may also have changed: check with the GM.
+1844	Hard
+1845	Difficulty: {0}
+1846	Difficulties (DC)
+1847	Invalid or too large image dimensions.
+1848	disabled title="Enable the fog first"
+1849	disabled title="Reveal the marker first"
+1850	Stealth
+1851	Natural stealth to fill in
+1852	Stealth possible.
+1853	Stealth, skills and sneak attack.
+1854	Fortune teller
+1855	{0}’s availability on {1}
+1856	Available
+1857	Available as general action categories, depending on context and conditions. Their effects are not applied automatically.
+1858	Default layout
+1859	Dispel Magic
+1860	Distance (km)
+1861	Invalid distance.
+1862	Invalid distance (0 to 20,000 km).
+1863	Distance, pace, lights and rations; the party’s reputation with factions.
+1864	-
+1865	Absent-minded, loses the thread
+1866	Handed out
+1867	Hand out to
+1868	Award XP
+1869	Award the XP
+1870	Award XP from defeated creatures, or one level per milestone; the sheet shows the available level.
+1871	Hand out the loot
+1872	Award experience (the available level is shown on the sheet), or use milestones: one click and the chosen characters can move to the next level.
+1873	Quick hand-out from the chest
+1874	Miscellaneous
+1875	Handout
+1876	Handout saved.
+1877	Handout sent
+1878	Handout sent:
+1879	Handout sent: players receive an alert.
+1880	Handout not found.
+1881	Handout read
+1882	Handout unavailable.
+1883	Handout ready: choose the recipients then “Send”.
+1884	Handout withdrawn: players no longer see it.
+1885	handout deleted
+1886	Handout deleted.
+1887	Handouts
+1888	Handouts for players
+1889	Handouts received
+1890	Owes a lot of money to the underworld
+1891	Feat:
+1892	Origin feat: {0} (manual effects).
+1893	Suggested origin feat:
+1894	Feat saved.
+1895	Epic boon
+1896	Feat not found.
+1897	Gives
+1898	given to
+1899	Give
+1900	Give to…
+1901	Give the players several ways to resolve the situation.
+1902	Give a title and a hook; use a starting lead if needed.
+1903	Feats
+1904	Custom feats and features
+1905	including private
+1906	Folder (full path on the server PC)
+1907	Twelve months of thirty days
+1908	-
+1909	Dragon
+1910	White dragon
+1911	Blue dragon
+1912	Brass dragon
+1913	Silver dragon
+1914	Gold dragon
+1915	Bronze dragon
+1916	Copper dragon
+1917	Black dragon
+1918	Red dragon
+1919	Green dragon
+1920	Dragons
+1921	Life Drain: +4, 3d6 necrotic; the target’s hit point maximum is reduced by the same amount (DC 10 Constitution saving throw).
+1922	Dragonborn
+1923	Animal Handling
+1924	Drow
+1925	Druid
+1926	Druidcraft
+1927	of the player
+1928	of the GM
+1929	of turn no.
+1930	Duration
+1931	Duration: 1 to 24 hours.
+1932	condition duration
+1933	Invalid duration: 0 to 99 rounds.
+1934	Invalid duration (1 minute to 400 days).
+1935	Invalid duration.
+1936	Condition durations
+1937	Precise condition durations, creature concentration, turn timer, co-GM station.
+1938	th hour): everyone makes a Constitution saving throw DC
+1939	Waters and coasts
+1940	Esc
+1941	failure
+1942	Scale
+1943	Failed
+1944	Scout and tracker, at ease at range.
+1945	Screen
+1946	Combat screen
+1947	table screen
+1948	Table screen
+1949	Table screen opened in a new window: put it on the TV and switch to full screen.
+1950	GM screen
+1951	Write a scenario without AI
+1952	Write “1-3: …” or “4: …”. Without a number, each line takes the next value. On a d100, “00” means 100.
+1953	-
+1954	Active edition:
+1955	Rules edition
+1956	Players’ edition
+1957	Players’ edition (no secrets)
+1958	GM’s edition (with secrets)
+1959	GM’s edition (with secret notes)
+1960	Invalid edition.
+1961	-
+1962	Clear this preview and the suggestion
+1963	Clear this conversation
+1964	Permanently clear this conversation?
+1965	Effect (manual)
+1966	Effect (see the book or the SRD):
+1967	Effect to check with the GM.
+1968	Unknown effect of a successful saving throw.
+1969	Support effect: real 1d4 according to the spell’s conditions, no automatic roll.
+1970	Effects to apply only after the GM’s approval
+1971	Cumulative effects (2014 rules):
+1972	Frightened
+1973	Item removed
+1974	item(s) skipped:
+1975	Elemental
+1976	Linked elements:
+1977	High
+1978	Elf
+1979	Helmeted elf
+1980	Wood elf
+1981	She
+1982	It replaces the icon; it
+1983	Éloi the One-Eyed
+1984	Elyra Clairlune
+1985	spell slot
+1986	Slot already used up or fully restored.
+1987	Available slot
+1988	Unknown slot.
+1989	Not enough slots or unavailable.
+1990	slot(s) of level
+1991	Slots: {0}
+1992	Slots · level 1
+1993	Slots · level 2
+1994	Slots · level 3
+1995	Slots {0}/{1}
+1996	Level {0} slots · short or long rest
+1997	Spell slots:
+1998	Computed spell slots
+1999	Available slots: {0}
+2000	Slots and concentration
+2001	Slots and concentration{0}
+2002	Slots and spells tracked in combat.
+2003	Invalid slots.
+2004	Slots level
+2005	Slots per level
+2006	Slots restored.
+2007	Tracked slots:
+2008	Theoretical slots (tracking disabled)
+2009	Poisoned
+2010	File checksum differs from the signed record: file deleted.
+2011	Invalid SHA-256 checksum in the record.
+2012	Fingerprint, face or device code, if you created a key in My account → Settings.
+2013	pending
+2014	Waiting for the GM’s choice.
+2015	looping
+2016	Looping
+2017	If there is a problem, tell the GM your device and what you were doing.
+2018	in progress
+2019	In progress
+2020	In danger
+2021	Struggling
+2022	Healthy
+2023	In play
+2024	In play
+2025	In play · GM private view
+2026	in stock
+2027	As a player, find your character from the home page.
+2028	As GM, check your campaign’s name and the rules edition.
+2029	Header and bottom bar fixed on small screens and with enlarged text; “My view” (GM / player) always visible.
+2030	Entangle
+2031	Incorrect encoding.
+2032	-
+2033	-
+2034	-
+2035	-
+2036	-
+2037	-
+2038	Stone’s Endurance
+2039	Relentless Endurance
+2040	committed.
+2041	-
+2042	Stakes
+2043	Stakes:
+2044	Stakes {0}
+2045	Stakes and consequences
+2046	Enemy
+2047	Sworn enemies
+2048	saved
+2049	Saved in your homebrew bestiary: reusable in all your encounters and in the bestiary search in combat. Never visible to players.
+2050	Saved on
+2051	Save
+2052	Save this scenario
+2053	Save this scene
+2054	Save as a template
+2055	Save in my bestiary
+2056	Save and sign in
+2057	Save the entry
+2058	Save the species and background
+2059	Save the casting

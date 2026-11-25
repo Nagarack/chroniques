@@ -1,0 +1,300 @@
+260	＋ Record a memory or a decision
+261	＋ Create a merchant
+262	＋ Create a monster
+263	＋ Create an item
+264	＋ Create a campaign
+265	＋ Create a scene
+266	+ Dex
+267	+ Failure
+268	＋ Record a feat / special feature
+269	＋ Condition…
+270	＋ Import this image
+271	＋ Adventurer tokens
+272	＋ Tokens for creatures in combat
+273	＋ Monster / NPC
+274	＋ New adventure
+275	＋ New map
+276	＋ New note
+277	＋ New scene
+278	＋ New table
+279	＋ Place on a map
+280	＋ Prepare a handout
+281	＋ Prepare a treasure
+282	＋ Prepare a new adventure
+283	＋ Prepare an encounter
+284	＋ Plan an event
+285	＋ Propose this date
+286	＋ Relationship with a character
+287	＋ Marker
+288	+ Wis
+289	+ Healing
+290	＋ Healing
+291	+ Success
+292	+{0} temp.
+293	+1 charge
+294	+1 h of travel
+295	+1 day
+296	+1 max HP per level, to add manually to the HP total.
+297	+1 to
+298	+1 to all three scores
+299	+10 min
+300	+2 to AC and Dexterity saving throws.
+301	+2 to
+302	+2 to one score, +1 to another
+303	+5 to AC and Dexterity saving throws.
+304	-
+305	-
+306	-
+307	− Damage
+308	−5 to passive Wisdom (Perception).
+309	⌂ Places
+310	⌖ Map
+311	⌖ Maps
+312	⌖ See the map
+313	⎙ Spell cards (PDF)
+314	⎙ Printable sheet
+315	⎙ Print
+316	⎙ Print / PDF
+317	⎙ Campaign book (PDF)
+318	⏱ Time elapsed
+319	⏳ 8 hours pass ·
+320	⏳ Condition durations
+321	⏳ Calendar events
+322	■ Stop
+323	▦ Combat desk
+324	▧ Avatar / portrait
+325	▧ Illustration
+326	▧ Image
+327	▶ Begin combat
+328	▶ Start combat
+329	▶ In progress
+330	▶ Scene in progress
+331	◇ Action
+332	◇ No combat in progress
+333	◇ Out of combat
+334	◈ GM board
+335	◈ Essential view
+336	○ not proficient · ● proficient · ◆ expertise · ● after “Save”: proficient saving throw
+337	◎ Concentration…
+338	◎ Shared
+339	● Combat in progress
+340	● Live
+341	☀ Long rest
+342	★ Level {0} available
+343	★ Main
+344	☑ Today’s session
+345	☾ Short rest
+346	♙ Player
+347	♛ Co-GM
+348	♛ GM area
+349	♛ Game Master
+350	♛ Game Masters
+351	♟ Creatures
+352	♟ Monsters and NPCs ·
+353	♟ Monsters and NPCs · {0}
+354	♟ Monsters and NPCs · advanced tracking
+355	♟ NPCs involved
+356	♥ {0} / {1} · AC {2}
+357	♥ {0}/{1} HP · AC {2} · Initiative {3}
+358	♥ Vitality & resources
+359	♧ Campaigns
+360	♧ Preparation notes are for the GM only.
+361	♫ Ambience for the scene “
+362	♫ Scene ambience
+363	♻ Campaign restored from the backup of
+364	♻ Restore a backup
+365	⚑ Summary
+366	⚑ Active quests
+367	⚔ Your turn!
+368	⚔ Add to the table
+369	⚔ in combat
+370	⚔ Combat active · Turn
+371	⚔ Action economy
+372	⚔ Send to combat
+373	⚔ Initiative and details
+374	⚔ Initiatives
+375	⚔ Open combat
+376	⚔ Ready encounters
+377	⚔ Follow the combat
+378	⚙ Customise
+379	⚠ {0} wounded character(s)
+380	⚠ Physical roll pending · DC {0}
+381	⚠ Concentration saving throw
+382	⚡ Quick NPC
+383	⛺ Camp (end of day)
+384	✉ Whispers{0}
+385	✉ Handouts to send
+386	✉ Player invitations
+387	✉ New whisper
+388	✉ Join with an invitation
+389	✎ Everyone can add and edit
+390	✎ Compose from the last session
+391	✎ History of {0}
+392	✎ Edit the sheet
+393	✓ I have finished this step
+394	✓ Resolved
+395	✓ Readable backup: “{0}”, {1} character(s) ({2}), {3} map(s){4}.
+396	✓ On the table screen
+397	✔ Objective completed ·
+398	✗ This backup cannot be restored.
+399	✦ {0} usable species traits ·
+400	✦ Species traits & feats
+401	✦ CHRONIQUES
+402	✦ Concentration
+403	✦ Ideas with an external AI — optional
+404	✦ Cast / record
+405	✦ What’s new in version {0}
+406	✦ Character progression
+407	✦ Scenes
+408	✧ {0} entries saved
+409	✧ Conditional bonus action
+410	✧ Actions
+411	✧ Turn economy
+412	✧ Spellbook of {0}
+413	✧ Origins · Species & background
+414	➝ Movement
+415	⟳ {0} · to recharge
+416	⟳ Update Chroniques
+417	⟳ Chroniques is updating: the page will reload by itself.
+418	⟿ Campaign timeline
+419	☷ All scenes
+420	☷ See the details
+421	🌧 Ambiences
+422	🍞 One ration used for everyone
+423	🎁 Chests
+424	🎁 Ready chests
+425	🎁 Revealed contents
+426	🎒 {0}’s pack
+427	🎒 Treasures
+428	🎲 Random tables
+429	🎵 Music
+430	🐾 Turn of
+431	🐾 Companions, familiars and mounts
+432	🐾 Place {0}
+433	👁 Read access
+434	💥 Sound effects
+435	💥 Damage
+436	💥 Damage applied to
+437	💥 Area damage
+438	📅 World calendar
+439	📅 Event:
+440	📅 Today is
+441	📓 Personal notebook
+442	📖 Description
+443	📖 Sheet
+444	📖 Official sheet in French
+445	📖 Read the description
+446	📖 My adventures
+447	📖 Preparations
+448	📖 Scenarios
+449	📜 Combat log
+450	📜 Previously on…
+451	📜 Previously…
+452	📦 Campaign template
+453	📱 Android app
+454	📱 Install the Android app
+455	📱 Install on iPhone / iPad
+456	📱 iPhone and iPad
+457	📴 Offline — showing data from {0}. Hit points, resources, notebook and whispers are kept here and will be sent when the network is back.
+458	🔇 Mute on my device
+459	🔊 Turn sound on
+460	🔊 Sound ambience
+461	🔊 Listen
+462	🔑 Passkey created: you can sign in without a password on this device.
+463	🔑 Passkeys
+464	🔑 Sign in with a passkey
+465	🔒 Secret notes are never sent to players
+466	🔒 Hidden
+467	🔒 GM only
+468	🔒 GM notes
+469	🔒 Private
+470	🔒 GM private
+471	🔒 Private
+472	🔒 GM only
+473	🔒 secret
+474	🔒 Secret
+475	🔒 GM secrets
+476	🔒 GM secrets:
+477	🔒 GM secrets (very sensitive)
+478	🔒 Campaign treasure — GM only
+479	🔔 Session reminder
+480	🧭 Setting out for
+481	🧭 End of the journey.
+482	🧭 Lead the discovery
+483	🧭 Pace
+484	🧭 Travel & exploration
+485	🧰 Marker loot · {0} lot(s)
+486	🧰 Party chest
+487	🧰 The GM places
+488	🪙 {0}’s coins
+489	0 HP
+490	1 counts as two failures; 20 restores 1 HP.
+491	1 and 20
+492	1 reaction
+493	1-3: Three goblins lying in wait&#10;4-5: A lost pedlar&#10;6: Nothing, the wind rises
+494	1.5 m of bright light, 1.5 m of dim
+495	1. Name and class
+496	1. Preview the information sent
+497	10 passkeys at most: delete one.
+498	10 passkeys at most.
+499	12 characters minimum
+500	2. Origin and ability scores
+501	2. Check before sending
+502	20 light sources at most.
+503	200 relationships at most.
+504	3 acts ✓
+505	3 steps · 30 s
+506	3. Send and suggest ideas
+507	3. Hit points and AC
+508	6 m of bright light, 6 m of dim
+509	9 m of bright light, 9 m of dim
+510	At 0 hit points
+511	at 0 HP
+512	At 0 HP: make your death saving throw at the start of your turn (on the sheet).
+513	At 0 HP · death saves
+514	At 0 HP, drop to 1 HP instead, subject to the conditions.
+515	At 0 HP, drop to 1 HP depending on the conditions.
+516	With each damage, Chroniques reminds you of the Constitution saving throw (DC 10 or half the damage).
+517	at the end of each turn
+518	To choose / none
+519	To complete
+520	To discover
+521	To be defined
+522	To be agreed with the GM
+523	To invite
+524	to attack
+525	at the end
+526	To read aloud at the start of the session. “Compose” suggests a text based on the last session (facts recorded automatically, ongoing quests): proofread it, tell it your way, then publish.
+527	half (2014 rules)
+528	To share among them
+529	At Higher Levels.
+530	To be specified
+531	To prepare
+532	To put back in the reserve
+533	To be filled in by the GM
+534	To resume next session
+535	To resume during the next session.
+536	Remember
+537	Scan with the phone’s camera, or send:
+538	To follow
+539	To watch (
+540	Prone
+541	Prone:
+542	to the whole table
+543	Once betrayed a friend
+544	To confirm with the GM
+545	upcoming
+546	Upcoming
+547	To check: •
+548	Your turn!
+549	Saw the crime but keeps quiet
+550	Discard my changes
+551	-
+552	Aberration
+553	-
+554	Cover
+555	Cover and visibility
+556	Three-quarters cover
+557	Half cover
+558	Total cover
+559	missing from the GitHub release.

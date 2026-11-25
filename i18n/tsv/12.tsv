@@ -1,0 +1,300 @@
+3260	My item
+3261	My item: {0}
+3262	My character
+3263	My player character
+3264	My turn
+3265	World
+3266	-
+3267	Coins
+3268	Coins saved.
+3269	Invalid coins.
+3270	Monster
+3271	Monster / group
+3272	Monster / NPC
+3273	Monster added to your homebrew bestiary.
+3274	Homebrew monster not found.
+3275	Monster updated.
+3276	monster deleted
+3277	Monster deleted from your bestiary.
+3278	Monsters
+3279	Monsters & NPCs
+3280	Spellcasting monsters
+3281	Monsters, items, encounters
+3282	Amount
+3283	Invalid amount.
+3284	Amount too small to be shared.
+3285	Adrenaline Rush
+3286	Move up
+3287	Move {0} up
+3288	Climb the ranks
+3289	Show to players
+3290	Show the place to players
+3291	Mount
+3292	Vicious Mockery
+3293	Morningstar: +4, 2d8+2 piercing. Javelin: +4, 2d6+2 piercing (1d6+2 at range).
+3294	Bite: +2, 2d6+2 piercing. Claws: +4, 2d4+2 slashing; paralysed for 1 minute on a failed DC 10 Constitution saving throw (except elves and undead).
+3295	Bite: +4 to hit, 2d4+2 piercing; the target may be knocked prone (Strength saving throw).
+3296	Bite: +4, 1d4+2 piercing.
+3297	Bite: +4, 1d4+2 piercing. Spear: +4, 1d6+2 piercing. Longbow: +3, 1d8+1 piercing.
+3298	Bite: +4, 2d4+2 piercing; the target is knocked prone if it fails a DC 11 Strength saving throw.
+3299	Bite: +5, 1d8+3 piercing and 2d8 poison (half on a DC 11 Constitution saving throw). Web (recharge 5-6): +5 (9/18 m), the target is restrained.
+3300	Bite: +5, 2d6+3 piercing; prone on a failed DC 13 Strength saving throw.
+3301	Bite: +5, 2d6+3 piercing and 2d6 poison.
+3302	Instant death
+3303	Undead
+3304	Healing Word
+3305	Password
+3306	Password: between 12 and 128 characters.
+3307	Current password
+3308	Incorrect current password.
+3309	Password saved. You are signed in.
+3310	Password updated. Other sessions signed out.
+3311	Forgotten password
+3312	Forgotten your password? Ask your GM for a reset link (Campaign → The members).
+3313	D&D engine
+3314	Reference engine
+3315	Reason
+3316	Incorporeal movement. Sunlight sensitivity.
+3317	-
+3318	Average
+3319	Ammunition counted.
+3320	Music and sound effects played on the table screen.
+3321	Mystery
+3322	has no rations left
+3323	Can’t hear and fails checks that require hearing.
+3324	Is not who they claim to be
+3325	is not recharged.
+3326	Dwarf
+3327	Helmeted dwarf
+3328	Hill dwarf
+3329	Dwarf
+3330	Nature
+3331	Main navigation
+3332	does not match the origin bonuses.
+3333	Don’t sort in the middle of combat: move a participant manually.
+3334	Can’t take actions, bonus actions or reactions.
+3335	Can’t attack the charmer or target them with harmful effects; the charmer has advantage on social interactions with it.
+3336	Can’t be targeted directly.
+3337	Can’t be seen without special means. Its attacks have advantage; attacks against it have disadvantage.
+3338	Can only crawl or stand up (half movement). Its attacks have disadvantage; melee attacks against it have advantage, ranged attacks disadvantage.
+3339	Stop copying
+3340	No longer has:
+3341	Can’t read and hides it
+3342	Can’t see and fails checks that require sight. Attacks against it have advantage; its attacks have disadvantage.
+3343	Requires concentration
+3344	necrotic
+3345	Necrotic
+3346	Nérée the Ferrywoman
+3347	Nervous, keeps looking at the door
+3348	Neutral
+3349	Neutral
+3350	Lvl
+3351	Lvl {0}
+3352	Lvl {0} · {1}/{2}
+3353	lvl {0} · {1}/{2} HP · AC {3} · Perc. {4}
+3354	Level
+3355	Level (0–9)
+3356	Level {0} — {1} left
+3357	Level {0} ·
+3358	Level {0} · {1}
+3359	Level {0} · {1} unlocked
+3360	Level {0} / 20
+3361	Level 6: the creature dies.
+3362	Unlock level
+3363	Invalid spell level.
+3364	Level saved.
+3365	Higher level available:
+3366	Levels
+3367	Fallen noble
+3368	Name
+3369	Name / title
+3370	Campaign name
+3371	Feature name
+3372	Device name
+3373	Step name
+3374	Item name
+3375	Name of the new campaign
+3376	Encounter name
+3377	Area name
+3378	Invalid AI model name.
+3379	Encounter name
+3380	Resource name
+3381	Feat name
+3382	Token name
+3383	Merchant name
+3384	Template name
+3385	Month name
+3386	Character name
+3387	Spell name
+3388	Spell or effect name
+3389	Name and class
+3390	Name required.
+3391	Name, role, trait, voice, secret
+3392	Number
+3393	Number of uses
+3394	Name
+3395	No
+3396	Not set
+3397	Unavailable
+3398	Not proficient
+3399	not shared
+3400	Not filled in
+3401	Normal
+3402	Normal
+3403	-
+3404	Note
+3405	noted
+3406	Note: 120 characters maximum.
+3407	Note: 300 characters maximum.
+3408	Note (optional)
+3409	Note added to the history.
+3410	GM note
+3411	Note saved.
+3412	Optional note
+3413	Note for the GM (optional)
+3414	Empty note.
+3415	-
+3416	Record
+3417	Record a physical dice result
+3418	Record a physical dice result (optional)
+3419	Notes
+3420	Notes:
+3421	Notes / properties
+3422	recorded after the physical dice
+3423	Confidential notes
+3424	GM confidential notes
+3425	Player notes
+3426	GM notes
+3427	GM notes: 1,000 characters maximum.
+3428	GM notes
+3429	GM notes:
+3430	GM notes: {0}
+3431	Shared notes
+3432	Players’ shared notes
+3433	Private notes
+3434	Private notes saved.
+3435	GM private notes
+3436	Private notes for the GM only.
+3437	GM-only notes
+3438	Secret notes
+3439	Secret notes: {0}
+3440	GM secret notes
+3441	GM secret notes
+3442	Secret notes, clues and twists
+3443	Record damage and healing with the −10 to +10 buttons, after your real rolls; choose the damage type if you know it.
+3444	Record the resources spent and the damage after the GM’s approval.
+3445	Notification
+3446	Test notification
+3447	Test notification sent.
+3448	Notifications: session reminder and “Your turn!”
+3449	Notifications refused by the device.
+3450	Today is
+3451	New
+3452	New co-GM enabled.
+3453	New handout
+3454	New handout from the GM: “
+3455	New password
+3456	New password for {0}
+3457	New character:
+3458	Invalid new character.
+3459	New marker
+3460	What’s new in version
+3461	New temporary hit points
+3462	New objective
+3463	New quantity
+3464	New session started.
+3465	New version available:
+3466	New class features: see the class progression table.
+3467	November
+3468	-
+3469	-
+3470	-
+3471	-
+3472	-
+3473	-
+3474	-
+3475	-
+3476	-
+3477	-
+3478	-
+3479	-
+3480	Cloud
+3481	Swarm of beasts
+3482	Invalid version number in the record.
+3483	LVL {0}
+3484	Objective
+3485	Objective:
+3486	Characters’ objective
+3487	Objective not found.
+3488	Objectives
+3489	Quest objectives
+3490	objectives per quest.
+3491	Objectives, leads and progress
+3492	Item
+3493	item “
+3494	Item ({0}): {1}
+3495	Item / equipment
+3496	Item / treasure
+3497	Item added to the chest.
+3498	Item created: give it to a player or put it in the loot.
+3499	Item given to
+3500	SRD item or free item (name below)
+3501	Item saved.
+3502	Item not found in this marker.
+3503	Item not found.
+3504	Invalid item.
+3505	Homebrew item
+3506	Homebrew item to give
+3507	Homebrew item added to the inventory.
+3508	Homebrew item not found.
+3509	homebrew item deleted
+3510	Item taken from the chest.
+3511	Item put back in the GM’s reserve.
+3512	SRD item
+3513	Item used.
+3514	item(s) from this marker?
+3515	Items
+3516	Items & money
+3517	Custom items and equipment, with no automatic change to statistics.
+3518	attuned items: remove an attunement first.
+3519	Magic items
+3520	Homebrew items
+3521	Obtains
+3522	Warlock
+3523	October
+3524	Odile Willowheart
+3525	Keen smell.
+3526	Keen smell. Pack tactics.
+3527	-
+3528	Ogre
+3529	Shadow
+3530	Masked shadow
+3531	The sheet’s “History” tab: levels, XP, items, combats and quests, recorded automatically, with the notes the GM addresses to you.
+3532	Tabs
+3533	-
+3534	Operation cancelled or timed out.
+3535	Unknown fog operation.
+3536	Unknown operation.
+3537	Missing operation.
+3538	Opposition
+3539	Opposition:
+3540	Opposition, antagonist or obstacle
+3541	Account options
+3542	Character options
+3543	Gold
+3544	Orc
+3545	Order adjusted manually
+3546	initiative order
+3547	Initiative order
+3548	Initiative order adjusted manually ·
+3549	Invalid initiative order.
+3550	Combat order
+3551	Order sorted by the entered initiatives (physical dice)
+3552	Table organisation
+3553	Session planning
+3554	Organise your GM desk
+3555	Organise short scenes linked to your campaign. All scenes are private by default.
+3556	Invalid orientation.
+3557	Original
+3558	Origin missing.
+3559	Origin and bonuses saved.

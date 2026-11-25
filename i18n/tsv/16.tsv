@@ -1,0 +1,300 @@
+4460	Account security
+4461	-
+4462	Select two different abilities allowed by the background.
+4463	Select an adventurer and check their HP, statistics and resources.
+4464	Select a player from this campaign.
+4465	Select a marker to start the discovery path.
+4466	Select a saved spell.
+4467	Select a class.
+4468	Select a 2014 or 2024 edition for automated progression.
+4469	Select a JPG, PNG, WebP or HEIC image compatible with your browser.
+4470	Select your giant ancestry.
+4471	depending on the spell
+4472	half caster (from level
+4473	Senses
+4474	Invalid movement direction.
+4475	Invalid direction.
+4476	Sunlight sensitivity. Pack tactics.
+4477	September
+4478	Will be attached automatically: screen “{0}”, {1}, {2}, screen size {3}, time. No password or private note is sent.
+4479	Server:
+4480	Server unreachable
+4481	Local server
+4482	Local server: set up Cloudflare Tunnel to play remotely.
+4483	Personal server
+4484	Service configured · model
+4485	App service unavailable: reload the page.
+4486	AI service unavailable (
+4487	-
+4488	-
+4489	Sessions not saved:
+4490	-
+4491	-
+4492	-
+4493	-
+4494	-
+4495	-
+4496	only the player concerned sees them.
+4497	Only the companion’s master can place it.
+4498	Only the GM sees HP, AC, actions and secret notes. Hidden creatures don’t appear for players. End combat to add/remove a participant.
+4499	Only the GM moves the turns forward.
+4500	Only the GM manages initiative in this demo.
+4501	only the GM sees them, the other players know nothing about them.
+4502	Only the GM or the author can remove this area.
+4503	Only the GM can add characters in this demo.
+4504	Only the campaign’s owning GM can reset a password.
+4505	Only the owning GM can start a backup.
+4506	Only the owning GM can update Chroniques.
+4507	Only the owning GM can change roles.
+4508	Only the GM sets condition durations.
+4509	Only the GM (he hands out)
+4510	Only if a feature or a spell allows it.
+4511	Only changes are sent to devices: faster on old phones and over 4G.
+4512	Only the changed parts of the screen are redrawn: typing and open panels are kept.
+4513	Only the character concerned and the GM can see spell details.
+4514	Only basic racial bonuses are calculated; check subraces and variants.
+4515	-
+4516	-
+4517	-
+4518	-
+4519	-
+4520	-
+4521	-
+4522	-
+4523	-
+4524	-
+4525	If the damage remaining after 0 HP reaches the HP maximum.
+4526	If an image is missing, ask the GM to import it again.
+4527	If you received an invitation, click “I have an invitation”.
+4528	Whistles through their teeth
+4529	Reports copied.
+4530	Testers’ reports
+4531	Report a problem
+4532	Invalid update signature: file rejected.
+4533	Silence
+4534	Hooded figure
+4535	False Life
+4536	Situation to be specified
+4537	Situation of the act
+4538	Situation or challenge
+4539	Heals, protects and strikes in the name of their god.
+4540	Healing
+4541	Healing — dice total
+4542	Healing:
+4543	Healing: {0}d4 + spellcasting modifier (real dice).
+4544	Healing: {0}d8 + spellcasting modifier (real dice).
+4545	Healing to be determined by the player.
+4546	Healing applied: +
+4547	Soldier
+4548	Dark
+4549	Rules contents
+4550	Sound added:
+4551	Their turn
+4552	Poll in progress
+4553	Sorcha Silverthread
+4554	Witch
+4555	Spell
+4556	Spell ({0}): {1}
+4557	Spell added to the spellbook.
+4558	Spell level
+4559	Level 2 spell, teleportation.
+4560	Spell already saved.
+4561	Available spell (filtered by class and search)
+4562	Spell saved
+4563	Spell outside the class list: ask for manual approval.
+4564	Spell unknown in the catalogue.
+4565	Spell unknown to the character.
+4566	Unknown spell.
+4567	Spell not found in the catalogue.
+4568	Spell not found.
+4569	spell cast
+4570	Cantrip
+4571	Spell lvl
+4572	Unprepared spell: manual approval needed.
+4573	Spell or effect (optional)
+4574	Spell or effect maintained
+4575	Custom spell added.
+4576	Custom spell already saved.
+4577	Incomplete custom spell.
+4578	Racial spell ·
+4579	Spell used
+4580	-
+4581	Spells
+4582	Spells ({0})
+4583	Known spells
+4584	{0}’s spells
+4585	Wizard spells (Intelligence, DC 14, +6): magic missile, shield, fireball, counterspell, fly, greater invisibility, cone of cold… AC 15 with mage armor.
+4586	Priest spells (Wisdom, DC 12): sacred flame, cure wounds, bless, sanctuary.
+4587	Cantrips
+4588	Breath Weapon
+4589	Breath and resistance: details to fill in
+4590	Source
+4591	Invalid illustration source.
+4592	Unknown light source.
+4593	Update source not configured.
+4594	Invalid GitHub source (github:owner/repository).
+4595	Subclass
+4596	Subclass (player’s choice)
+4597	Subclass from level {0}{1}
+4598	Subclass available from level
+4599	Subrace and extra bonus to fill in
+4600	Subrace, lineage or ancestry (if applicable)
+4601	Subrace, lineage or ancestry unknown for this species.
+4602	Underground
+4603	Memory
+4604	Memory not found.
+4605	Invalid memory.
+4606	Memory recorded:
+4607	Special (no action used)
+4608	Specter
+4609	-
+4610	-
+4611	Skeleton
+4612	SRD 5.1 (CC BY 4.0){0}.
+4613	Stable / dead. Damage at 0 HP adds a failure (two on a critical hit).
+4614	-
+4615	-
+4616	-
+4617	-
+4618	-
+4619	-
+4620	Statistics and additional information
+4621	Status
+4622	Invalid status.
+4623	Invalid status or visibility.
+4624	Stock
+4625	Stock (empty = unlimited)
+4626	Insufficient stock (
+4627	Storage
+4628	Illustration storage full.
+4629	-
+4630	-
+4631	-
+4632	-
+4633	-
+4634	success
+4635	success ·
+4636	Successes {0}/3 · Failures {1}/3
+4637	succumbs to exhaustion.
+4638	Suggested for their class
+4639	Suggestion copied.
+4640	Suggestion received — to proofread and edit
+4641	Suggestion received; it was not saved in the campaign.
+4642	Continued:
+4643	Continued: see Game rules in Chroniques.
+4644	Next
+4645	Next →
+4646	Track the date and time in your world: time advances with rests and journeys, seasons change and your planned events trigger.
+4647	Automatic tracking unavailable with custom rules.
+4648	Game tracking
+4649	Slot tracking active.
+4650	Slot tracking already enabled.
+4651	Manual tracking
+4652	Follow the story
+4653	Follow the session
+4654	Follow the combat without virtual dice
+4655	Follow the actions
+4656	Follow the discoveries
+4657	Superstitious
+4658	Deletion cancelled.
+4659	table deletion
+4660	Delete
+4661	Delete {0}
+4662	Remove this feat from the sheet?
+4663	Delete this lot
+4664	Delete this marker
+4665	Delete this event?
+4666	Delete this objective?
+4667	Delete this item?
+4668	Delete this map
+4669	Delete this map, its image and all its markers?
+4670	Delete this passkey? The device will no longer be able to use it to sign in.
+4671	Remove this creature from combat?
+4672	Delete this entry
+4673	Delete this entry from the history?
+4674	Delete this note for all players?
+4675	Delete this relationship
+4676	Delete this scene from the preparation?
+4677	Delete this table? (can be undone)
+4678	Permanently delete this audio file from the server?
+4679	Permanently delete this lot from the marker? You can also move it to the GM’s reserve.
+4680	Permanently delete this marker?
+4681	Permanently delete this scenario? Linked scenes and quests will be kept.
+4682	Permanently delete this memory from the campaign?
+4683	Permanently delete this campaign entry?
+4684	Delete the objective
+4685	Delete the table
+4686	On request
+4687	On iPhone/iPad: iOS 16.4 or later, and first add Chroniques to the home screen, then open it from the icon.
+4688	On iPhone/iPad, open Chroniques from the home screen icon.
+4689	On the other device, open
+4690	On the sheet: your secret notes, visible only to you and the GM.
+4691	tailor-made
+4692	On mobile, open More → Campaign maps and tap a shared marker to see the revealed information.
+4693	on your PC.
+4694	Encumbered: beyond Strength × 7.5 kg, speed and rolls may be penalised (see with the GM).
+4695	Action Surge
+4696	Survival
+4697	Sync:
+4698	Delayed sync
+4699	-
+4700	Table created.
+4701	Campaign table
+4702	Table saved.
+4703	Table not found.
+4704	-
+4705	Dashboard
+4706	Live dashboard
+4707	Dashboard reserved for the GM.
+4708	Party table (horizontal scrolling possible)
+4709	2024 tables and rules
+4710	-
+4711	-
+4712	-
+4713	random tables
+4714	Random tables
+4715	tables at most.
+4716	Tables shared by the GM and announced results.
+4717	-
+4718	Pack tactics.
+4719	Size: 1 to 150 m.
+4720	Size (m)
+4721	Invalid announced size.
+4722	Area size
+4723	Text size
+4724	Text size:
+4725	Text size: {0}
+4726	Adjustable text size (My account); deletions can be undone in one click.
+4727	Type at least two letters.
+4728	Type at least two letters. The item is added to {0}’s inventory; you can then change the quantity or the notes.
+4729	Type a word in the search: “prone”, “grapple”, “rest”, or the name of a spell.
+4730	Type a name: goblin, lich, dragon…
+4731	Download already in progress.
+4732	Downloading and checking the signature…
+4733	Download impossible (
+4734	Downloading…
+4735	Download and check
+4736	Phones
+4737	Storm
+4738	-
+4739	-
+4740	-
+4741	-
+4742	-
+4743	-
+4744	Casting time
+4745	Darkness
+4746	Run the co-GM station
+4747	Completed
+4748	completed
+4749	Completed
+4750	Completed
+4751	End
+4752	End combat
+4753	End the current combat?
+4754	End the journey?
+4755	End combat before adding the encounter.
+4756	End combat before adding a participant.
+4757	End combat before importing a template.
+4758	End combat before removing a creature.
+4759	Test

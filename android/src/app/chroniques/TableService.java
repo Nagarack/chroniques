@@ -30,8 +30,8 @@ public class TableService extends Service {
         PendingIntent stop = PendingIntent.getService(this, 3, new Intent(this, TableService.class).setAction(STOP), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         @SuppressWarnings("deprecation")
         Notification n = Compat.builder(this, Compat.CHANNEL_LIVE)
-            .setSmallIcon(R.drawable.ic_stat).setContentTitle("Partie en cours")
-            .setContentText("Chroniques vous préviendra quand ce sera votre tour.")
+            .setSmallIcon(R.drawable.ic_stat).setContentTitle(Compat.t("Partie en cours", "Game in progress"))
+            .setContentText(Compat.t("Chroniques vous préviendra quand ce sera votre tour.", "Chroniques will let you know when it’s your turn."))
             .setContentIntent(pi).setOngoing(true)
             .addAction(new Notification.Action.Builder(0, "Arrêter", stop).build())
             .build();

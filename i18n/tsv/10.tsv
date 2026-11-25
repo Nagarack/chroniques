@@ -1,0 +1,300 @@
+2660	Unavailable
+2661	Unavailable here: you need the campaign’s HTTPS address (or “localhost” on the GM’s PC) and a recent browser.
+2662	Unavailable here: notifications need an address
+2663	Infernal
+2664	Influence
+2665	Information allowed to be sent (none pre-ticked)
+2666	GM-only information
+2667	Ingenuity
+2668	Ingenuity and versatility
+2669	Init.
+2670	Init. {0}
+2671	Initiative
+2672	INITIATIVE
+2673	Initiative (real die)
+2674	Initiative {0}
+2675	Initiative 20 — lair actions
+2676	Initiative 20 · lair actions:
+2677	Base initiative
+2678	Real initiative
+2679	Magic Initiate (Cleric)
+2680	Magic Initiate (Wizard)
+2681	Automatic installation: data backup, installation, check on a copy of the database, then restart. If there is a problem, the current version is put back automatically. Connected players will see the page reload (about one minute).
+2682	installed: reloading…
+2683	Install Chroniques
+2684	Install Chroniques on the phone
+2685	Install and restart
+2686	Install on your phone
+2687	Instantaneous
+2688	built into the app (quick start, offline possible)
+2689	Intelligence
+2690	Question witnesses and choose a route.
+2691	Intimidation
+2692	Intrigue
+2693	Not found.
+2694	Insight
+2695	Insight
+2696	Passive Insight
+2697	invalid (1–20).
+2698	-
+2699	Inventory
+2700	Inventory: shared items and coins, to deposit (Give to… → Party chest) or take back.
+2701	Inventory & merchants
+2702	Inventory & treasures
+2703	Inventory and loot
+2704	Illustrated inventory
+2705	Living inventory
+2706	Invent your own items (rarity, attunement, charges, icon) or copy an SRD item to edit it. They stay secret until you give them: the player receives a copy without your GM notes.
+2707	Invest.
+2708	Investigation
+2709	Passive Investigation
+2710	Invisibility
+2711	Invisible
+2712	Invisible to players
+2713	Invitation missing or already used.
+2714	Chroniques invitation
+2715	Invitation expired or incorrect.
+2716	Invitation ready: have the QR code scanned or send the link.
+2717	Invitation received
+2718	Invitation revoked.
+2719	invitation(s) ready.
+2720	Invite this player
+2721	Invite the whole table
+2722	Invite your players
+2723	Invite your group
+2724	iPhone / iPad:
+2725	iPhone/iPad
+2726	Isaure de Valombre
+2727	-
+2728	-
+2729	-
+2730	-
+2731	-
+2732	-
+2733	I rolled a real d{0}:
+2734	I have an invitation
+2735	I explicitly authorise sending this text to the AI provider and understand that charges may apply.
+2736	Milestone: next level
+2737	Milestone: next level available on the sheets.
+2738	Milestone reached:
+2739	January
+2740	death saving throw
+2741	Death saving throw
+2742	Invalid roll.
+2743	Token {0}
+2744	Token saved
+2745	Read-only GitHub token (private repository){0}
+2746	GitHub token not recognised (it starts with github_pat_ or ghp_).
+2747	Token not found.
+2748	Free token
+2749	Token placed in the centre: drag it.
+2750	Token placed in the centre of the map.
+2751	Token removed.
+2752	token(s) placed at the bottom of the map: drag them.
+2753	tokens per map.
+2754	Saving throws
+2755	Gaming set of your choice
+2756	Young red dragon
+2757	Jory Lightfoot
+2758	Play in a loop
+2759	Play on a phone
+2760	Play once
+2761	Player
+2762	Player not in this campaign.
+2763	Player detached.
+2764	Player and GM
+2765	Inveterate gambler
+2766	Day
+2767	Day {0} · {1} h of travel
+2768	Invalid day.
+2769	Journal
+2770	Journal & quests
+2771	Journal & quests → Timeline & summary: the big moments and figures of the campaign.
+2772	Campaign journal
+2773	Campaign journal updated.
+2774	Table log
+2775	Combat log
+2776	Journal, images and spells
+2777	Days in the month
+2778	Con save DC {0}
+2779	Invalid JSON
+2780	July
+2781	June
+2782	until
+2783	Until
+2784	Kenku
+2785	Klaus Bear-Belly
+2786	KB
+2787	Kobold
+2788	The address is public: protect it with Cloudflare Access and Chroniques accounts.
+2789	Help for each screen
+2790	The Android app does not support passkeys: create them from Chrome or another browser.
+2791	The edition selects the class actions and progression (subclasses and spell slots). Features, feats, learned spells and multiple choices remain to be confirmed.
+2792	The character’s condition and possible actions according to their resources.
+2793	The condition removes itself at the chosen time.
+2794	Your character’s history
+2795	The image is reduced and compressed on your device, then stored on your server. {0} accompanies {1}.
+2796	The GM Library
+2797	The GM Library and Journal & quests are organised in tabs.
+2798	The shop “
+2799	the campaign
+2800	The active campaign has changed. Refresh the page before changing data.
+2801	The map is private: players don’t see its background.
+2802	The map is visible, but this marker stays secret.
+2803	The map, initiative and featured images, full screen on a TV, with no secrets at all.
+2804	the target
+2805	the target itself
+2806	The community lives with the consequences.
+2807	The spell configuration changes: confirm resetting their tracking.
+2808	The confrontation
+2809	The current date and events are kept as closely as possible.
+2810	The latest GitHub release does not contain chroniques-maj.json.
+2811	The combat layout cannot be remembered here.
+2812	The layout cannot be remembered in this browser.
+2813	The false lead
+2814	The sheet is created at level 1. Equipment, armour and class features are completed on the sheet afterwards, with the GM.
+2815	The timeline will fill up over the sessions.
+2816	Role management is reserved for the owning GM.
+2817	Navigation
+2818	The revelation
+2819	The session will start with the next action.
+2820	Today’s session
+2821	-
+2822	Leave a lasting consequence in the region.
+2823	Let the players roll their dice, then record the resources spent.
+2824	Spear: +3, 1d6+1 piercing (1d8+1 two-handed).
+2825	Cast
+2826	Cast {0}
+2827	Start the tour
+2828	Cast a spell
+2829	full spellcaster
+2830	Versatile spellcaster, support and inspiration for the group.
+2831	Cast {0}
+2832	Start the server and get the initial key shown in the Windows window.
+2833	Roll the chosen Hit Dice, enter their total: Constitution is added for each die. “Short rest” features are restored.
+2834	Roll your d{0}
+2835	Roll your real dice and announce your initiative to the table.
+2836	Roll your real die, enter the total: Chroniques reads the line. The tool never rolls anything.
+2837	-
+2838	Languages
+2839	Lantern (flask of oil)
+2840	Hooded lantern
+2841	The ✉ button opens a private conversation with the GM: a discreet action, a question, without the other players seeing it.
+2842	The Help button offers a complete path, to follow at your own pace.
+2843	The fog hides the display for players; for absolute secrecy, keep the map private or import an image without the hidden place. Tokens of hidden creatures stay invisible to players.
+2844	The adventure log
+2845	The catalogue filters by class, but exceptions (feats, multiclassing, domains, racial spells) are entered in the custom section.
+2846	The heart of the mystery
+2847	the party chest.
+2848	The chest is empty.
+2849	The combat
+2850	Combat has not started.
+2851	the contents of the chest; you can deposit in it.
+2852	The contents are secret until you decide.
+2853	The JSON content is required.
+2854	The content the players will read…
+2855	The System Reference Document 5.1: rules, conditions and the 319 spells. Available offline once loaded.
+2856	the handout, visible only to the recipients
+2857	The source file must not exceed 15 MB.
+2858	The session thread
+2859	The party
+2860	The party:
+2861	The party finds a contradictory lead.
+2862	The party at a glance
+2863	The party is about to live its first adventure.
+2864	The guide and the notebook can also be used from the phone.
+2865	The player tracks their actions, bonus actions, reactions and movement.
+2866	Your character’s log, kept automatically. The GM can add notes to it.
+2867	The adventure log
+2868	The journal tells your discoveries; the spellbook and illustrations complete the sheets.
+2869	The log will fill up during the combat.
+2870	The place must first be visible to players.
+2871	The best healer:
+2872	The GM hands out
+2873	The GM hands out the chest’s contents himself.
+2874	The GM sends a handout: “
+2875	The GM already exists.
+2876	The GM will share the scenes when the time comes.
+2877	The GM prepares the maps, places markers and reveals only the places discovered.
+2878	The owning GM cannot be demoted.
+2879	The GM selects an encounter out of combat, clicks “Add to the table”, then enters the initiatives rolled with real dice in “Combat & initiative”. The new creatures are independent copies: their HP and conditions change without altering the template.
+2880	The no-slot mode is for cantrips and exceptions approved by the GM (feat, item, ritual or racial spell). It does not check these exceptions automatically.
+2881	The Constitution modifier ({0}{1}) is added automatically; minimum 1 HP.
+2882	The maximum level is 20.
+2883	The downloaded package contains version
+2884	Levelling up does not change HP or ability scores: Hit Dice, feats, learned spells and traits are to be confirmed with the GM. A single class is tracked (no automatic multiclassing).
+2885	The difficult passage
+2886	The character owes them
+2887	The toughest:
+2888	Most often prone:
+2889	The first clue
+2890	The story of the last session, published by the GM, on the home page.
+2891	The marker and the map are visible.
+2892	The party’s long rest makes 8 hours pass automatically. Events reached are announced in the log (privately if they are secret).
+2893	the player role?
+2894	The score
+2895	The AI service returned no text. Try again if needed.
+2896	The official SRD 5.1: combat, conditions, rest, magic and the 319 spells. Search for a word (“prone”, “cover”); conditions shown in combat are also clickable.
+2897	The official SRD (combat, conditions, rest, magic) with search, and the full description of the 319 SRD spells in the spellbook.
+2898	Time is against the people under threat.
+2899	The text is that of the SRD 5.1 (2014 rules): point out the 2024 differences to the players if needed.
+2900	Cannot read the file.
+2901	Cannot read.
+2902	Playback started on the table screen.
+2903	Read only: these notes are written and edited by the players at your table.
+2904	legendary
+2905	Legendary
+2906	Legendary:
+2907	Optional caption
+2908	Caption too long (100 characters maximum).
+2909	Slow
+2910	The 334 SRD creatures have their official stat block (📖 Sheet).
+2911	The 362 SRD magic items: official names and descriptions.
+2912	Bonus actions are conditional and each reaction needs its trigger.
+2913	Alerts only reflect the recorded conditions; they do not replace the GM’s judgement. No virtual dice, no automatic consequences.
+2914	The alliances
+2915	The other tools remain available from the menu.
+2916	The adventurers
+2917	2024 bonuses come from the background, not the species.
+2918	Ability score bonuses are counted in Origins.
+2919	The −10 to +10 buttons record the damage and healing announced after your real dice rolls. First choose a damage type: resistances and vulnerabilities are then applied automatically.
+2920	The action buttons record the attack and remind you of the dice; the GM screen summarises the rules.
+2921	The Mists of Aubeciel
+2922	Features are those entered on the sheet: nothing is calculated automatically. Check their triggers before use.
+2923	The maps published by your GM will appear here.
+2924	Level changes, feats and spells need the player’s or the GM’s approval.
+2925	Changes are synced. Publishing a map exposes
+2926	Passkeys don’t work with a numeric address such as {0}: on the GM’s PC, open
+2927	The confidences
+2928	The benefiting creatures add a real 1d4 to the rolls concerned according to the spell’s rules.
+2929	The dice shown in the spellbook are a reference at the base level. With a higher slot, check the adjusted formula. All rolls are still made with real dice.
+2930	Dice are rolled physically. Changes are synced from the sheets and the combat.
+2931	The two passwords are not the same.
+2932	Shared items are available from “More” on mobile.
+2933	The conditions
+2934	Events will appear here during the game.
+2935	Illustrations become available as soon as a sheet is chosen above.
+2936	The essential information of your table, in one place.
+2937	Initiatives and results come from your physical dice.
+2938	The players have not written a note yet.
+2939	The players will never see these notes.
+2940	The links point to your sheets, quests and scenes. Nothing is shared with the players automatically.
+2941	Lights burn down when time advances (travel or world calendar), not during combat rounds.
+2942	The members
+2943	Updates are only downloaded over HTTPS.
+2944	Names and quantities are visible. Private notes stay hidden.
+2945	Player notes are read-only for the GM.
+2946	The group’s notes
+2947	Secret notes and hidden monsters are not shared with players.
+2948	Notifications are blocked for this site in the browser settings.
+2949	Hit points in one gesture
+2950	Adventurer portraits (classes and species) are offered first. Without a chosen image, each character gets their class icon.
+2951	The first traces
+2952	HP, actions, reaction and movement stay visible at the top of the sheet. The three sections separate in-play tracking, features and progression.
+2953	Session reminders work on this device.
+2954	Rewards, quests and events are recorded as campaign information. Changes to inventory, HP, experience and spell slots stay separate: no automatic change or virtual roll is made.
+2955	GM-only settings are not accessible to players.
+2956	The rules
+2957	Relationships with the factions change.
+2958	The summaries your GM chose to share.
+2959	Backups will also be copied to

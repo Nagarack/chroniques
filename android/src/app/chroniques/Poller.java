@@ -36,7 +36,7 @@ final class Poller {
     static final class HttpError extends Exception { final int code; HttpError(int c) { super("HTTP " + c); code = c; } }
 
     static int poll(Context c) {
-        Store s = new Store(c);
+        Store s = new Store(c); if (Compat.lang == null && s.lang() != null) Compat.lang = s.lang();
         String server = s.server();
         if (server == null) return NO_SERVER;
         String cookie;

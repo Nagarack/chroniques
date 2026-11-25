@@ -1,0 +1,300 @@
+560	Abyssal
+561	Singsong southern accent
+562	Accept the invitation
+563	Local access only.
+564	GM access
+565	Quick access
+566	Quick access: {0}
+567	Quick access on mobile
+568	Quick access
+569	Access to this inventory denied.
+570	Access to this purse denied.
+571	Access to this sheet denied.
+572	Access to the coins denied.
+573	Access to the spellbook denied.
+574	Access to this sheet’s results denied.
+575	Access denied.
+576	Access reserved for the owning GM.
+577	Access reserved for the GM.
+578	Hook
+579	Hook {0}
+580	Character hooks
+581	Home
+582	Home → Party view: saving throws, passive scores and spell save DCs.
+583	Point buy:
+584	Purchase complete: the item is in the inventory, the purse has been charged.
+585	buys
+586	Buys
+587	Buy
+588	Buy from merchants opened by the GM, give an item to another player or put it in the party chest.
+589	Acid
+590	Acolyte
+591	Acolyte / follower
+592	Acrobatics
+593	Act {0}
+594	Act {0}: {1} / {2} / {3}
+595	Invalid act.
+596	Action
+597	Action: {0}
+598	Bonus action
+599	Bonus action: temporary wings, 10 minutes; flying speed = normal speed.
+600	Bonus action: Dash and gain {0} temporary HP; the counter resets on a short or long rest.
+601	Bonus action: sense vibrations through stone for 10 minutes (18 m).
+602	Bonus action: become Large for 10 minutes if there is room.
+603	Bonus action: short teleport.
+604	Bonus action unavailable or already used.
+605	Bonus action used
+606	Pending action refused by the server:
+607	Breath action and rolls to resolve with the 2014 rules; ancestry to be specified.
+608	legendary action
+609	Legendary action recorded
+610	Action recorded
+611	Action reserved for the GM.
+612	Extra action according to the class feature; apply manually.
+613	Action used
+614	action(s) done offline saved.
+615	Actions
+616	Actions:
+617	Actions (name and dice to roll physically)
+618	Actions & conditions
+619	Actions & resources
+620	Actions in combat
+621	{0}’s actions
+622	Lair actions
+623	Lair actions (reminder at initiative 20)
+624	Turn actions
+625	Actions and features
+626	Actions and physical dice
+627	Actions and physical dice:
+628	Detailed actions and notes in the classic combat view.
+629	Legendary actions
+630	Legendary actions {0}/{1}
+631	Actions during its turn
+632	Custom actions (one per line)
+633	GM’s main actions
+634	Remaining actions
+635	Universal actions · D&D {0}
+636	Actions, features and resources
+637	-
+638	Activation impossible.
+639	Enabled on this device
+640	Enable the calendar
+641	Enable slot tracking
+642	Enable on this device
+643	Enable a NEW spell counter? It stays separate from the manual resources already added.
+644	Enabled
+645	Enable at least one panel.
+646	Enable the world calendar first.
+647	Enable slot tracking first.
+648	Enable slot tracking in Sheets & features to spend slots automatically.
+649	Refresh
+650	-
+651	-
+652	-
+653	-
+654	-
+655	Address copied:
+656	Invalid HTTPS address.
+657	Invalid address:
+658	Most frequent foes:
+659	Adversity
+660	Aëlin Sylveronce
+661	Game Master combat display
+662	Display for TV or projector
+663	Show
+664	Also show HP to players (if visible)
+665	Show to players
+666	Show this map on the table screen
+667	Show panels
+668	Show on the table screen
+669	Show only what helps you during the encounter. Each campaign keeps its own layout on this device.
+670	Halfling nimbleness
+671	Enlarge
+672	Private enlargement of the illustration
+673	Aggressive: moves towards an enemy as a bonus action.
+674	Grappled
+675	Help
+676	help ·
+677	Help & tutorial
+678	Rules cheat sheet
+679	Printable cheat sheet
+680	Help
+681	Help players get started
+682	Air and mountains
+683	creature added
+684	added to the inventory.
+685	Added to the campaign memory (private: share it from the memory if you wish).
+686	added to your templates.
+687	added from your homebrew bestiary
+688	added, hidden from players
+689	Add
+690	Add to inventory
+691	Add to the sheet
+692	Add to memory
+693	Add to combat
+694	Add to spellbook
+695	Add to templates
+696	Add this custom spell
+697	Add as a secondary illustration (8 per sheet at most)
+698	Add the item for sale
+699	Add the item
+700	Add the feature
+701	Add the resource
+702	Add the marker
+703	Add the copies from this encounter to the creatures already present? No dice will be rolled.
+704	Add or remove a condition
+705	Add an exhaustion level
+706	Add an item to the chest
+707	Add an illustrated marker
+708	Add a feature
+709	Add a note
+710	Add a resource
+711	Add at least one line.
+712	First add a monster or an NPC in Combat.
+713	First add an item in the Inventory.
+714	First add a spell in the Spellbook.
+715	First add a grid to the map to place an area.
+716	Add groups to the encounter.
+717	Add the first group below.
+718	Add creatures from the SRD bestiary: several copies share a single initiative.
+719	Add a spell or select your character to record a result.
+720	Add a map or an encounter, then decide what the players can discover.
+721	Add your familiar or mount here; “Send to combat” gives it its own turn, right after you.
+722	Add, equip and track your items; your statistics never change on their own.
+723	Adjust the format and sliders. The saved image matches this preview exactly.
+724	Alchemist
+725	Aldric Morteveine
+726	Alert
+727	ALERTS
+728	Skip to main content
+729	Ally
+730	Allies
+731	Allies, contacts and notable figures
+732	lit —
+733	Light
+734	Ambience
+735	Sound ambience
+736	Sound ambience started when the scene becomes “in progress” (optional)
+737	-
+738	-
+739	-
+740	-
+741	-
+742	-
+743	Ability Score Improvement or feat
+744	Friend
+745	Friendly
+746	Love
+747	Former soldier
+748	Old illustration not deleted:
+749	Android
+750	Android:
+751	Android: install the Chroniques app (Settings → Android app) or, in Chrome, Menu ⋮ → Install. iPhone: Safari → Share → Add to Home Screen.
+752	Year
+753	Calendar starting year
+754	Invalid starting year.
+755	Invalid year (not before the starting year).
+756	Announce to players
+757	Cancelled
+758	Cancel
+759	Undo the last combat action
+760	Undo the last area
+761	Undo one use
+762	August
+763	Framing preview
+764	Unknown API.
+765	Appearance: {0}
+766	Android app
+767	Android app:
+768	No Android app on this server.
+769	-
+770	-
+771	-
+772	Applied when a damage type is chosen before recording the damage: resistance ÷ 2 (rounded down), vulnerability × 2, immunity 0.
+773	Apply
+774	Apply (sheet: {0})
+775	Apply the grid
+776	Apply the damage
+777	Apply a long rest? Check the rest conditions.
+778	First apply a condition to a creature or a character.
+779	Learns:
+780	Learn Chroniques
+781	after
+782	After signing in, choose your campaign and open Help if needed.
+783	After conversion, only PNG and WebP are accepted.
+784	After the real rolls, enter the initiatives then start combat; N moves to the next turn, U undoes.
+785	After a real dice roll, record damage or healing with these buttons. The app never rolls anything.
+786	afternoon
+787	Giant spider
+788	Rule with the official rules
+789	Shortbow: +4 to hit, 1d6+2 piercing.
+790	Arcana
+791	Archer
+792	Archived
+793	Table archives
+794	-
+795	Weapon
+796	Armour / equipment
+797	Mage Armor
+798	Arrival:
+799	-
+800	-
+801	-
+802	-
+803	Artifact
+804	artifact
+805	Artifact
+806	Item added
+807	Item added.
+808	Item for sale from “
+809	Item not found.
+810	Item updated.
+811	item removed
+812	Item removed.
+813	items per merchant.
+814	Martial arts, mobility and quick strikes.
+815	Giant ancestry: manual choice
+816	Giant ancestry to choose
+817	Draconic ancestry: manual choice
+818	Draconic ancestry to choose
+819	Fey ancestry
+820	Poison Spray
+821	Assistance
+822	In-game assistance
+823	Scenario assistant
+824	Link this character to your account in this campaign?
+825	Link an illustration
+826	Deafened
+827	Game master’s workshop
+828	Athletics
+829	-
+830	-
+831	Savage Attacker
+832	Attack: d20
+833	Ranged attack — check the modifier on the sheet.
+834	Melee attack.
+835	Spell attack — roll total
+836	Spell attack: d20 + bonus shown; damage {0}d10 (real dice).
+837	Spell attack: d20 + bonus shown; damage {0}d8 (real dice).
+838	Extra Attack: two attacks per Attack action.
+839	Improved Extra Attack (
+840	Attack
+841	Attack, cast a spell, Dash (speed doubled), Disengage, Dodge, Help, Hide, Search, Use an Object, Ready.
+842	Attacks and dice
+843	Attacks and physical dice
+844	Multiattack: beak and claws. Beak: +7, 1d10+5 piercing. Claws: +7, 2d8+5 slashing.
+845	Multiattack: two attacks, only one bite. Claws: +6, 2d4+3 slashing. Bite: +6, 1d6+3 piercing and 3d6 necrotic.
+846	Multiattack: two longsword attacks and one shortsword attack. Longsword: +5, 1d8+3 slashing. Shortsword: +5, 1d6+3 piercing. Heavy crossbow: +3, 1d10+1 piercing.
+847	Multiattack: two scimitar attacks and one dagger attack. Scimitar: +5, 1d6+3 slashing. Dagger: +5, 1d4+3 piercing.
+848	Multiattack: bite and sting (while flying: claws possible). Bite: +7, 2d6+4 piercing. Claws: +7, 2d8+4 slashing. Sting: +7, 2d6+4 piercing and 7d6 poison (half on a DC 15 Constitution saving throw).
+849	Multiattack: bite and two claws, or three spikes. Bite: +5, 1d8+3 piercing. Claws: +5, 1d6+3 slashing. Tail spike: +5 (30/60 m), 1d8+3 piercing.
+850	Multiattack: bite and two claws. Bite: +10, 2d10+6 piercing and 1d6 fire. Claws: +10, 2d6+6 slashing. Fire breath (recharge 5-6): 9 m cone, 16d6 fire (half on a DC 17 Dexterity saving throw).
+851	Multiattack: bite and two claws. Bite: +7, 1d6+4 piercing. Claws: +7, 2d6+4 slashing.
+852	Multiattack: bite and claws. Bite: +4, 1d6+2 piercing. Claws: +4, 1d6+2 slashing.
+853	Multiattack: bite and claws. Bite: +6, 1d8+4 piercing. Claws: +6, 2d6+4 slashing.
+854	attacks per Attack action).
+855	Savage Attacks
+856	Reach the place and understand its history.
+857	Reached
+858	Warning: you are using this PC’s local address. The link will only work on this computer; set up the HTTPS address (CONFIGURER_URL_HTTPS.bat) to invite remotely.
+859	Attitude towards the group

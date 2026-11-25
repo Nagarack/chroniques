@@ -42,6 +42,9 @@ const rows=[
  ['revivify','Retour à la vie',3,'cleric paladin','action','contact','Instantanée','V S M',false,false]
 ];
 let INDEX=[];try{INDEX=(root&&root.ChroniquesSRDSpellIndex)||(typeof require==='function'?require('./data/srd-spells-index.js'):[]);}catch{INDEX=[];}
+// 5.2 : interface anglaise → noms, portées, durées et écoles du SRD anglais (mêmes identifiants et mêmes clés).
+const INDEX_EN=(root&&root.ChroniquesI18n&&root.ChroniquesI18n.lang==='en'&&root.ChroniquesSRDSpellIndexEn)||null;
+if(INDEX_EN){const en=Object.fromEntries(INDEX_EN.map(r=>[r[0],r]));for(const r of rows){const e=en[r[0]];if(e){r[1]=e[1];r[5]=e[5];r[6]=e[6];}}INDEX=INDEX.map(r=>en[r[0]]||r);}
 const SCHOOL=Object.fromEntries(INDEX.map(r=>[r[0],r[10]]));
 const CHANGED24=new Set(INDEX.filter(r=>r[11]===1).map(r=>r[0]));
 const known=new Set(rows.map(r=>r[0]));

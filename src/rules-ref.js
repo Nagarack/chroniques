@@ -4,15 +4,19 @@
 (function(root,factory){const api=factory(root);if(typeof module==='object'&&module.exports)module.exports=api;if(root)root.ChroniquesRules=api;})(typeof globalThis!=='undefined'?globalThis:this,function(root){
 'use strict';
 let DATA=null,loading=null;
+// 5.2 : en anglais, textes officiels du SRD 5.1 anglais (src/data/srd-regles-en.js, mêmes identifiants).
+const EN=(typeof window!=='undefined'&&window.ChroniquesI18n&&window.ChroniquesI18n.lang==='en');
 const CAST={action:'Action',bonus:'Action bonus',reaction:'Réaction',minute:'Plus longue'};
 function load(){if(DATA)return Promise.resolve(DATA);if(loading)return loading;
  loading=new Promise((ok,ko)=>{
   if(typeof window==='undefined'||typeof document==='undefined'){try{DATA=require('./data/srd-regles-fr.js');ok(DATA);}catch(e){loading=null;ko(e);}return;}
-  if(root.ChroniquesSRDFr){DATA=root.ChroniquesSRDFr;ok(DATA);return;}
-  const sc=document.createElement('script');sc.src='/src/data/srd-regles-fr.js';sc.onload=()=>{DATA=root.ChroniquesSRDFr||null;if(DATA)ok(DATA);else{loading=null;ko(new Error('Règles indisponibles.'));}};
+  const G=EN?'ChroniquesSRDEn':'ChroniquesSRDFr';if(root[G]){DATA=root[G];ok(DATA);return;}
+  const sc=document.createElement('script');sc.src=EN?'/src/data/srd-regles-en.js':'/src/data/srd-regles-fr.js';sc.onload=()=>{DATA=root[G]||null;if(DATA)ok(DATA);else{loading=null;ko(new Error('Règles indisponibles.'));}};
   sc.onerror=()=>{loading=null;ko(new Error('Règles indisponibles (hors ligne ?).'));};document.head.appendChild(sc);});
  return loading;}
 const loaded=()=>!!DATA;
+// Textes officiels anglais : jamais repassés dans le dictionnaire de l'interface (« Modifier » y signifie « Edit »).
+const NT=()=>DATA&&DATA.lang==='en'?' translate="no"':'';const NTM=()=>EN?' translate="no"':'';
 const data=()=>DATA;
 const fold=s=>String(s||'').toLocaleLowerCase('fr').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[’']/g,"'");
 const escDefault=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -22,7 +26,8 @@ function spell(id){return DATA&&DATA.spells[id]||null;}
 function findSpellByName(name){if(!DATA)return null;const n=fold(name);for(const [id,s] of Object.entries(DATA.spells))if(fold(s.name)===n)return {id,...s};return null;}
 // États : texte officiel pour une condition (« Aveuglé », « À terre »…).
 const COND_ALIAS={'empoigne':'agrippe',"incapable d'agir":'neutralise','epuise':'epuisement'};
-function condition(name){if(!DATA)return null;const c=DATA.rules.find(x=>x.id==='etats');if(!c)return null;let n=fold(name);n=COND_ALIAS[n]||n;return c.sections.find(s=>fold(s.title)===n)||null;}
+const COND_EN={'aveugle':'blinded','charme':'charmed','assourdi':'deafened','effraye':'frightened','agrippe':'grappled','neutralise':'incapacitated','invisible':'invisible','paralyse':'paralyzed','petrifie':'petrified','empoisonne':'poisoned','a terre':'prone','entrave':'restrained','etourdi':'stunned','inconscient':'unconscious','epuisement':'exhaustion'};
+function condition(name){if(!DATA)return null;const c=DATA.rules.find(x=>x.id==='etats');if(!c)return null;let n=fold(name);n=COND_ALIAS[n]||n;if(DATA.lang==='en')n=COND_EN[n]||n;return c.sections.find(s=>fold(s.title)===n)||null;}
 function plain(t){return String(t).replace(/\*\*/g,'').replace(/^\| /,'').replace(/^### /,'').replace(/\t/g,' · ');}
 // Recherche : titres d'abord, puis texte. Résultats : {kind:'rule'|'spell', ...}
 function search(q,limit=30){if(!DATA)return [];const n=fold(q).trim();if(n.length<2)return [];const words=n.split(/\s+/).filter(Boolean);const out=[];
@@ -57,13 +62,13 @@ function spellMeta(s){return [['Incantation',s.castTime],['Portée',s.range],['C
 function levelLabel(s){return s.level===0?'Sort mineur'+(s.school?' ('+s.school.toLowerCase()+')':''):s.school+' du '+s.level+(s.level===1?'er':'e')+' niveau'+(s.ritual?' (rituel)':'');}
 const CLASS_FR={bard:'barde',cleric:'clerc',druid:'druide',paladin:'paladin',ranger:'rôdeur',sorcerer:'ensorceleur',warlock:'occultiste',wizard:'magicien'};
 function spellHtml(id,esc=escDefault,opts={}){const s=spell(id);if(!s)return '';
- return `<article class="srd-spell"><header>${opts.noTitle?'':`<h3>${esc(s.name)}</h3>`}<p class="srd-school">${esc(levelLabel(s))}</p></header>
+ return `<article class="srd-spell"><header>${opts.noTitle?'':`<h3${NT()}>${esc(s.name)}</h3>`}<p class="srd-school">${esc(levelLabel(s))}</p></header>
  <dl class="srd-meta">${spellMeta(s).map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v||'—')}</dd></div>`).join('')}</dl>
- <div class="srd-body">${blocksHtml(s.text,esc)}${s.higher?`<p><strong>À plus haut niveau.</strong> ${esc(s.higher)}</p>`:''}</div>
+ <div class="srd-body"><div${NT()}>${blocksHtml(s.text,esc)}</div>${s.higher?`<p><strong>À plus haut niveau.</strong> <span${NT()}>${esc(s.higher)}</span></p>`:''}</div>
  ${s.v24?`<div class="srd-2024 ${opts.edition==='2024'?'active':''}"><p><strong>Règles 2024 (SRD 5.2) :</strong> différences repérées automatiquement. Le texte du sort peut aussi avoir changé : vérifiez avec le MJ.</p><div class="srd-table-wrap"><table class="srd-table"><thead><tr><th scope="col"></th><th scope="col">2014</th><th scope="col">2024</th></tr></thead><tbody>${s.v24.map(([k,a,b])=>`<tr><th scope="row">${esc(k)}</th><td>${esc(a)}</td><td>${esc(b)}</td></tr>`).join('')}</tbody></table></div></div>`:''}
  ${opts.noClasses?'':`<p class="muted small">Classes : ${s.classes.map(c=>CLASS_FR[c]||c).join(', ')||'—'}</p>`}</article>`;}
 function sectionHtml(chapterId,index,esc=escDefault){const r=section(chapterId,index);if(!r)return '';
- return `<article class="srd-section"><p class="srd-crumb">${esc(r.chapter.title)}</p><h3>${esc(r.section.title)}</h3>${blocksHtml(r.section.text,esc)}</article>`;}
+ return `<article class="srd-section"><p class="srd-crumb"${NT()}>${esc(r.chapter.title)}</p><h3${NT()}>${esc(r.section.title)}</h3><div${NT()}>${blocksHtml(r.section.text,esc)}</div></article>`;}
 // Texte court (sans balises) d'un sort, pour les cartes imprimées : coupé proprement si trop long.
 function spellCardText(id,max=900){const s=spell(id);if(!s)return null;let t=s.text.map(plain).join(' ');if(s.higher)t+=' À plus haut niveau. '+s.higher;
  if(t.length<=max)return {text:t,cut:false};const cut=t.slice(0,max);const end=Math.max(cut.lastIndexOf('. '),max-80);return {text:cut.slice(0,end+1)+' […]',cut:true};}
@@ -71,8 +76,8 @@ function spellCardText(id,max=900){const s=spell(id);if(!s)return null;let t=s.t
 let MON=null,monLoading=null;
 function loadMonsters(){if(MON)return Promise.resolve(MON);if(monLoading)return monLoading;
  monLoading=new Promise((ok,ko)=>{if(typeof window==='undefined'||typeof document==='undefined'){try{MON=require('./data/srd-monstres-fr.js');ok(MON);}catch(e){monLoading=null;ko(e);}return;}
-  if(root.ChroniquesSRDMonstresFr){MON=root.ChroniquesSRDMonstresFr;ok(MON);return;}
-  const sc=document.createElement('script');sc.src='/src/data/srd-monstres-fr.js';sc.onload=()=>{MON=root.ChroniquesSRDMonstresFr||null;if(MON)ok(MON);else{monLoading=null;ko(new Error('Fiches indisponibles.'));}};sc.onerror=()=>{monLoading=null;ko(new Error('Fiches indisponibles (hors ligne ?).'));};document.head.appendChild(sc);});
+  const G=EN?'ChroniquesSRDMonstresEn':'ChroniquesSRDMonstresFr';if(root[G]){MON=root[G];ok(MON);return;}
+  const sc=document.createElement('script');sc.src=EN?'/src/data/srd-monstres-en.js':'/src/data/srd-monstres-fr.js';sc.onload=()=>{MON=root[G]||null;if(MON)ok(MON);else{monLoading=null;ko(new Error('Fiches indisponibles.'));}};sc.onerror=()=>{monLoading=null;ko(new Error('Fiches indisponibles (hors ligne ?).'));};document.head.appendChild(sc);});
  return monLoading;}
 const monstersLoaded=()=>!!MON;
 function monster(id){if(!MON)return null;let m=MON[id];if(typeof m==='string')m=MON[m.slice(1)];return m&&typeof m==='object'?m:null;}
@@ -80,11 +85,11 @@ const FIELD_LABELS=[['ac','Classe d’armure'],['hp','Points de vie'],['speed','
 const modTxt=v=>{const m=Math.floor((v-10)/2);return (m>=0?'+':'−')+Math.abs(m);};
 function monsterHtml(id,esc=escDefault){const m=monster(id);if(!m)return '';
  const entries=list=>list.map(([n,t])=>`<p>${n?`<strong><em>${esc(n)}.</em></strong> `:''}${esc(t).replace(/\n/g,'<br>')}</p>`).join('');
- const sec=(title,list,intro)=>list&&list.length?`<h4>${title}</h4>${intro?`<p>${esc(intro)}</p>`:''}${entries(list)}`:'';
+ const sec=(title,list,intro)=>list&&list.length?`<h4>${title}</h4>${intro?`<p${NTM()}>${esc(intro)}</p>`:''}<div${NTM()}>${entries(list)}</div>`:'';
  return `<article class="srd-monster"><p class="srd-school">${esc(m.m)}</p>
  <dl class="srd-meta">${FIELD_LABELS.filter(([k])=>m.f[k]).slice(0,3).map(([k,l])=>`<div><dt>${l}</dt><dd>${esc(m.f[k])}</dd></div>`).join('')}</dl>
  ${m.a?`<table class="srd-abilities"><thead><tr>${['FOR','DEX','CON','INT','SAG','CHA'].map(x=>`<th scope="col">${x}</th>`).join('')}</tr></thead><tbody><tr>${m.a.map(v=>`<td>${v} (${modTxt(v)})</td>`).join('')}</tr></tbody></table>`:''}
  <dl class="srd-fields">${FIELD_LABELS.slice(3).filter(([k])=>m.f[k]).map(([k,l])=>`<div><dt>${l}</dt><dd>${esc(m.f[k])}</dd></div>`).join('')}</dl>
- <div class="srd-body">${entries(m.t)}${sec('Actions',m.ac)}${sec('Réactions',m.r)}${sec('Actions légendaires',m.l,m.li)}</div></article>`;}
+ <div class="srd-body"><div${NTM()}>${entries(m.t)}</div>${sec('Actions',m.ac)}${sec('Réactions',m.r)}${sec('Actions légendaires',m.l,m.li)}</div></article>`;}
 return {loadMonsters,monstersLoaded,monster,monsterHtml,load,loaded,data,fold,chapters,section,spell,findSpellByName,condition,search,blocksHtml,spellHtml,sectionHtml,spellCardText,levelLabel,CAST,CLASS_FR};
 });

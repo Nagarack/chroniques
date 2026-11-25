@@ -55,7 +55,7 @@ const SRD_OF={kobold:'kobold','rat-geant':'giant-rat',bandit:'bandit',garde:'gua
 const CURATED=M.map(([id,name,cr,type,hp,ac,speed,abilities,defenses,traits,actions])=>Object.freeze({id,name,cr,type,hp,ac,speed,abilities,defenses,traits,actions,legendary:'',xp:XP_BY_CR[cr],srd:SRD_OF[id]||'',curated:true}));
 let FULL=null,loading=null;
 function fromSrd(r){const [index,name,nameEn,cr,type,hp,ac,speed,a,defenses,traits,actions,legendary,xp,sc,alias]=r;return Object.freeze({spellcasting:sc?{ability:sc[0],dc:sc[1],attack:sc[2],slots:sc[3],spells:sc[4]}:null,id:'srd-'+index,name,nameEn,cr,type,hp,ac,speed,abilities:{str:a[0],dex:a[1],con:a[2],int:a[3],wis:a[4],cha:a[5]},defenses:defenses||{},traits:traits||'',actions:actions||'',legendary:legendary||'',xp:xp||XP_BY_CR[cr]||0,srd:index,alias:alias||''});}
-function merge(rows){const curatedBySrd=new Map(CURATED.map(c=>[c.srd,c]));const out=rows.map(r=>{const e=fromSrd(r);const c=curatedBySrd.get(e.srd);return c?Object.freeze({...c,name:e.name,nameEn:e.nameEn,legendary:e.legendary,spellcasting:e.spellcasting,alias:e.name!==c.name?c.name:e.alias}):e;});
+function merge(rows){const curatedBySrd=new Map(CURATED.map(c=>[c.srd,c]));const out=rows.map(r=>{const e=fromSrd(r);const c=curatedBySrd.get(e.srd);const en=typeof window!=='undefined'&&window.ChroniquesI18n&&window.ChroniquesI18n.lang==='en';if(c&&en)return Object.freeze({...c,...e,alias:''});return c?Object.freeze({...c,name:e.name,nameEn:e.nameEn,legendary:e.legendary,spellcasting:e.spellcasting,alias:e.name!==c.name?c.name:e.alias}):e;});
  for(const c of CURATED)if(!out.some(e=>e.id===c.id))out.push(c);
  const order=cr=>cr.includes('/')?Number(cr.split('/')[0])/Number(cr.split('/')[1]):Number(cr);return out.sort((x,y)=>order(x.cr)-order(y.cr)||x.name.localeCompare(y.name,'fr'));}
 function fullLoaded(){return FULL!==null;}
@@ -63,8 +63,9 @@ function fullLoaded(){return FULL!==null;}
 function loadFull(){if(FULL)return Promise.resolve(FULL);if(loading)return loading;
  loading=new Promise((ok,ko)=>{
   if(typeof window==='undefined'||typeof document==='undefined'){try{FULL=merge(require('./data/srd-monsters.js'));ok(FULL);}catch(e){ko(e);}return;}
-  if(window.ChroniquesSRDMonsters){FULL=merge(window.ChroniquesSRDMonsters);ok(FULL);return;}
-  const sc=document.createElement('script');sc.src='/src/data/srd-monsters.js';sc.onload=()=>{FULL=merge(window.ChroniquesSRDMonsters||[]);ok(FULL);};sc.onerror=()=>{loading=null;ko(new Error('Bestiaire SRD indisponible.'));};document.head.appendChild(sc);
+  const EN=(typeof window!=='undefined'&&window.ChroniquesI18n&&window.ChroniquesI18n.lang==='en'),G=EN?'ChroniquesSRDMonstersEn':'ChroniquesSRDMonsters';// 5.2 : noms et textes anglais si l'interface est en anglais.
+  if(window[G]){FULL=merge(window[G]);ok(FULL);return;}
+  const sc=document.createElement('script');sc.src=EN?'/src/data/srd-monsters.en.js':'/src/data/srd-monsters.js';sc.onload=()=>{FULL=merge(window[G]||[]);ok(FULL);};sc.onerror=()=>{loading=null;ko(new Error('Bestiaire SRD indisponible.'));};document.head.appendChild(sc);
  });return loading;}
 function list(){return FULL||CURATED;}
 function get(id){return list().find(m=>m.id===id)||CURATED.find(m=>m.id===id)||null;}

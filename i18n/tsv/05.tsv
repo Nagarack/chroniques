@@ -1,0 +1,300 @@
+1160	Powerful build
+1161	Map
+1162	Map missing.
+1163	Map shown on the table screen.
+1164	Map created.
+1165	Campaign map
+1166	Map saved.
+1167	Map and initiative for a TV, with no secrets at all
+1168	{0} map and markers
+1169	Map not found.
+1170	Map changed in the meantime.
+1171	Map not accessible.
+1172	Map unavailable.
+1173	Tactical map
+1174	Map too large after conversion (2 MB maximum).
+1175	Maps
+1176	Campaign maps
+1177	Spell cards
+1178	Maps and exploration
+1179	Tactical maps
+1180	Cartographer
+1181	Checkboxes in published quests.
+1182	Horned helmet
+1183	Cassien Duroc
+1184	-
+1185	Catalogue: the 319 SRD 5.1 spells, with their full description (📖). {0}
+1186	Automatic catalogue unavailable with custom rules.
+1187	Item catalogue unavailable.
+1188	SRD item catalogue (equipment and magic items)
+1189	Fantasy catalogue · CC BY 3.0
+1190	Category
+1191	Category (optional)
+1192	Unknown category.
+1193	Invalid category.
+1194	CC BY 3.0
+1195	This “?” button shows the instructions for the screen you are on. Keyboard: ? to open it, / to search a list, Esc to close.
+1196	This “?” button explains the screen you are on. Conditions (Frightened, Prone…) are explained when you hover over or tap their name.
+1197	This change resets the tracked slots. Continue?
+1198	This companion is not in combat.
+1199	This account is not part of the campaign.
+1200	This account already has this role.
+1201	This file contains Chroniques
+1202	This file is not a Chroniques campaign template.
+1203	This file is not a character exported from Chroniques.
+1204	This form rolls no dice. Only enter a total obtained with your real dice. The result will be added to the log, but will not change HP or slots. Recording a cast spell stays separate.
+1205	This link comes from your GM. It can only be used once and expires after two hours.
+1206	This character already has a token on this map.
+1207	This character still has HP.
+1208	This character is already assigned to another member.
+1209	This character is already assigned.
+1210	This character is incapacitated.
+1211	This power is already available.
+1212	What they want
+1213	What the group discovered, its questions, its plans…
+1214	What the player reads in their inventory: effects, bonuses, dice to roll…
+1215	What the players will discover
+1216	What the players can discover
+1217	What changes
+1218	What might change during the next session
+1219	What happened
+1220	This marker holds treasures. Move them to the GM’s reserve before deleting the marker.
+1221	This marker is empty. First prepare an item below.
+1222	These are leads, not a required path: the players’ choices stay free.
+1223	This spell changed in the 2024 rules: see 📖 Description
+1224	This spell is not part of the SRD 5.1: check your rulebook.
+1225	Celestial
+1226	Circle
+1227	These notes are confidential and never sent to players.
+1228	This device already has a passkey for this account.
+1229	This username already exists.
+1230	This item cannot be used from the inventory.
+1231	This shop is closed.
+1232	This map holds treasures. Move them to the GM’s reserve before deleting the map.
+1233	This passkey is already registered.
+1234	This creature does not have this condition.
+1235	This creature has no legendary actions.
+1236	This creature does not cast spells.
+1237	This date is already proposed.
+1238	This illustration is visible to all connected players.
+1239	This note was modified by
+1240	This note no longer exists.
+1241	This customisation does not change the campaign and is not synced between devices.
+1242	This option has already been used.
+1243	This backup cannot be restored.
+1244	This one-minute tour shows you the essentials. Nothing is changed during the tour. Press Esc to leave at any time.
+1245	This two-minute tour shows you where the main tools are. Nothing is changed during the tour. Press Esc to leave at any time.
+1246	Everyone can deposit and take back; everything is noted in the log.
+1247	Invalid field.
+1248	Invalid allowed fields.
+1249	Luck
+1250	Luck and natural stealth
+1251	Changes shape (for example into a chest). Adhesive: sticks to whatever touches it.
+1252	Turned to stone: incapacitated, can’t move or speak. Resistance to all damage; automatically fails Strength and Dexterity saving throws.
+1253	Changing edition will remove the origin bonuses and require species and backgrounds to be set up again. Continue?
+1254	Changing species or lineage resets racial uses: confirmation required.
+1255	Changing species or lineage resets racial uses to zero. Continue?
+1256	Change campaign
+1257	Change character
+1258	Change server
+1259	Change the appearance
+1260	Change the password
+1261	Changing the password signs out the other sessions of this account.
+1262	Changing the rules removes the saved origins and their bonuses: confirmation required.
+1263	Scout’s hat
+1264	Mage’s hat
+1265	Chapters
+1266	Each campaign keeps its characters, notes and permissions. The same account can be a player at one table and GM at another.
+1267	each creature added to combat (visible to players only if the creature is revealed)
+1268	each copy given to a player
+1269	Each invitation gives a link and a QR code, valid for 24 h and only once. They disappear when you leave the page: pass them on right away (the invitation stays valid, you can revoke it below).
+1270	Each player rolls their saving throw with their dice; you only enter the result. Resistances, vulnerabilities and immunities from the sheets are applied automatically.
+1271	Each backup can be copied to a USB stick or a synced folder (OneDrive, Google Drive, Dropbox) on the server PC.{0}
+1272	Each turn: one action, movement up to your speed, a bonus action only if a feature allows it. A reaction comes back at the start of the character’s next turn.
+1273	Charge: +2d8 if it moved 3 m in a straight line, then pushes or knocks prone (DC 14 Strength saving throw). Labyrinthine recall. Reckless.
+1274	Carried load
+1275	Carried load{0}
+1276	Loading the description…
+1277	Loading the sheet…
+1278	Loading the list…
+1279	Loading invitations…
+1280	Loading the rules…
+1281	Loading the catalogue…
+1282	loading…
+1283	Charges (0 = none)
+1284	Maximum charges
+1285	Charges left
+1286	Charisma
+1287	Charmed
+1288	Bounty hunter
+1289	Search
+1290	Search the history
+1291	Search for a rule
+1292	Search…
+1293	Search for a rule with a word, or click a condition shown in combat.
+1294	Search for an event, or filter decisions and consequences.
+1295	Search for a word (“prone”, “grapple”, “rest”) or browse the chapters. Conditions shown in combat are also clickable.
+1296	Figures taken from session summaries and histories (rolls stay physical, so they are not counted).
+1297	Figures taken from the summaries published by the GM and your character’s history.
+1298	Chosen automatically from the name
+1299	Choose Drow, High Elf or Wood Elf to show the racial spells.
+1300	Choose player or GM view
+1301	Choose the species
+1302	Choose the background
+1303	Choose the class
+1304	Choose the player
+1305	Choose the character
+1306	Choose a new password
+1307	Choose a map
+1308	Choose your campaign
+1309	Choose…
+1310	Choose “GM private” or “Visible to players” for each entry.
+1311	Choose +2/+1 or +1/+1/+1 for the background.
+1312	Choose Abyssal, Chthonic or Infernal to reveal the legacy’s spells.
+1313	Choose at least one recipient.
+1314	Choose at least one character.
+1315	Choose at least one target.
+1316	First choose an image file.
+1317	First choose a class for a suitable distribution.
+1318	Choose forests or rocks for the related features.
+1319	Choose the edition and manage your campaign data.
+1320	Choose the right campaign and check that you are in Game Master mode.
+1321	Choose the campaign in My campaigns or with the selector at the top.
+1322	Choose the category: portrait, creature or item.
+1323	Choose the shape and size, then tap the map.
+1324	Choose the damage type before recording it: resistances and vulnerabilities apply on their own.
+1325	Choose the 2014 or 2024 rules for this creator.
+1326	Choose the 2014 or 2024 rules.
+1327	Choose Open, or use the Campaign selector, to change table.
+1328	Choose a character to check their equipment and charges.
+1329	Choose a character then “Invite this player”: a QR code to scan around the table and a link to send appear. “Invite the whole table” prepares one invitation per free character.
+1330	Choose a PC for their actions, conditions and resources. For monsters, use the GM panel below.
+1331	Choose a portrait, an item, a monster or a marker in the media library.
+1332	Choose a scenario to attach its elements.
+1333	Choose an ancestry before setting the resistance and breath type.
+1334	Choose a map available in the campaign.
+1335	Choose a class in step 1 to compute HP.
+1336	Choose a reference class to compute the slots.
+1337	Choose a class to see its hit die, its saving throws and its main ability.
+1338	Choose a creature from the suggested list.
+1339	Choose a species and a background to see the related features and bonuses.
+1340	Choose a step of the player path and open the suggested screen.
+1341	Choose a sheet.
+1342	Choose an illustration below or import your image.
+1343	Choose a JPG, PNG or WebP image under 15 MB.
+1344	Choose a backup, test it (complete read without changing anything), then restore this campaign. The current state is backed up first: you can always go back.
+1345	Choose only the information to share.
+1346	Choose your username and password to join the campaign.
+1347	Choose your character and see the spells known or prepared.
+1348	Choose your character and see their HP, armour class and resources.
+1349	Choice cancelled.
+1350	Skill choice (Insight, Perception or Survival), protection against Charmed; 4-hour trance as a long rest.
+1351	Subclass choice.
+1352	Chrome
+1353	Chrome → Menu ⋮ → Install app or Add to Home screen.
+1354	Campaign chronicle
+1355	Chroniques
+1356	CHRONIQUES
+1357	Chroniques · sheet generated on {0}. Dice stay physical.
+1358	Chroniques · v{0}
+1359	Chroniques {0}
+1360	Chroniques {0} is available
+1361	Chroniques {0} is available on the server.
+1362	Chroniques is up to date.
+1363	Chroniques was not started with DEMARRER_CHRONIQUES.bat: close the server window then run that file again, the update will install on start-up.
+1364	Chroniques was not launched with DEMARRER_CHRONIQUES.bat: close the server window and start it again, the update will install on start-up.
+1365	Chroniques is installing then restarting. This page will reload by itself.
+1366	Chroniques opens without a network with the latest data; HP, resources and notes are sent when the network is back.
+1367	-
+1368	Chroniques v{0} ·
+1369	-
+1370	-
+1371	-
+1372	Chroniques:
+1373	-
+1374	-
+1375	Timeline of adventures and decisions
+1376	Chthonic
+1377	Almost whispers
+1378	Whispers
+1379	Whispers{0}
+1380	Whisper to the GM
+1381	Hill giant
+1382	Falls
+1383	Drops to 0 HP
+1384	Target: Constitution saving throw against the DC shown; {0}d8 damage.
+1385	Target: Dexterity saving throw against the DC shown; {0}d6 fire (half on a success according to the rules).
+1386	Target: Dexterity saving throw against the DC shown; {0}d8 damage (real dice).
+1387	Duplicate target.
+1388	Target not found.
+1389	Invisible or unseen target
+1390	targets at most.
+1391	Targets{0}
+1392	Scimitar: +3, 1d6+1 slashing.
+1393	Scimitar: +3, 1d6+1 slashing. Light crossbow: +3 (24/96 m), 1d8+1 piercing.
+1394	Scimitar: +4 to hit, 1d6+2 slashing. Shortbow: +4, 1d6+2 piercing.
+1395	Scimitar: +4, 1d6+2 slashing. Shortbow: +4 (24/96 m), 1d6+2 piercing.
+1396	Light
+1397	Class
+1398	Class to choose
+1399	Armour class
+1400	ARMOUR CLASS
+1401	Armour class updated.
+1402	Starting class
+1403	Reference class
+1404	Unknown reference class.
+1405	Class saved.
+1406	Invalid class.
+1407	Class not recognised: refer to the book for HP and features.
+1408	Classes: {0}
+1409	Key shown in the terminal
+1410	Inconsistent passkey.
+1411	Passkey unknown on this server: sign in with your password, then create a key in My account.
+1412	Passkey unavailable.
+1413	Passkey deleted.
+1414	-
+1415	Incorrect first-setup key.
+1416	Key of
+1417	AI key not authorised. Check the server configuration.
+1418	Server initial key
+1419	Key not found.
+1420	Invalid update public key (32 bytes expected).
+1421	Cleric
+1422	Passkeys unavailable at this address (HTTPS required).
+1423	Click an illustration to link it to the selected sheet.
+1424	Click “Invite this player”: have the QR code scanned or send the link, the code is already inside.
+1425	Click Customise to show, hide or resize panels.
+1426	Close the current session and start a new one? The current summary stays available in “Previous sessions”.
+1427	Co-GM
+1428	co-GM? This person will be able to see and edit all the sheets and secret notes of the campaign.
+1429	Full co-GM
+1430	full co-GM? This person will be able to see and edit all the sheets and secret notes of the campaign.
+1431	Creature co-GM
+1432	creature co-GM? During combat, this person will run the monsters (HP, conditions, actions, next turn) from the co-GM station, without access to your notes, the notebook or the other sheets. They keep their character.
+1433	Creature co-GM (restricted)
+1434	Tick “I have finished”; you can start the path again at any time.
+1435	Tick at least one target.
+1436	Tick the explicit permission before sending.
+1437	Tick or remove the conditions observed at the table. No automatic roll and no expired duration without confirmation.
+1438	Code copied.
+1439	Invitation code
+1440	Invitation code
+1441	Code taken from your invitation link. Already have an account? Choose “Sign in”: the invitation will be offered right after.
+1442	Code given by the GM
+1443	Pending codes
+1444	Chest
+1445	Party chest
+1446	Chest updated.
+1447	Chest or pack full (70 different items).
+1448	Chest full (70 different items).
+1449	-
+1450	Tax collector
+1451	Collects rumours
+1452	Paste the suggestion into your scenario only if you wish. No sheet, scene or note was changed.
+1453	Hills
+1454	Combat
+1455	Combat & initiative
+1456	Combat and initiative
+1457	Combat started · initiative order set
+1458	Combat no.
+1459	Combat not started

@@ -50,6 +50,7 @@ const TR=require('./src/travel.js');
 const RT=require('./src/random-tables.js');
 const AD=require('./src/area-damage.js');
 const WA=require('./src/webauthn.js');
+const I18N=require('./src/i18n-core.js');
 const FA=require('./src/factions.js');
 const AI=require('./src/scenario-ai');
 const root=__dirname;
@@ -89,6 +90,14 @@ const allowedStatic=new Map([
  ['/src/factions.js',['src/factions.js','text/javascript; charset=utf-8']],
  ['/src/random-tables.js',['src/random-tables.js','text/javascript; charset=utf-8']],
  ['/src/area-damage.js',['src/area-damage.js','text/javascript; charset=utf-8']],
+ ['/src/i18n-core.js',['src/i18n-core.js','text/javascript; charset=utf-8']],
+ ['/src/i18n.js',['src/i18n.js','text/javascript; charset=utf-8']],
+ ['/src/i18n/en.js',['src/i18n/en.js','text/javascript; charset=utf-8']],
+ ['/src/data/srd-spells-index.en.js',['src/data/srd-spells-index.en.js','text/javascript; charset=utf-8']],
+ ['/src/data/srd-regles-en.js',['src/data/srd-regles-en.js','text/javascript; charset=utf-8']],
+ ['/src/data/srd-monstres-en.js',['src/data/srd-monstres-en.js','text/javascript; charset=utf-8']],
+ ['/src/data/srd-monsters.en.js',['src/data/srd-monsters.en.js','text/javascript; charset=utf-8']],
+ ['/src/data/srd-items.en.js',['src/data/srd-items.en.js','text/javascript; charset=utf-8']],
  ['/src/spells.js',['src/spells.js','text/javascript; charset=utf-8']],
  ['/src/spell-guide.js',['src/spell-guide.js','text/javascript; charset=utf-8']],
  ['/src/creatures.js',['src/creatures.js','text/javascript; charset=utf-8']],
@@ -108,6 +117,13 @@ const allowedStatic=new Map([
  ['/src/data/srd-monsters.js',['src/data/srd-monsters.js','text/javascript; charset=utf-8']],
  ['/src/data/srd-items.js',['src/data/srd-items.js','text/javascript; charset=utf-8']],
  ['/aide-joueur.html',['aide-joueur.html','text/html; charset=utf-8']],
+ ['/iphone',['iphone.html','text/html; charset=utf-8']],
+ ['/iphone.html',['iphone.html','text/html; charset=utf-8']],
+ ['/iphone.en.html',['iphone.en.html','text/html; charset=utf-8']],
+ ['/aide-mj.en.html',['aide-mj.en.html','text/html; charset=utf-8']],
+ ['/aide-joueur.en.html',['aide-joueur.en.html','text/html; charset=utf-8']],
+ ['/guide.en.html',['GUIDE_UTILISATION.en.html','text/html; charset=utf-8']],
+ ['/tutos.en.html',['TUTOS_EXPRESS.en.html','text/html; charset=utf-8']],
  ['/aide-mj.html',['aide-mj.html','text/html; charset=utf-8']],
  ['/src/onboarding.js',['src/onboarding.js','text/javascript; charset=utf-8']],
  ['/src/quick-help.js',['src/quick-help.js','text/javascript; charset=utf-8']],
@@ -153,12 +169,15 @@ function createServer(opts={}){
  // V4.9 : notifications de rappel de séance (clés VAPID générées une fois, abonnements par appareil).
  function pushStore(){if(!db.push||typeof db.push!=='object')db.push={};if(!db.push.vapid){db.push.vapid=WP.createVapid();persist();}if(!Array.isArray(db.push.subs))db.push.subs=[];if(!db.push.sent||typeof db.push.sent!=='object')db.push.sent={};return db.push;}
  const pushOpts={allowHosts:opts.pushAllowHosts||[],allowHttp:!!opts.pushAllowHosts};
+ // 5.2 : notifications dans la langue choisie par chaque compte (Mon compte → Langue).
+ let enEngine=null;function enText(t){if(!enEngine){try{enEngine=I18N.create(require('./src/i18n/en.js').ui);}catch{enEngine={translateText:x=>x};}}return enEngine.translateText(t);}
+ function localize(userId,m){const u=db.users.find(x=>x.id===userId);if(u?.lang!=='en')return m;return {...m,title:enText(String(m.title||'')),body:enText(String(m.body||''))};}
  async function pushTo(userIds,message){const st=pushStore();const targets=st.subs.filter(x=>userIds.includes(x.userId));let ok=0;const gone=[];
-  for(const sub of targets){const r=await WP.send(st.vapid,sub,message,{subject:opts.pushSubject||process.env.CHRONIQUES_PUSH_CONTACT||'mailto:chroniques@localhost'});if(r.ok)ok++;if(r.gone)gone.push(sub.endpoint);}
+  for(const sub of targets){const r=await WP.send(st.vapid,sub,localize(sub.userId,message),{subject:opts.pushSubject||process.env.CHRONIQUES_PUSH_CONTACT||'mailto:chroniques@localhost'});if(r.ok)ok++;if(r.gone)gone.push(sub.endpoint);}
   if(gone.length){st.subs=st.subs.filter(x=>!gone.includes(x.endpoint));persist();}return {sent:ok,total:targets.length,removed:gone.length};}
  // File de notifications par compte : lue par l'application Android (vérification périodique) et l'historique.
  function inboxAdd(userIds,message){const st=pushStore();if(!st.inbox||typeof st.inbox!=='object')st.inbox={};const at=new Date().toISOString();
-  for(const id of new Set(userIds)){const list=st.inbox[id]||(st.inbox[id]=[]);list.push({id:random(8),at,title:message.title,body:message.body,tag:message.tag||'',url:message.url||'/'});if(list.length>30)list.splice(0,list.length-30);}persist();}
+  for(const id of new Set(userIds)){const list=st.inbox[id]||(st.inbox[id]=[]);const lm=localize(id,message);list.push({id:random(8),at,title:lm.title,body:lm.body,tag:message.tag||'',url:message.url||'/'});if(list.length>30)list.splice(0,list.length-30);}persist();}
  async function notifyUsers(userIds,message){inboxAdd(userIds,message);return pushTo(userIds,message);}
  // « À vous de jouer » : seulement si l'application du joueur n'est pas affichée à l'écran.
  const lastTurnNotice=new Map();
@@ -1006,6 +1025,7 @@ function createServer(opts={}){
      st.subs=st.subs.filter(x=>x.endpoint!==sub.endpoint);if(st.subs.filter(x=>x.userId===u.id).length>=10)badRequest('Maximum 10 appareils par compte.');
      st.subs.push({id:random(9),userId:u.id,...sub,createdAt:new Date().toISOString()});persist();send(res,200,{ok:true,devices:st.subs.filter(x=>x.userId===u.id).length});return;}
     if(pathname==='/api/push/unsubscribe'){const u=requireUser(req);const st=pushStore();const n=st.subs.length;st.subs=st.subs.filter(x=>!(x.userId===u.id&&(b.all===true||x.endpoint===String(b.endpoint||''))));if(st.subs.length!==n)persist();send(res,200,{ok:true,devices:st.subs.filter(x=>x.userId===u.id).length});return;}
+    if(pathname==='/api/lang'){const u=requireUser(req);const rec=db.users.find(x=>x.id===u.id);const l=b.lang==='en'?'en':'fr';if(rec.lang!==l){rec.lang=l;persist();}send(res,200,{lang:l});return;}
     if(pathname==='/api/presence'){const u=requireUser(req);const h=sha(cookie(req,'chroniques_sid')||'');for(const x of listeners)if(x.sessionHash===h)x.visible=b.visible!==false;send(res,200,{ok:true});return;}
     if(pathname==='/api/push/prefs'){const u=requireUser(req);const st=pushStore();st.prefs??={};st.prefs[u.id]={...(st.prefs[u.id]||{}),turn:b.turn!==false};persist();send(res,200,{prefs:st.prefs[u.id]});return;}
     if(pathname==='/api/push/test'){const u=requireUser(req);limit(req,'media');const r=await pushTo([u.id],{title:'Chroniques',body:'Les rappels de séance fonctionnent sur cet appareil.',url:'/',tag:'test'});send(res,200,r);return;}

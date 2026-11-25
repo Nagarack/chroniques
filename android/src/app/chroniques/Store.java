@@ -37,4 +37,6 @@ final class Store {
     void setLive(boolean b) { p.edit().putBoolean("live", b).apply(); }
     String dismissedVersion() { return p.getString("dismissed", ""); }
     void setDismissedVersion(String v) { p.edit().putString("dismissed", v).apply(); }
+    String lang() { return p.getString("lang", null); }
+    void setLang(String l) { p.edit().putString("lang", l).apply(); }
 }

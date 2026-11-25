@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chroniques — Game Master cheat sheet</title>
+<style>
+:root{--ink:#2b2118;--muted:#6b5a45;--rule:#d9cdb6;--accent:#8c2f1f;--paper:#fbf8f1}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 'Alegreya Sans','Gill Sans','Trebuchet MS',system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:28px 24px}
+h1{font:400 30px/1.15 'IM Fell English',Georgia,serif;margin:0 0 4px}h2{font:400 19px/1.2 'IM Fell English',Georgia,serif;color:var(--accent);margin:0 0 6px}
+.lede{color:var(--muted);margin:0 0 18px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px}
+section{border-top:1px solid var(--rule);padding-top:10px}ul,ol{margin:0;padding-left:18px}li{margin:2px 0}
+kbd{border:1px solid var(--rule);border-bottom-width:2px;border-radius:3px;padding:0 5px;font:inherit;font-size:13px}
+.print{margin:18px 0 0;color:var(--muted)}.foot{margin-top:16px;color:var(--muted);font-size:13px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+@media print{@page{size:A4;margin:12mm}body{background:#fff;font-size:12px}main{padding:0}.print{display:none}}
+</style></head><body><main>
+<h1>Game Master cheat sheet</h1>
+<p class="lede">The server runs on your PC: keep the <strong>DEMARRER_CHRONIQUES</strong> window open during the game. Dice stay physical.</p>
+<div class="grid">
+<section><h2>Before the session</h2><ol>
+<li><strong>Campaign → Invite this player</strong> (or the whole table): a QR code to scan, or a link to send.</li>
+<li><strong>Characters</strong>: check HP, AC, resistances and resources with each player.</li>
+<li><strong>Combat → Monsters and NPCs</strong>: add the creatures (SRD bestiary or free sheet).</li>
+<li><strong>GM Library</strong>: your homebrew monsters and items, your encounters and their difficulty for the party’s level.</li>
+<li><b>Today’s session</b> (Preparation): scenes, encounters, NPCs, quests and handouts on one printable page.</li>
+<li><b>📜 Previously on…</b> (Today’s session): compose, proofread, publish; can be shown on the table screen.</li>
+<li><b>🧭 Travel</b> (Journal &amp; quests → Calendar): distance, pace, camp, rations, lights.</li>
+<li><b>⚜ Factions &amp; relationships</b> (Notebook): party reputation from −5 to +5 with each faction, members, NPC ↔ character relationships.</li>
+<li><b>⚡ Quick NPC</b> (Journal &amp; quests → Recurring NPCs): name, role, trait, voice, secret, with ideas to pick from.</li>
+<li><b>🎲 Random tables</b> (Today’s session): write “1-3: …”, roll your die, enter the total; “Announce to players” adds it to their log.</li>
+<li><b>♫ Scene ambience</b> (Prepare the session): the chosen track starts when the scene becomes “in progress”.</li>
+<li>Back up: “Back up now” button or SAUVEGARDER_CHRONIQUES.bat.</li></ol></section>
+<section><h2>During combat</h2><ul>
+<li><b>📖 Sheet</b> among an SRD creature’s actions: its official stat block.</li>
+<li><b>✉ Whispers</b>: a private message to one player (“you notice…”) that the others don’t see.</li>
+<li><b>Game rules</b> and <b>clickable conditions</b>: the official rule in two clicks.</li>
+<li>Enter the initiatives rolled with dice, then <strong>Start combat</strong>.</li>
+<li><kbd>N</kbd> next turn · <kbd>U</kbd> undo the last action (10 levels).</li>
+<li><strong>Condition durations</strong>: end or start of turn, caster’s turn, saving throw reminder at the end of each turn (⏳ on the condition).</li>
+<li><b>Party view</b>: saving throws, passive Perception and spell save DCs for the whole table. Optional <b>turn timer</b> ⏱.</li>
+<li><b>Co-GM station</b> (<code>/#poste-comj</code>): a screen to run the creatures on a tablet; “Creature co-GM” role for a friend with no access to your secrets.</li>
+<li>Choose the <strong>damage type</strong>: resistance ÷ 2, vulnerability × 2, immunity 0.</li>
+<li><b>💥 Area damage</b> (Combat desk, or “💥 Damage” under an area placed on the map): dice total, “succeeded” or “failed” for each target; half or nothing depending on the spell, then resistances. <kbd>U</kbd> undoes.</li>
+<li>Concentration (adventurers <em>and</em> creatures): the saving throw DC is shown with each damage.</li>
+<li>Creatures in groups: a single initiative; action buttons and a legendary action counter under each creature.</li>
+<li><strong>GM screen</strong>: common rules, from the combat.</li>
+<li><strong>Table screen</strong>: map and initiative for the TV, with no secrets.</li>
+<li><kbd>Ctrl</kbd>+<kbd>K</kbd>: search everywhere and run a command.</li></ul></section>
+<section><h2>What players see</h2><ul>
+<li><em>Hidden</em> creatures: invisible to them. <em>Visible</em> ones: name and conditions only.</li>
+<li>Monster statistics, defences and notes: never sent.</li>
+<li>Shared notes: written by the players, readable by you.</li>
+<li>Character history: your <em>secret</em> notes never appear there for them.</li>
+<li>“My view → Player” to check their point of view.</li></ul></section>
+<section><h2>Updates and backups</h2><ul>
+<li><b>Update</b>: Settings → “Update Chroniques” → upload the ZIP → “Install and restart” (server started with DEMARRER_CHRONIQUES.bat). Updates published on GitHub are also offered automatically.</li>
+<li><b>Restore a backup</b>: Settings → choose a date → “Test” (nothing is changed) then “Restore…”. The current state is backed up just before.</li>
+<li><b>Mirror copy</b>: enter a USB stick or OneDrive / Google Drive folder in Settings; every backup is copied there. A daily backup is made automatically.</li>
+<li><b>Campaign template</b> (Settings): export / import your preparation (random tables included).</li>
+<li><b>🔑 Passkeys</b> (Settings → Passkeys): sign in with your fingerprint, face or device code. A key created on the HTTPS address only works on that address; your password stays valid.</li>
+<li><b>🌐 Language</b>: My account → English / Français. Each person chooses; the campaign data does not change.</li>
+<li>Or close the server, then drag the new ZIP onto <strong>METTRE_A_JOUR.bat</strong>. Backup, check and rollback are automatic.</li>
+<li>A problem? <strong>REVENIR_VERSION_PRECEDENTE.bat</strong>.</li>
+<li>Copy the <code>backups</code> folder somewhere else from time to time.</li></ul></section>
+<section><h2>Playing remotely</h2><ul>
+<li>CONFIGURER_URL_HTTPS.bat saves the Cloudflare tunnel address.</li>
+<li>Without an HTTPS address, invitation links only work on your PC.</li>
+<li>PROTEGER_CLOUDFLARE_ACCESS.bat to restrict access to the site.</li></ul></section>
+<section><h2>Shortcuts</h2><ul>
+<li><kbd>?</kbd> screen help · <kbd>/</kbd> search · <kbd>Esc</kbd> close</li>
+<li>Guided tour: Help &amp; tutorial → Start the tour.</li>
+<li>Practice campaign: My campaigns, to test without risk.</li></ul></section>
+</div>
+<p class="print">To print: <kbd>Ctrl</kbd> + <kbd>P</kbd>.</p>
+<p class="foot">Chroniques · D&amp;D 5e table assistant (2014 and 2024 rules) · SRD 5.1 / 5.2.1 reference. <a href="/aide-mj.html" hreflang="fr">Version française</a></p>
+</main></body></html>

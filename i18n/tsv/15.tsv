@@ -1,0 +1,300 @@
+4160	Short rest: +
+4161	Short rest · {0}
+4162	Short rest with the real Hit Dice; long rest for the whole party in one click.
+4163	short or long rest
+4164	Short or long rest
+4165	Short rest taken.
+4166	Guided rest
+4167	Rest impossible at 0 HP.
+4168	Unknown rest.
+4169	Invalid rest.
+4170	Long rest
+4171	Long rest (party)
+4172	Long rest applied to the whole party.
+4173	party long rest
+4174	Party long rest
+4175	Long rest for the whole party
+4176	Regains consciousness.
+4177	Take your character into another campaign.
+4178	Bring back a character exported from another Chroniques campaign (.json file). It is added here as a new character, to be assigned to its player afterwards.
+4179	Hellish Rebuke
+4180	Performance
+4181	Reputation {0}{1} out of 5: {2}
+4182	Reputation with “
+4183	Party reputation:
+4184	Reputation minus one
+4185	Reputation plus one
+4186	Request from another site refused.
+4187	Request too large
+4188	required: speed reduced by 3 m.
+4189	res.
+4190	Res.
+4191	Reserved for the campaign’s owning GM.
+4192	Reserved for the owning GM.
+4193	Reserved for the GM.
+4194	Loot reserve
+4195	-
+4196	Dwarven resilience
+4197	resistance
+4198	Resistance
+4199	Fire resistance; Thaumaturgy cantrip.
+4200	Poison resistance; advantage on saving throws against the Poisoned condition.
+4201	Resistance to damage of
+4202	Resistance to {0} damage.
+4203	Draconic resistance
+4204	Resistance and inherited magic to be specified
+4205	Fiendish resistance
+4206	Hellish resistance and Thaumaturgy
+4207	Damage resistances
+4208	Resistances and vulnerabilities
+4209	Resistances and vulnerabilities{0}
+4210	Resists bludgeoning, piercing and slashing damage from non-magical attacks (to be applied by the GM).
+4211	Resolved
+4212	-
+4213	Resolve the crisis through words or action.
+4214	resource “
+4215	Resource added.
+4216	Resource used
+4217	Resource exhausted
+4218	Resource does not exist.
+4219	Resource not found.
+4220	Resources
+4221	Resources {0}/{1}
+4222	Resources & conditions
+4223	Remaining resources
+4224	TRACKED RESOURCES {0}
+4225	left out of {0} m
+4226	Restoration impossible:
+4227	Partial recovery
+4228	restored
+4229	Restore “
+4230	Restore {0}
+4231	Restore the default combat layout?
+4232	Restore a level {0} slot
+4233	Restore…
+4234	-
+4235	Restricted
+4236	-
+4237	Result
+4238	Invalid saving throw result.
+4239	Dice result
+4240	Die result
+4241	Invalid result.
+4242	Summary
+4243	Summary copied (players’ version, without the GM’s secrets).
+4244	Summary private again.
+4245	Session summary
+4246	Session summary —
+4247	Session summary:
+4248	One-sentence summary
+4249	Shared summary
+4250	Summary for players
+4251	Summary that will only be visible if the scene is published
+4252	Summary visible to players in Journal & quests.
+4253	Summaries
+4254	Session summaries, memory, handouts and notebook gathered in a PDF. Choose “Save as PDF” in the print window.
+4255	Summaries, handouts and journal gathered in a keepsake PDF.
+4256	Remember
+4257	Kept
+4258	Removed
+4259	Remove
+4260	Remove {0} from the chest
+4261	Withdraw from players
+4262	Remove this companion from the sheet?
+4263	Remove this lot from the treasure?
+4264	Remove this spell from the spellbook?
+4265	Remove this item from the chest?
+4266	Remove this feature from the sheet?
+4267	Remove this date
+4268	Remove this illustration?
+4269	Remove this resource from the sheet?
+4270	Remove from the map
+4271	Remove the current image
+4272	Remove the main image
+4273	Remove the duration of {0} for {1}
+4274	Remove the fog
+4275	Remove the saved GitHub token?
+4276	Remove the GM role from
+4277	Remove without healing
+4278	Remove an exhaustion level
+4279	Remove one ration from each character’s inventory?
+4280	First remove the features that use this resource.
+4281	Back to sign-in
+4282	Back to life
+4283	Back to the party
+4284	creature removed
+4285	Find important decisions
+4286	Find useful tools
+4287	Find a lost item
+4288	Find the places, quests, sessions and discoveries shared by your GM.
+4289	Find the objectives and summaries shared by the GM.
+4290	Find your adventures and choose your permissions per campaign.
+4291	Succeeded
+4292	succeeded
+4293	Succeeded
+4294	Reuse a saved image or import a new illustration.
+4295	Revealed
+4296	Revealed to players
+4297	Reveal
+4298	Reveal this marker
+4299	Reveal this marker and its description to players? The chest contents stay hidden.
+4300	Reveal the contents
+4301	Reveal the chest contents
+4302	Reveal the name and quantity of all items in this chest?
+4303	Reveal the map and the marker before their contents.
+4304	Go back to the server choice screen?
+4305	See this guide again
+4306	Revoke
+4307	Revoke this invitation? The code will no longer work.
+4308	Nothing to undo: the state has changed since the last action.
+4309	Nothing for sale yet.
+4310	nothing importable
+4311	Nothing notable recorded yet: combats, damage, defeated creatures, items obtained, completed scenes and memories are added here automatically.
+4312	Nothing recorded.
+4313	Nothing yet: the history fills up over the sessions.
+4314	-
+4315	Laughs before every sentence
+4316	Laughs far too loudly
+4317	Ritual
+4318	Rival
+4319	Undead Fortitude: at 0 HP, Constitution saving throw (DC 5 + damage) to stay at 1 HP, except radiant damage or a critical hit.
+4320	Dwarven toughness
+4321	Dwarven toughness: extra HP to fill in manually
+4322	ranger
+4323	Ranger
+4324	Ranger (archer)
+4325	Ranger
+4326	Roland Bellegarde
+4327	Role / occupation
+4328	{0}’s role
+4329	player role
+4330	Player role restored.
+4331	Role updated.
+4332	GM role
+4333	Invalid role or account.
+4334	Rogue
+4335	Red
+4336	Round
+4337	ROUND
+4338	Round {0}
+4339	Round {0} · {1}
+4340	Round {0} · turn of
+4341	rounds in total
+4342	Reopen
+4343	Sections
+4344	Gnome cunning
+4345	Pace
+4346	Unknown pace.
+4347	Practise without risk
+4348	goes out.
+4349	Attunes with
+4350	Explorer’s pack
+4351	Safari
+4352	Safari → Share → Add to Home Screen → Add.
+4353	Sage
+4354	Wisdom
+4355	Manual entry
+4356	Enter the username and password of your Chroniques account.
+4357	Enter the key shown when the server started.
+4358	Enter the real damage (and its type): resistances, concentration and 0 HP are flagged.
+4359	Enter the initiatives rolled with physical dice and follow the turns.
+4360	Enter the initiatives rolled with dice, start combat, then go through the turns. Keyboard: N for the next turn, U to undo the last action.
+4361	Without the App Store: open the campaign’s HTTPS address in Safari, then Share → “Add to Home Screen”. Chroniques then opens like an app, with notifications (iOS 16.4 and later).
+4362	Unarmoured 10 + Dex
+4363	No description.
+4364	Without a slot — manual approval
+4365	No caption
+4366	No rarity
+4367	No result:
+4368	Untitled
+4369	No type
+4370	Save {0}{1}
+4371	Saving throw
+4372	Saving throw — announced total
+4373	Saving throw: 50 characters maximum.
+4374	Saving throw to repeat (optional)
+4375	Automatic backup impossible:
+4376	Backup created:
+4377	{0} saving throw
+4378	Concentration saving throw DC {0}
+4379	Constitution saving throw, DC 10 or half the damage (whichever is higher).
+4380	Daily backup impossible:
+4381	Successful save
+4382	Backup downloaded.
+4383	concentration saving throw(s) to resolve
+4384	Back up now
+4385	Death saving throws
+4386	Party saving throws and passive scores
+4387	Guided saving throws
+4388	Proficient saving throws: {0}
+4389	Saving throws, passive Perception, spell save DCs
+4390	Saving throws, passive scores and DCs of the whole party
+4391	Back up the data before a major update.
+4392	Scenario to use (optional)
+4393	Scenario saved in the GM’s private preparations.
+4394	Scenario not found.
+4395	Invalid scenario.
+4396	Scenarios
+4397	Session scene
+4398	Scene saved.
+4399	Scene not found.
+4400	Invalid scene.
+4401	Scene completed:
+4402	Scene, triggers, reinforcements...
+4403	-
+4404	-
+4405	scenes
+4406	Scenes
+4407	scenes created
+4408	Session scenes
+4409	Scenes and flow
+4410	shared scenes
+4411	Shared scenes
+4412	-
+4413	-
+4414	-
+4415	-
+4416	-
+4417	-
+4418	Score
+4419	Base score
+4420	Scores before origin bonuses
+4421	Missing base scores.
+4422	Ability scores
+4423	Scores outside point buy (real dice or free distribution): to confirm with the GM.
+4424	Scores not filled in are shown as “—”. Modifiers of saved scores are calculated; rolls and skills stay manual.
+4425	Scores assigned according to the class’s main ability: swap them freely.
+4426	Council scribe
+4427	Hide
+4428	concentrates on
+4429	Sign in
+4430	Disengage
+4431	Take revenge on a former associate
+4432	Session
+4433	Session (optional)
+4434	Session of “
+4435	Session of
+4436	Today’s session
+4437	Today’s session: your tables (encounters, loot, rumours…). Roll your real die, enter the total: the line appears.
+4438	Session in progress
+4439	Session set: it appears on everyone’s home page.
+4440	Session not found.
+4441	Session with no notable fact recorded.
+4442	session{0}
+4443	Sessions
+4444	Previous sessions · {0}
+4445	Second Wind
+4446	Secondary
+4447	Secret:
+4448	Secret (GM only)
+4449	Shared secret
+4450	Secret
+4451	Secret (GM only)
+4452	GM secrets
+4453	GM-only secrets
+4454	Secrets, personal goals, rumours heard, names to remember… The other players don’t see it.
+4455	Secrets, twists, unrevealed clues…
+4456	Unknown campaign section.
+4457	Sheet sections
+4458	Secure the game
+4459	SECURITY: server on 127.0.0.1 only. Use Cloudflare Tunnel for remote access.

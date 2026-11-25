@@ -57,6 +57,8 @@ Historique : voir `CHANGELOG.md`. Recette de test : `GUIDE_TESTEURS.md`.
 - **Tables aléatoires** (5.1) : vos tables, votre dé, le total saisi, la ligne affichée.
 - **Dégâts de zone** (5.1) : plusieurs cibles en une saisie, sauvegardes et résistances appliquées ; cibles touchées par une zone de la carte.
 - **Clés d’accès** (5.1) : connexion par empreinte, visage ou code de l’appareil (Paramètres).
+- **English** (5.2) : interface, aides et règles du SRD 5.1 en anglais, au choix de chacun (Mon compte → English).
+- **iPhone / iPad** (5.2) : installation sur l’écran d’accueil, guide pas à pas sur `/iphone`.
 
 ## Mettre à jour
 

@@ -1,0 +1,300 @@
+2060	Save the map
+2061	Save the creature
+2062	Save the date
+2063	Save the sheet
+2064	Save the coins
+2065	Save the notebook
+2066	Save the marker
+2067	Save the actions
+2068	Save the members
+2069	Save the changes
+2070	Save the notes
+2071	Save my class
+2072	Save anyway?
+2073	Save the new marker before importing a custom image.
+2074	Sorcerer
+2075	-
+2076	Restrained
+2077	Between 1 and 24 months.
+2078	in the meantime. Your changes stay in the field: copy them, then discard them to reload the shared version.
+2079	Entry not found.
+2080	Only enter https://app.yourdomain.com (no port or path).
+2081	Enter your single-use invitation code.
+2082	Sending impossible.
+2083	Sending…
+2084	Sent to
+2085	Sent to combat, it appears in the initiative right after {0}; you manage its HP yourself and can place its token on the map.
+2086	Send
+2087	Send to
+2088	Send to the GM
+2089	Upload and check
+2090	Upload to the server
+2091	Send a test
+2092	Sent with “Report a problem” (My account menu). They are also saved in
+2093	Send this link to the player only (valid for 2 h, single use). Their old password and current sessions will be cancelled.
+2094	Shortsword: +4 to hit, 1d6+2 piercing.
+2095	Shortsword: +4, 1d6+2 piercing. Shortbow: +4 (24/96 m), 1d6+2 piercing.
+2096	Longsword
+2097	Longsword: +3, 1d8+1 slashing. Longbow: +3 (45/180 m), 1d8+1 piercing.
+2098	Exh.
+2099	Exh. {0}
+2100	Exhausted
+2101	exhaustion
+2102	Exhaustion: level {0}
+2103	Exhaustion {0}
+2104	Exhaustion level
+2105	Equipped
+2106	Equipment
+2107	Equipment & treasures
+2108	Equip
+2109	Equip armour and shield then apply the suggested AC; keep an eye on load and attunements.
+2110	Era
+2111	Era (optional)
+2112	Connection error.
+2113	Internal server error.
+2114	Arcane scholar, the widest choice of spells.
+2115	Sleight of Hand
+2116	-
+2117	Audio space full (300 MB): delete some tracks.
+2118	Image storage space full (150 MB).
+2119	Species
+2120	Species / race
+2121	Species to be defined
+2122	Unknown species for this edition.
+2123	Custom species
+2124	2024 species
+2125	Spies for a rival faction
+2126	Dodge
+2127	Try the steps with your group, without rolling dice in the app.
+2128	Try entering initiatives (after real rolls) and tracking resources before the session.
+2129	is available again.
+2130	is already in combat.
+2131	is ready to be installed.
+2132	is ready to be installed{0}.
+2133	Is wanted in another town
+2134	is stabilised.
+2135	Is a noble on the run
+2136	is defeated.
+2137	and sign in with a co-GM account.
+2138	What next?
+2139	Step
+2140	Step {0} of {1}
+2141	Step 1 · Set the scene
+2142	Step 2 · Objective and stakes
+2143	Step 3 · Prepare the three key moments
+2144	Step 4 · Link to existing preparations
+2145	Steps
+2146	condition
+2147	Condition
+2148	Condition: {0}
+2149	State updated in the meantime: try again.
+2150	creature condition
+2151	Installation status
+2152	Preparation status
+2153	Invalid preparation status.
+2154	Notification status unavailable.
+2155	Incapacitating condition
+2156	Unknown condition.
+2157	Invalid condition for
+2158	Conditions
+2159	Character conditions
+2160	Conditions and concentration
+2161	Summer
+2162	Put out {0}
+2163	Stunned
+2164	Be recognised at their true worth
+2165	Study
+2166	Event
+2167	Event not found.
+2168	Event planned.
+2169	Planned events
+2170	events.
+2171	E.g.: Promised to find the miller’s sister.
+2172	E.g.: Clues about the seal
+2173	E.g.: I clicked “Next turn” and nothing happened.
+2174	E.g. 2 or 0.5
+2175	E.g. 2d6 + mod. (to check with the GM)
+2176	E.g. 450
+2177	E.g. prone, cover, concentration, fireball
+2178	E.g. Saw the crime but keeps quiet
+2179	E.g. Aasimar (not in the SRD)
+2180	E.g. Apparition in the crypt
+2181	E.g. Weapons and armour, fixed prices
+2182	E.g. Artisan
+2183	E.g. Sneak Attack
+2184	E.g. Fireball
+2185	E.g. Cart, Trap, Ally
+2186	E.g. Hunter, Champion…
+2187	E.g. at Léa’s, bring the dice
+2188	E.g. Almost whispers
+2189	E.g. Silver casket
+2190	E.g. Collects rumours
+2191	E.g. Hempen rope, Potion of healing, Bread
+2192	E.g. HP
+2193	E.g. feat chosen at level 4
+2194	E.g. dragon, fire, sword…
+2195	E.g. Goblin ambush
+2196	E.g. Ambush on the road
+2197	E.g. Longsword +1
+2198	E.g. longsword, potion of healing, rope…
+2199	E.g. sword, potion, ring, bag of holding…
+2200	E.g. Harvest festival, arrival of the caravan
+2201	E.g. Brunhild’s forge
+2202	E.g. Fortress of the mists
+2203	E.g. Guardian of the crypt
+2204	E.g. Herbalist
+2205	E.g. Hold Person
+2206	E.g. I want to quietly steal the key
+2207	E.g. The Misty Coast
+2208	E.g. The door of the old sanctuary
+2209	E.g. Dawn blade
+2210	E.g. The Cracked Cauldron
+2211	E.g. The Mist Pass
+2212	E.g. The mysterious adversary
+2213	E.g. The pact with the guild
+2214	E.g. The ceiling collapses: DC 15 Dexterity saving throw, 3d6 bludgeoning.
+2215	E.g. The secret of the grey stones
+2216	E.g. The baron’s sealed letter
+2217	E.g. Saved their life at the pass
+2218	E.g. GM Aubeciel
+2219	E.g. Bite: +4, 1d6+2 piercing
+2220	E.g. Odile Willowheart
+2221	E.g. Saved the dean’s son
+2222	E.g. Goblin patrol
+2223	E.g. Potion of healing
+2224	E.g. Rage, Ki, spell slot
+2225	E.g. The misty region
+2226	E.g. Repay a debt
+2227	E.g. Encounters on the road
+2228	E.g. Wisdom DC 13
+2229	E.g. Session 5
+2230	E.g. Soren Moonbreaker
+2231	E.g. Lively tavern
+2232	E.g. Léa’s phone
+2233	E.g. You notice a figure watching you…
+2234	E.g. An encounter where combat is not required; mysterious atmosphere.
+2235	E.g. journey to Valombre
+2236	E.g. Travel, Loot, Rumours
+2237	exactly the user’s text
+2238	Example: level 1 slot; any free uses are handled separately.
+2239	Example defences: vulnerable to bludgeoning, immune to poison.
+2240	Expertise
+2241	Expires on {0}
+2242	Explain the events and act.
+2243	Exploration
+2244	Explore the destination and make a decision.
+2245	Explore the scene and talk with the witnesses.
+2246	Explore the maps
+2247	Explore the revealed maps
+2248	Character export
+2249	Export and backup
+2250	Export impossible.
+2251	Export your preparation (notebook, scenes, homebrew monsters and items, encounters, handouts, merchants, maps and markers, GM treasure) to replay it with another group or hand it to another GM. Characters, players and what happened in play are never included.
+2252	Easy
+2253	Challenge rating
+2254	Challenge rating (CR)
+2255	Maximum challenge rating
+2256	Faction not found.
+2257	-
+2258	-
+2259	Factions
+2260	Factions and attitudes
+2261	Low
+2262	Make a fortune
+2263	Drag to move on a computer
+2264	Pass
+2265	Let time pass
+2266	Done
+2267	Belongs to a cult
+2268	Have the player path tried from another account, without exposing private notes.
+2269	Drag on the map to measure a distance.
+2270	Drag your token to show where your character is.
+2271	Drag your token to move.
+2272	Make the rolls with your physical dice and record the resources spent.
+2273	Familiar
+2274	Family
+2275	Tired of everything
+2276	Fey
+2277	Fenna Brisevent
+2278	Closed
+2279	Close
+2280	Close the illustration
+2281	Close the shop
+2282	Farmer
+2283	Fire
+2284	February
+2285	Sheet
+2286	Sheet → History: everything that happens to the character, recorded automatically. The GM adds secret or visible notes.
+2287	Sheet missing from the file.
+2288	Full, reusable sheet
+2289	Invalid campaign sheet.
+2290	Invalid companion sheet.
+2291	Creature sheet
+2292	Invalid creature sheet.
+2293	Creature sheet changed ·
+2294	Character sheet
+2295	Session sheet
+2296	Unreadable version record.
+2297	Version record unreachable (
+2298	Version record not recognised.
+2299	Version record too long.
+2300	Detailed sheet →
+2301	Private detailed sheet. In player mode, only your own abilities are accessible. The GM can see the campaign’s sheets.
+2302	Notebook entry not found.
+2303	Sheet in play. All dice are rolled physically: nothing is applied without your action.
+2304	Sheet saved, but image rejected:
+2305	Sheet saved.
+2306	Detailed sheet and features →
+2307	Printable sheet
+2308	Invalid sheet.
+2309	Sheet not found.
+2310	Linked sheet
+2311	Linked sheet not found.
+2312	Sheet updated ·
+2313	Linked sheet or template (optional, GM only)
+2314	Sheets & features
+2315	Character sheets
+2316	notebook entries
+2317	Party sheets →
+2318	Sheets unavailable (offline?).
+2319	Sheets unavailable.
+2320	File
+2321	Audio file
+2322	Audio file missing.
+2323	Audio file expected.
+2324	Illustration file missing.
+2325	New version file
+2326	Character file
+2327	Unreadable file: a campaign template (.json) is expected.
+2328	Unreadable file.
+2329	Image file incompatible or too large (15 MB maximum).
+2330	File larger than announced: download stopped.
+2331	File rejected.
+2332	File too large (20 MB maximum).
+2333	File too large for a character.
+2334	File too large for an update.
+2335	Invalid or incompatible V0.4 file.
+2336	ZIP file expected (the Chroniques version received as a .zip).
+2337	Fiend
+2338	Proud of their lineage
+2339	thread(s) to follow
+2340	Filter
+2341	Filter the history
+2342	Filter the inventory
+2343	Filter the timeline
+2344	Filter the bestiary
+2345	Filter the creatures
+2346	Filter the notes
+2347	Filter the characters
+2348	Filter the scenes
+2349	Filter my items
+2350	Filter by environment
+2351	Filter…
+2352	Filters by environment and challenge rating.
+2353	Automatic end
+2354	End of the condition “
+2355	end of combat
+2356	End of combat
+2357	End of the journey
+2358	Firefox
+2359	-

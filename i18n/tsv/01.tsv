@@ -1,0 +1,260 @@
+0	-1 = unlimited
+1	— {0} {1}, level {2}
+2	— {0} / {1} km · {2} pace ({3} km/h, {4} km per day){5}
+3	— to recharge
+4	— party budget: low {0}, moderate {1}, high {2} XP (2024 rules method)
+5	— sign in with a co-GM account (or your own) on the other device.
+6	— the 2024 edition changed some conditions (exhaustion in particular)
+7	— roll the real dice.
+8	— next objective:
+9	— ends
+10	, to back up with the campaign.
+11	, modified on
+12	, grouped on a single initiative
+13	, on a single initiative
+14	, see the README). You can still upload the .zip manually below.
+15	, including any secrets drawn on it.
+16	; suggestions are never added to your campaign automatically. The AI API may be billed separately.
+17	; for players, the campaign’s HTTPS address.
+18	-
+19	; you can link them here. Publishing a scene never publishes the scenario or its secrets.
+20	: Chroniques
+21	: private repository without a token, or no published version
+22	: duration removed
+23	: the installed version (
+24	: recharged
+25	: Constitution saving throw DC
+26	: invalid value (in steps of 0.5).
+27	: check passed.
+28	? The person will become a player again and keep their character.
+29	-
+30	· {0} active
+31	· {0} creature{1}{2}
+32	· {0} HP · AC {1}
+33	· {0} XP{1}
+34	· 1 square =
+35	· at 0 HP, no rest:
+36	· legendary action
+37	· app installed
+38	· d20 attack
+39	· no damage
+40	· AC
+41	· suggested AC:
+42	· ability scores to enter
+43	· charges
+44	· Charges
+45	· choice to make
+46	· concentration
+47	· Concentration
+48	· concentration:
+49	· Concentration:
+50	· concentration kept (DC
+51	· concentration lost (
+52	· condition:
+53	· Uses a resource
+54	· from the SRD
+55	· In the world:
+56	· DC
+57	· DC {0} · attack {1}{2} ({3})
+58	· movement
+59	· Hit Dice available:
+60	· Data hosted on your server
+61	· turn economy reset manually
+62	· spell slots restored
+63	· in combat:
+64	· exhaustion level
+65	· Equipped
+66	· condition
+67	· concentration ends
+68	· end of turn: new saving throw
+69	· CR
+70	· attuned
+71	· Attuned
+72	· image attached
+73	· images included
+74	· interface {0}.
+75	· Player:
+76	· roll 1d6 for
+77	· read by
+78	· homebrew
+79	· level
+80	· Secret notes: {0}
+81	· not read yet
+82	· Linked character
+83	· Custom
+84	· for
+85	· Temporary HP:
+86	· rest
+87	· left
+88	· ritual
+89	· Ritual
+90	· round
+91	· round {0}
+92	· pace
+93	· saving throw at the end of each turn:
+94	· death saving throw:
+95	· concentration saving throw
+96	· Constitution saving throw to make with a real d20 (DC
+97	· secret
+98	· spell level
+99	· on the table screen
+100	· a single turn for the group
+101	· used on
+102	· checked on {0}
+103	· visible to players
+104	" alt="Preview">
+105	“{0}” is outside the values of the {1} ({2} to {3}).
+106	“1” = until the end of its next turn. 1 minute = 10 rounds. “of”: the creature whose turn counts (often the caster). The saving throw is shown to the GM at the end of each of the target’s turns; 0 turns = reminder only, no automatic end.
+107	“Drink” a potion: roll the dice shown and enter the total to heal yourself.
+108	“Compose” suggests “Previously on…”: proofread, publish, show it on the TV. Link encounters, NPCs and places to scenes: they appear here.
+109	“Print” opens the browser’s print window: choose your printer, or “Save as PDF”. On a phone: Share → Print, then save as PDF.
+110	“Previously…” saved.
+111	”: format rejected.
+112	” (physical die)
+113	” (Journal & quests).
+114	” to the state of this backup? All changes made since will be replaced. A safety backup of the current state is made just before.
+115	” is open.
+116	” deleted (copies already given are kept).
+117	({0} in the area, already ticked)
+118	(+{0} without CR)
+119	(10 + Dexterity modifier). With armour, use the AC given by the item.
+120	(to do)
+121	(secure Internet access) or “localhost” on the GM’s PC.{0}
+122	(action unlocked)
+123	(announced by the GM/player)
+124	(attacks, proficient skills, spell save DCs).
+125	(no damage on a successful save)
+126	(“Apply” button)
+127	(loading…)
+128	(Constitution) =
+129	(d{0} up to {1} {2} Constitution).
+130	(d{0}, Constitution {1}{2} per die)
+131	(physical die)
+132	(physical dice, effects not applied)
+133	(physical dice)
+134	(real dice)
+135	(feats and features to confirm)
+136	(home screen, notifications)
+137	(effects to set up).
+138	(effects to confirm against the rules).
+139	(slot used)
+140	(equipment).
+141	(private faction)
+142	(SRD sheet
+143	(Strength 10 by default)
+144	(the first line counts).
+145	(the power recharges on the result shown)
+146	(hidden creatures stay invisible to players)
+147	(Lorc, Delapouite and other authors, CC BY 3.0). These are not official D&D illustrations. They are hosted on your server: no Internet connection is needed. The file
+148	(hidden from players)
+149	(hidden)
+150	(same features as the website)
+151	(update signed by the publisher, {0} MB).{1}
+152	(half damage on a successful save)
+153	(average of the d{0} + {1} CON)
+154	(sharing the loot)
+155	(appropriate resources restored)
+156	(Summary: check the exact rule in your edition.)
+157	(succeeded)
+158	(downloaded automatically, signature and checksum verified)
+159	(TV, projector). Nothing is sent over the Internet.
+160	(from “
+161	): 0 HP
+162	) is already up to date or newer.
+163	) leaves combat.
+164	) joins combat.
+165	[GM]
+166	-
+167	-
+168	-
+169	-
+170	{0}: defence
+171	{0}: level {1} → {2}
+172	{0} · {1} · lvl {2}
+173	{0} · {1} · level {2}
+174	{0} · {1} HP · AC {2}
+175	{0} · {1} left
+176	{0} · {1}{2} · level {3}
+177	{0} · CC BY 4.0
+178	{0} · Account verified by the server
+179	{0} · CR {1} ({2} XP) · {3} HP · AC {4}{5}
+180	{0} · Player
+181	{0} · lvl {1}
+182	{0} · lvl {1} · Initiative {2}
+183	{0} · level {1}{2}
+184	{0} · Level {1}{2}
+185	{0} · round {1}
+186	{0} ({1} km/h)
+187	{0} legendary action(s) left out of {1}
+188	{0} alert(s) · {1} concentration saving throw(s) pending
+189	{0} device(s) subscribed for your account.{1}
+190	{0} adventurer(s) at 50% HP or less · {1} creature(s) tracked
+191	{0} feature(s) to unlock
+192	{0} proposed date(s)
+193	{0} of {1} m{2}{3}
+194	{0} set
+195	{0} damage declared{1} · result to confirm
+196	{0} Last update ({1}): {2}
+197	{0} level {1} slot(s) out of {2}
+198	{0} theoretical slots (tracking off)
+199	{0} in progress
+200	{0} saved · {1} usable
+201	{0} entr{1}
+202	{0} entries
+203	{0} events
+204	{0} groups · {1} creatures
+205	{0} icons · authors credited
+206	{0} roll(s) pending
+207	{0} Casting a spell does not resolve its damage, saving throws, conditions or effects. It can use the turn’s action if you tick this option.
+208	{0} Older manual resources stay separate: do not use both counters for the same spells. Some features recover slots differently depending on the class and must be handled manually.
+209	{0} Reactions need a valid trigger.
+210	{0} lot(s) · {1} item(s) available. Items can be handed out even if the loot stays secret.
+211	{0} Campaign memory
+212	{0} item{1} · {2}
+213	{0} Guided tour {1}
+214	{0} character(s) to watch
+215	{0} missile(s): 1d4 + 1 damage each; no usual d20 attack roll.
+216	{0} ray(s): one d20 attack roll, then 1d10 damage per ray (real dice).
+217	{0} result(s)
+218	{0} Without armour:
+219	{0} scenario(s) · {1} ready · sharing always manual
+220	{0} scene(s) in progress · {1} upcoming
+221	{0} session(s), {1} combat(s), {2} foe(s) defeated.
+222	{0} item types · {1} kg (approx.)
+223	{0} A long rest removes one level.
+224	{0} Your first steps · {1}/{2}
+225	{0} XP defeated this session
+226	{0}{1} — click for the full rule
+227	{0}{1} · {2} HP · AC {3} · {4}
+228	{0}{1} · AC {2} · Init. {3} · {4}
+229	• Nothing notable recorded yet.
+230	•••••••• (leave empty to remove it)
+231	← Previous
+232	↑ ↓ to choose · Enter to open · Esc to close · Ctrl+K anywhere
+233	↑ Go to the next level
+234	↓ Export the JSON
+235	↓ Sort by initiative
+236	↔ Relationships
+237	↩ Action undone ·
+238	↩ Undo
+239	↶ Reaction on a trigger
+240	↻ Refresh
+241	⇧ Import a character
+242	⇩ Export this character (.json)
+243	⇩ Export the template (.json)
+244	⇩ Download the app (APK)
+245	＋ Add
+246	＋ Add this group
+247	＋ Add creatures
+248	＋ Add an item for sale
+249	＋ Add a companion
+250	＋ Add an item
+251	＋ Add an item to this chest
+252	＋ Add a character
+253	＋ Add a sound
+254	＋ Add a spell from the catalogue
+255	＋ Add a custom or off-catalogue spell
+256	＋ Add a map
+257	＋ Add an entry
+258	＋ Feature
+259	+ Con

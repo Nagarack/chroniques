@@ -9,8 +9,9 @@ function loaded(){return DATA!==null;}
 function load(){if(DATA)return Promise.resolve(DATA);if(loading)return loading;
  loading=new Promise((ok,ko)=>{
   if(typeof window==='undefined'||typeof document==='undefined'){try{DATA=build(require('./data/srd-items.js'));ok(DATA);}catch(e){ko(e);}return;}
-  if(window.ChroniquesSRDItems){DATA=build(window.ChroniquesSRDItems);ok(DATA);return;}
-  const sc=document.createElement('script');sc.src='/src/data/srd-items.js';sc.onload=()=>{DATA=build(window.ChroniquesSRDItems||{});ok(DATA);};sc.onerror=()=>{loading=null;ko(new Error('Catalogue d’objets indisponible.'));};document.head.appendChild(sc);
+  const EN=(typeof window!=='undefined'&&window.ChroniquesI18n&&window.ChroniquesI18n.lang==='en'),G=EN?'ChroniquesSRDItemsEn':'ChroniquesSRDItems';// 5.2 : noms et descriptions anglais si l'interface est en anglais.
+  if(window[G]){DATA=build(window[G]);ok(DATA);return;}
+  const sc=document.createElement('script');sc.src=EN?'/src/data/srd-items.en.js':'/src/data/srd-items.js';sc.onload=()=>{DATA=build(window[G]||{});ok(DATA);};sc.onerror=()=>{loading=null;ko(new Error('Catalogue d’objets indisponible.'));};document.head.appendChild(sc);
  });return loading;}
 const norm=s=>String(s||'').toLocaleLowerCase('fr').normalize('NFD').replace(/[̀-ͯ]/g,'');
 // Recherche sur le nom français et le nom anglais ; les débuts de nom passent en premier.

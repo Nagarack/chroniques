@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 5.2.0 — Chroniques en anglais, iPhone
+- **🌐 Interface en anglais** : bouton « English / Français » dans Mon compte et sur l’écran de connexion ; par défaut, la langue de l’appareil. Chacun choisit sa langue : les données de la campagne ne changent pas, un MJ francophone et des joueurs anglophones peuvent partager la même table.
+- **Tout est traduit** : environ 5 000 textes d’interface et messages du serveur, les fenêtres de confirmation, les dates, les notifications (dans la langue de chaque compte), les tutoriels express, les aide-mémoire MJ et joueur, un guide d’utilisation anglais condensé et les écrans de l’application Android.
+- **Règles en anglais** : textes officiels du SRD 5.1 anglais (CC BY 4.0) pour les règles, les états, les 319 sorts, les 334 créatures et les objets, chargés seulement si la langue est l’anglais. Les noms français déjà enregistrés dans la campagne (sorts, monstres, objets) s’affichent en anglais.
+- **📱 iPhone et iPad** : pas d’application App Store (compte Apple payant), mais une page d’installation pas à pas (`/iphone`) : Safari → Partager → Sur l’écran d’accueil ; plein écran et notifications (iOS 16.4+). Lien sur l’écran de connexion des iPhone et dans Paramètres.
+- **Android** : les textes de l’application (premier écran, serveur injoignable, notifications, mises à jour) suivent la langue choisie.
+- Corrections : derniers tutoiements des tutoriels express et du guide, « potions bues ».
+- Limites connues : les distances de l’interface restent en mètres (les textes officiels anglais parlent en pieds : 1,5 m = 5 ft) ; le guide anglais est un résumé du guide français ; les textes écrits par le MJ et les joueurs ne sont jamais traduits.
+
 ## 5.1.0 — Téléphones corrigés, tables aléatoires, dégâts de zone, clés d’accès
 **Correction importante (téléphones et application Android)**
 - Sur les écrans étroits et avec la taille du texte « Grande », l’en-tête débordait à droite : « Mon affichage » (MJ / joueur) et « Mon compte » devenaient inaccessibles, et la barre du bas était coupée. L’en-tête passe sur deux lignes (logo et boutons, puis « Mon affichage »), « Mon compte » devient un bouton ☰, et plus aucune page ne déborde en largeur (vérifié sur toutes les pages, MJ et joueur, de 320 à 412 px de large).

@@ -1,0 +1,300 @@
+2360	Sacred Flame
+2361	Flattering and cunning
+2362	Bane
+2363	Dash
+2364	How it works during the game
+2365	Map background: {0}
+2366	Map background (JPG, PNG or WebP, converted automatically)
+2367	Map background saved.
+2368	STR {0} · DEX {1} · CON {2} · INT {3} · WIS {4} · CHA {5} · speed {6} m
+2369	Strength
+2370	Forests and plains
+2371	Blacksmith
+2372	Format
+2373	Unrecognised audio format (MP3, OGG, WAV, M4A, WebM or FLAC).
+2374	Shape
+2375	Unknown shape.
+2376	Extreme heat (8 L of water)
+2377	Gravedigger
+2378	Lightning
+2379	Misty Step
+2380	provided by the server
+2381	Provider: OpenAI API · Model: {0} · storage on the app side: no request or answer saved automatically.
+2382	CR up to
+2383	-
+2384	Can be split before and after the action. Difficult terrain: 1 m costs 2 m. Standing up: half your speed.
+2385	-
+2386	Hums while thinking
+2387	Timeline & summary
+2388	Campaign timeline
+2389	Cold
+2390	Frost Cold
+2391	Nimble Escape: Disengage or Hide as a bonus action.
+2392	Nimble Escape.
+2393	Shadow stealth (Hide as a bonus action). Sunlight sensitivity.
+2394	Gains
+2395	Win the adventurers’ trust
+2396	Gain Heroic Inspiration on a long rest, choose a skill and an origin feat; record manually.
+2397	Gallery · {0}/8
+2398	Gallery full.
+2399	Game-icons.net
+2400	Guard
+2401	Door guard
+2402	Keep the campaign memory
+2403	Keep a secret buried
+2404	Keep secret markers private; enable the fog then tap the map to reveal explored areas.
+2405	Gargoyle
+2406	Gaspard Tournemain
+2407	Giant
+2408	Generating…
+2409	Generous to a fault
+2410	Manage the GM’s reserve
+2411	Manage campaigns and roles
+2412	Manage creatures →
+2413	Manage invitations
+2414	Manage the chest items · {0} lot(s)
+2415	Manage your equipment
+2416	Manage conditions, legendary actions and recharges; “Next turn” moves the combat forward.
+2417	-
+2418	Frost
+2419	-
+2420	Gnoll
+2421	Gnome
+2422	Forest gnome
+2423	Rock gnome
+2424	Goblin
+2425	Goblin archer
+2426	Goblin scout
+2427	Bugbear
+2428	Goliath
+2429	Ghoul
+2430	Club: +2, 1d4 bludgeoning.
+2431	Large
+2432	Large build
+2433	Large form
+2434	Long stride
+2435	Greataxe: +6, 2d12+4 slashing. Gore: +6, 2d8+4 piercing.
+2436	-
+2437	Severity
+2438	Gregorian (365 days)
+2439	Claws: +3, 2d4+1 slashing. Club: +3, 1d4+1 bludgeoning. Luring song: charms humanoids within 90 m (DC 11 Wisdom saving throw).
+2440	Grid: 0 (none) or 4 to 80 squares wide.
+2441	Grid (squares wide)
+2442	Grid applied: tokens will snap to the squares.
+2443	Grid and tokens · {0}
+2444	Grid removed.
+2445	Grid, draggable tokens, fog of war, distance measuring and spell areas. “Table screen” shows the map and initiative on a TV, with no secrets at all.
+2446	Spellbook
+2447	Spellbook
+2448	Private spellbook
+2449	Grey
+2450	Group
+2451	Group of “
+2452	Level {0} party: CR {1} to {2} for a serious fight. Automatic grouping (type and features), not an official table.
+2453	Group not found.
+2454	Empty group
+2455	Fighter
+2456	Northern warrior
+2457	Holy warrior: heavy armour, healing and divine strikes.
+2458	Fighter
+2459	iPhone installation guide
+2460	User guide
+2461	Mountain guide
+2462	Step-by-step guide
+2463	-
+2464	Guilds, cults, courts and their attitude towards the group
+2465	h of travel ·
+2466	Greataxe: +5, 1d12+3 slashing. Javelin: +5 (9/36 m), 1d6+3 piercing.
+2467	Halfling
+2468	Lightfoot halfling
+2469	-
+2470	-
+2471	-
+2472	-
+2473	-
+2474	-
+2475	Attunement
+2476	Requires attunement
+2477	Attuned
+2478	Harpy
+2479	Haste
+2480	High elf
+2481	Herbalist
+2482	Fiendish legacy: manual choice
+2483	Fiendish legacy to choose
+2484	Infernal legacy
+2485	-
+2486	Time
+2487	Invalid time.
+2488	Owlbear
+2489	Hilda Pierrefeu
+2490	History
+2491	Adventurers’ stories
+2492	History
+2493	Background:
+2494	Background: proficiency included
+2495	Background to be defined
+2496	History of {0}
+2497	Character history
+2498	Unknown background for this edition.
+2499	Custom background
+2500	Custom background: choose 3 different abilities.
+2501	Custom background: choice of the three abilities to confirm with the GM.
+2502	-
+2503	-
+2504	Winter
+2505	Hobgoblin
+2506	Lizardfolk / dragonborn
+2507	Honoured
+2508	Horizontal
+2509	Out of combat
+2510	OUT OF COMBAT
+2511	Out of combat, the app checks for reminders about every 15 minutes (depending on the phone’s battery saving).
+2512	Offline
+2513	Offline: action noted on this device, it will be sent when the network is back.
+2514	Offline: this action will be possible when the network is back.
+2515	Hostile
+2516	Hostile
+2517	Host not allowed: open the configured Chroniques HTTPS URL.
+2518	HTTPS (Cloudflare Tunnel)
+2519	Public HTTPS (Cloudflare Tunnel): {0}/ (Chroniques accounts and invitations required)
+2520	Human
+2521	Human (standard)
+2522	Standard human
+2523	Standard human (not variant)
+2524	Human
+2525	Humanoid
+2526	AI disabled. Set CHRONIQUES_OPENAI_API_KEY on the server then restart.
+2527	AI inactive on the server
+2528	Here: light or dark appearance, settings, full help and sign-out.
+2529	Unknown monster/NPC icon.
+2530	Invalid marker icon.
+2531	Catalogue icon not found.
+2532	Fantasy icon (optional)
+2533	Unknown icon.
+2534	Quick icon
+2535	Fantasy icons by
+2536	Username
+2537	Username: 3 to 40 characters (letters, digits, spaces, - _ .).
+2538	Feature ID
+2539	Creature ID already used.
+2540	Feat ID
+2541	Invalid link ID.
+2542	Template ID already used.
+2543	Invalid marker ID.
+2544	Duplicate ID.
+2545	Invalid ID.
+2546	Incorrect username or password.
+2547	Missing marker IDs.
+2548	Identify the forces at play and decide whom to support.
+2549	Ignore
+2550	-
+2551	Owes the character
+2552	Minor Illusion
+2553	Illustration
+2554	Illustration missing from this gallery.
+2555	Illustration missing.
+2556	Illustration of {0}
+2557	Bestiary illustration
+2558	CC BY 3.0 catalogue illustration
+2559	Catalogue illustration not found.
+2560	Game Master’s illustration
+2561	Large illustration
+2562	Illustration saved.
+2563	Existing illustration
+2564	Existing illustration unavailable.
+2565	Illustration unavailable.
+2566	Illustration not found.
+2567	Invalid illustration.
+2568	Illustration unavailable.
+2569	Illustration not deleted:
+2570	Featured illustration
+2571	Illustration shown by the Game Master.
+2572	Illustration shown by the GM
+2573	Illustration removed.
+2574	Illustration too large.
+2575	Illustrations
+2576	Illustrations & items
+2577	Illustrate without losing the files
+2578	Image missing.
+2579	Current image
+2580	Image of “
+2581	Image of handout {0}
+2582	Marker image saved.
+2583	Incorrectly encoded image.
+2584	Invalid encoded image.
+2585	Unreadable image.
+2586	Invalid image.
+2587	Image unavailable.
+2588	Image not recognised by this browser.
+2589	Image not recognised.
+2590	Personal image (optional)
+2591	Personal image on the server
+2592	Main image and alternatives
+2593	Private image on the server · 2 MB after compression.
+2594	Image too heavy after compression.
+2595	Image too large (2 MB maximum after conversion).
+2596	Image too large.
+2597	-
+2598	Images already saved in Chroniques
+2599	Secure private images
+2600	Private images, accessible only if the marker is revealed. 2 MB maximum after compression.
+2601	Images cropped and compressed in the browser (2 MB maximum). The server keeps them on your PC in
+2602	Imm.
+2603	-
+2604	-
+2605	Hold Person
+2606	Immune to exhaustion and poisoning.
+2607	Immune to charm, exhaustion and poisoning.
+2608	immunity
+2609	Immunity
+2610	Damage immunities
+2611	Condition immunities
+2612	Import impossible.
+2613	Important: something doesn’t work
+2614	Import
+2615	Import / replace the image
+2616	Import from the device (JPG, PNG, WebP)
+2617	Import from combat
+2618	Import a template into this campaign
+2619	Import an image
+2620	Import an image (JPG, PNG, WebP, HEIC)
+2621	Import a map, add a grid and tokens for the adventurers or creatures.
+2622	-
+2623	Impossible
+2624	Cannot read this image.
+2625	Cannot maintain concentration.
+2626	Cannot resize the image.
+2627	Printing
+2628	Print my sheet
+2629	Print the page to have it at hand, and send the handouts still pending.
+2630	Spellcasting
+2631	Spellcasting (optional)
+2632	Casting saved.
+2633	Invalid spellcasting.
+2634	Incapacitated
+2635	Incapacitated, drops whatever it holds and falls prone. Fails Strength and Dexterity saving throws; automatic critical hit within 1.5 m.
+2636	Incapacitated, dead, or a new concentration spell.
+2637	Incapacitated, can’t move or speak. Fails Strength and Dexterity saving throws; an attack that hits it within 1.5 m is a critical hit.
+2638	Incapacitated. Fails Strength and Dexterity saving throws; attacks against it have advantage.
+2639	Include map images
+2640	Role mismatch.
+2641	Unknown
+2642	Unknown
+2643	Unconscious
+2644	Clue
+2645	Enter the amount found and the characters involved: each receives their share, the indivisible remainder is reported.
+2646	Enter the item’s name.
+2647	Enter the result of the d
+2648	Enter the dice total.
+2649	For each date, say whether you are available. The GM will set the session.
+2650	Enter an amount to share.
+2651	Enter an XP amount.
+2652	Enter an amount.
+2653	Enter a name for the custom species.
+2654	Enter a name for the custom background.
+2655	Enter a price for this free item.
+2656	Enter a price for your item.
+2657	Give your availability in Journal & quests.
+2658	Give your availability for the next session and read the handouts sent by the GM (a badge marks new ones).
+2659	Give your availability for the next sessions and read the handouts sent by the GM.

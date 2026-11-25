@@ -1,0 +1,210 @@
+5000	Use a JPG, PNG or WebP file under 15 MB.
+5001	Only use sounds you have the rights to (your own creations, free licences).
+5002	Use your current account, without creating a second username.
+5003	v{0} · Together around the table
+5004	Thunderwave
+5005	Defeated:
+5006	Valid for 24 h, single use. Backup code:
+5007	Value (real dice total)
+5008	Invalid exhaustion value.
+5009	Fixed value:
+5010	Invalid numeric value.
+5011	Base values without skills, proficiency, expertise, equipment, feats or temporary effects.
+5012	Variant: {0}. {1}.
+5013	Change
+5014	Invalid feature change.
+5015	HP change
+5016	Invalid change.
+5017	Zero change.
+5018	Quick HP changes
+5019	Ooze
+5020	Availability check on opening
+5021	Check impossible: {0}
+5022	Checking…
+5023	Check the campaign
+5024	Check the spell description in your edition’s rules; no automated roll.
+5025	Check the file
+5026	Check the GM board
+5027	Check the conditions and dice in the rules.
+5028	Check the evidence and meet a suspect.
+5029	Check the party’s spells
+5030	Check now
+5031	Check your equipment
+5032	Check every change with the player: dice stay physical.
+5033	Check how it looks on the sheet or the map before revealing it.
+5034	Check the D&D edition used by the campaign.
+5035	Check the rules edition and the campaign settings.
+5036	Check the range, conditions and available spell slots.
+5037	Check the name of the active campaign, at the very top of the screen.
+5038	Check the character and the available quantity.
+5039	Check special cases with the GM.
+5040	Check the conditions with the GM
+5041	Check that Chroniques is running on the GM’s PC (DEMARRER_CHRONIQUES.bat), then reload the page. To discover the tool without a server,
+5042	Check that the GM’s PC is on and that Chroniques is running on it, then reload the page.
+5043	Check your known or prepared spells and the available slots.
+5044	Check your character, their ability scores and HP with your GM.
+5045	To {0}
+5046	To the GM’s reserve
+5047	Version {0}
+5048	Character file version not supported.
+5049	Template version not supported.
+5050	Player version
+5051	Green
+5052	Vertical
+5053	Veteran
+5054	Wants:
+5055	-
+5056	Towns and roads
+5057	Purple
+5058	Visibility
+5059	Invalid contents visibility.
+5060	Unknown visibility.
+5061	Invalid visibility.
+5062	Initial visibility
+5063	Invalid visibility.
+5064	Visible
+5065	Visible to players
+5066	Visible to allowed players
+5067	Visible to players
+5068	Visible only if the sheet is published
+5069	Darkvision
+5070	Superior darkvision
+5071	Guided tour
+5072	Guided tour (2 min)
+5073	Spd.
+5074	Speed
+5075	SPEED
+5076	Speed (m)
+5077	Speed 0 while the grapple lasts. Escaping takes an action (check or saving throw depending on the edition).
+5078	Speed 0. Attacks against it have advantage, its attacks have disadvantage, disadvantage on Dexterity saving throws.
+5079	Reference speed: {0} m. {1}.
+5080	Speed halved
+5081	Speed reduced to 0
+5082	Vivienne Roncebrune
+5083	Here is
+5084	See
+5085	See the home page
+5086	see the sheet
+5087	See the “{0}” entry in the journal →
+5088	See the table ({0} line{1})
+5089	See the combat
+5090	See the combat ↗
+5091	See the journal
+5092	See the summary
+5093	See {0}’s summary
+5094	See the maps
+5095	See the discoveries
+5096	See the sheets
+5097	See the rules.
+5098	See the sessions
+5099	See the quick tutorials
+5100	See all the quick tutorials
+5101	See all the ideas
+5102	Voice:
+5103	Deep, slow voice
+5104	Hoarse voice of a pipe smoker
+5105	Voice, way of speaking
+5106	Fly
+5107	Fly 12 m.
+5108	Fly 15 m (hover).
+5109	Fly 15 m. Regrows its tail spikes (24 per day).
+5110	Fly 18 m. False appearance: motionless, it looks like a statue.
+5111	Fly 24 m, climb 12 m.
+5112	Fly 24 m.
+5113	Draconic flight
+5114	Volume
+5115	Ambience volume
+5116	Invalid volume.
+5117	Your adventurers
+5118	Your campaigns
+5119	Your changes are saved on your server. The GM can download a JSON backup of the campaign.
+5120	Your monsters, items and encounters — without virtual dice.
+5121	Your hit points
+5122	Your spells as printable cards, from the spellbook.
+5123	Your combat desk
+5124	Your account and appearance
+5125	Your equipment
+5126	Your workspace
+5127	Your sheet as a PDF.
+5128	Your summarised sheet: armour class, initiative, speed and conditions. The “⋯” button lets you change the portrait.
+5129	Your GM has not shared anything in the chronicle yet.
+5130	Your password
+5131	Your character
+5132	Do you want to join the campaign linked to this link with your current account?
+5133	You
+5134	You have the latest known version.
+5135	You will be its owner and GM. An independent campaign with its own sample sheets will be created.
+5136	You and the GM
+5137	You play next turn
+5138	You play in
+5139	You are not part of this campaign.
+5140	You can only buy for your own character.
+5141	You can only move your own token.
+5142	You can only deposit your own items.
+5143	You can only give your own items.
+5144	You cannot edit this illustration.
+5145	You only see the information the GM has shared.
+5146	You only see the scenes the GM has decided to share.
+5147	You already take part in this campaign.
+5148	You can add the site to the home screen like an app.
+5149	You can see all the sheets in the campaign; the players’ resources stay under their control or the GM’s.
+5150	You can restart this tour from Help & tutorial. A printable cheat sheet also awaits you there.
+5151	You can stay GM and also own a character. In Player view, you will be able to edit this sheet.
+5152	You only answer for your own character.
+5153	You will be notified on your turn.
+5154	Extremely formal with everyone, even their dog
+5155	Travel and factions
+5156	Hooded traveller
+5157	-
+5158	-
+5159	Real tables in the rules; spells changed in 2024 flagged.
+5160	Group view
+5161	Party view
+5162	Game Master view
+5163	Keen sight and smell.
+5164	Game master’s private view
+5165	Vuln.
+5166	vulnerability
+5167	Vulnerability
+5168	Damage vulnerabilities
+5169	-
+5170	-
+5171	Invalid WebP.
+5172	WebP not supported.
+5173	-
+5174	-
+5175	-
+5176	Wilfried Lanterne
+5177	Windows
+5178	Wyvern
+5179	Worg
+5180	-
+5181	-
+5182	-
+5183	-
+5184	-
+5185	-
+5186	-
+5187	-
+5188	-
+5189	-
+5190	XP: {0}{1}
+5191	XP from defeated creatures (CR filled in):
+5192	XP awarded
+5193	XP and milestones
+5194	XP per character
+5195	XP for
+5196	XP each.
+5197	-
+5198	Yvain Corneroche
+5199	Zélie Chantepluie
+5200	Zero virtual dice
+5201	Zombie
+5202	Spell area
+5203	Area not found.
+5204	Spell areas · {0}
+5205	areas cleared
+5206	Areas cleared.
+5207	Areas placed: {0}
+5208	areas on a map: clear some.
+5209	Zoom
