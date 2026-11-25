@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 5.0.2 — Relecture complète des textes
+- **Vouvoiement partout** : aide rapide, premiers pas, visite guidée, messages d’erreur, écrans vides, combat (« À vous de jouer ! »), cartes, butin, préparation de séance et guides imprimables s’adressent désormais tous à l’utilisateur avec « vous ». Seul le message d’invitation à copier pour un ami reste au tutoiement, plus naturel entre joueurs.
+- **Textes périmés retirés** : mentions de « V0.3 », de « prototype » et de « migrations pas encore disponibles » dans les Paramètres ; l’encadré d’installation sur téléphone présente maintenant l’application Android ; la page « Serveur inaccessible » explique quoi vérifier.
+- **Coquilles et accents** : « Reconnexion », « SÉCURITÉ … accès distant », guide de migration réécrit avec ses accents, « Partager avec les joueurs », « Visible des joueurs », règle du jet de sauvegarde contre la mort formulée correctement.
+- Aucune modification des règles, des données ni du fonctionnement.
+
 ## 5.0.1 — Publication automatique par GitHub
 - **Versions publiées automatiquement** : chaque nouvelle version envoyée sur le dépôt GitHub privé est testée, construite (ZIP + application Android signée) et publiée par GitHub Actions. Le ZIP publié contient déjà l’adresse du dépôt et la clé de vérification : votre serveur trouve et vérifie seul les versions suivantes, puis propose « Installer et redémarrer ». Guide : `PUBLIER_UNE_VERSION.md`.
 - **Jeton GitHub dans l’application** : pour un dépôt privé, collez un jeton en lecture seule dans Paramètres → Mettre à jour Chroniques (enregistré dans `config/`, jamais affiché ni inclus dans les ZIP).

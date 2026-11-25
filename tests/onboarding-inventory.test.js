@@ -90,8 +90,8 @@ test('V2.6 : rendu simulé MJ/joueur du guide et de l’inventaire sans erreur J
   return el('#app').innerHTML;
  }
  const guideGm=await paint('gm','guide'),guidePlayer=await paint('player','guide');
- assert(guideGm.includes('Inviter ton groupe'));assert(guideGm.includes('Préparer et distribuer le butin'));
- assert(guidePlayer.includes('Découvrir ta fiche'));assert(!guidePlayer.includes('Inviter ton groupe'));
+ assert(guideGm.includes('Inviter votre groupe'));assert(guideGm.includes('Préparer et distribuer le butin'));
+ assert(guidePlayer.includes('Découvrir votre fiche'));assert(!guidePlayer.includes('Inviter votre groupe'));
  const invMj=await paint('gm','inventory'),invPlayer=await paint('player','inventory');
  assert(invMj.includes('Butin secret'));assert(invMj.includes('Trésor de campagne'));
  assert(!invPlayer.includes('Butin secret'));assert(!invPlayer.includes('loot-give'));assert(invPlayer.includes('inventory-money'));

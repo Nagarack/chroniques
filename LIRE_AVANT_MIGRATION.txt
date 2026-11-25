@@ -1,15 +1,17 @@
-CHRONIQUES - MIGRATION VERS UNE NOUVELLE VERSION
+CHRONIQUES — MIGRATION VERS UNE NOUVELLE VERSION
 
-DEPUIS LA 3.9 : fermez le serveur et glissez le ZIP de la nouvelle version sur METTRE_A_JOUR.bat.
-Tout est automatique (sauvegarde, verification, retour arriere). La methode ci-dessous ne sert
-qu'une derniere fois, pour passer d'une version plus ancienne a la 3.9.
+Mises à jour habituelles : rien à faire à la main. Paramètres → Mise à jour → « Installer et redémarrer »
+(ou fermez le serveur et glissez le ZIP de la nouvelle version sur METTRE_A_JOUR.bat). Tout est
+automatique : sauvegarde, vérification, retour arrière en cas de problème.
 
-1. Sauvegarder l'ancienne version (SAUVEGARDER_CHRONIQUES.bat), puis arreter completement son serveur.
-2. Extraire la nouvelle version dans un NOUVEAU dossier VIDE.
-3. Double-cliquer MIGRER_DONNEES.bat, puis indiquer l'ancien dossier (celui qui contient server.js).
-   Sont copies : la base de donnees, la configuration HTTPS et les images (data\media).
-4. La copie refuse d'ecraser une base deja presente dans le nouveau dossier.
-5. Demarrer avec DEMARRER_CHRONIQUES.bat, puis verifier campagnes, personnages, images et permissions.
-6. Conserver l'ancien dossier et sa sauvegarde pour un retour arriere.
+La méthode ci-dessous ne sert qu'une seule fois, pour passer d'une version antérieure à la 3.9.
+
+1. Sauvegardez l'ancienne version (SAUVEGARDER_CHRONIQUES.bat), puis arrêtez complètement son serveur.
+2. Extrayez la nouvelle version dans un NOUVEAU dossier VIDE.
+3. Double-cliquez sur MIGRER_DONNEES.bat, puis indiquez l'ancien dossier (celui qui contient server.js).
+   Sont copiés : la base de données, la configuration HTTPS et les images (data\media).
+4. La copie refuse d'écraser une base déjà présente dans le nouveau dossier.
+5. Démarrez avec DEMARRER_CHRONIQUES.bat, puis vérifiez campagnes, personnages, images et permissions.
+6. Conservez l'ancien dossier et sa sauvegarde pour pouvoir revenir en arrière.
 7. La configuration Cloudflare reste identique : tunnel HTTP vers 127.0.0.1:8080.
-8. Lire GUIDE_TESTEURS.md et garder les identifiants et codes d'invitation prives.
+8. Lisez GUIDE_TESTEURS.md et gardez privés les identifiants et les codes d'invitation.

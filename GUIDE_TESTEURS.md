@@ -13,7 +13,7 @@ Cette version est une **bêta** : lisez ces points avant d'inviter de vrais joue
 
 ## Aide intégrée
 
-La **visite guidée** (Aide & tutoriel, ou le bandeau d'accueil) montre les vrais boutons écran par écran. Le bouton **?** de la barre du haut ouvre le **Mode d'emploi** de l'écran en cours (trois gestes, différents pour le MJ et les joueurs) ; il se referme au changement d'écran. À la première connexion, un rappel **« Tes premiers pas »** guide le démarrage. Un index imprimable de toutes les aides est disponible sur **`/tutos.html`**, sans connexion.
+La **visite guidée** (Aide & tutoriel, ou le bandeau d'accueil) montre les vrais boutons écran par écran. Le bouton **?** de la barre du haut ouvre le **Mode d'emploi** de l'écran en cours (trois gestes, différents pour le MJ et les joueurs) ; il se referme au changement d'écran. À la première connexion, un rappel **« Vos premiers pas »** guide le démarrage. Un index imprimable de toutes les aides est disponible sur **`/tutos.html`**, sans connexion.
 
 ## Grille de test — à cocher à la table
 
@@ -48,7 +48,7 @@ La **visite guidée** (Aide & tutoriel, ou le bandeau d'accueil) montre les vrai
 - [ ] **Sauvegardes (4.6) :** Paramètres → Tester une sauvegarde puis Restaurer ; essayer une copie miroir vers une clé USB ou OneDrive.
 - [ ] **Recherche (4.5) :** Ctrl+K, taper « liche », « potion » ou le nom d’un personnage ; essayer la commande « Écran du MJ ».
 - [ ] **Écran de table (4.5) :** brancher une TV ou un vidéoprojecteur, ouvrir « Écran de table » ; vérifier qu’aucune créature masquée n’apparaît et que le tour actif suit.
-- [ ] **Panneau joueur (4.5) :** pendant un combat, sur téléphone, vérifier la vibration « À toi de jouer ! » et les boutons Action / Action bonus / Réaction.
+- [ ] **Panneau joueur (4.5) :** pendant un combat, sur téléphone, vérifier la vibration « À vous de jouer ! » et les boutons Action / Action bonus / Réaction.
 - [ ] **Repos et XP (4.5) :** repos court avec un dé de vie réel ; repos long du groupe ; distribuer l’XP de la séance puis passer un niveau.
 - [ ] **Impressions (4.5) :** cartes de sorts et livre de campagne en PDF.
 - [ ] **Annuler (4.5) :** supprimer un objet maison puis « Annuler » dans la notification.
@@ -91,7 +91,7 @@ La **visite guidée** (Aide & tutoriel, ou le bandeau d'accueil) montre les vrai
 - [ ] **Redémarrage :** arrêter puis relancer le serveur pendant que les joueurs sont connectés ; ils doivent rester connectés.
 - [ ] **Cartes et trésors :** placer et révéler un repère, créer un coffre, distribuer un objet.
 - [ ] **Lisibilité :** thème sombre confortable sur PC et téléphone, textes assez grands, aucun chevauchement avec un nom long.
-- [ ] **Réconnexion :** couper puis restaurer le réseau ; le bandeau rouge « Connexion perdue » apparaît puis disparaît, sans perte de données.
+- [ ] **Reconnexion :** couper puis restaurer le réseau ; le bandeau rouge « Connexion perdue » apparaît puis disparaît, sans perte de données.
 - [ ] **Sauvegarde :** lancer une sauvegarde et vérifier son existence (des copies automatiques sont aussi faites dans `data/auto-backups/`).
 
 ## Signalement des bugs

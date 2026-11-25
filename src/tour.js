@@ -2,7 +2,7 @@
    Rien n'est modifié pendant la visite : elle ne fait que naviguer et montrer. */
 (function(root,factory){const api=factory();if(typeof module!=='undefined'&&module.exports)module.exports=api;if(root)root.ChroniquesTour=api;})(typeof window!=='undefined'?window:null,function(){'use strict';
 const GM=[
- {title:'Bienvenue, Maître du Jeu',text:'Cette visite de deux minutes vous montre où se trouvent les outils principaux. Rien n’est modifié pendant la visite. Touche Échap pour quitter à tout moment.'},
+ {title:'Bienvenue, Maître du Jeu',text:'Cette visite de deux minutes vous montre où se trouvent les outils principaux. Rien n’est modifié pendant la visite. Appuyez sur Échap pour quitter à tout moment.'},
  {nav:'overview',target:'.sidebar nav|.sidebar|.mobile-bottom-nav',title:'La navigation',text:'Tout part d’ici : Tableau de bord, Combat, Personnages et Cartes. Les rubriques « Suivi de la partie », « Préparation » et « Bibliothèque » se déplient d’un clic.'},
  {nav:'campaign',target:'[data-task="invite"]',title:'Inviter vos joueurs',text:'Choisissez un personnage puis « Inviter ce joueur » : un QR code à faire scanner autour de la table et un lien à envoyer s’affichent. « Inviter toute la table » prépare une invitation par personnage libre.'},
  {nav:'character',target:'.hp-quick|.sheet-strip|.char-compact',title:'Les points de vie en un geste',text:'Les boutons −10 à +10 notent les dégâts et les soins annoncés après vos vrais jets de dés. Choisissez d’abord un type de dégâts : résistances et vulnérabilités sont alors appliquées automatiquement.'},
@@ -19,10 +19,10 @@ const GM=[
  {title:'C’est parti !',text:'Pour vous entraîner sans toucher à votre vraie partie, créez une campagne d’entraînement depuis « Mes campagnes ». Cette visite reste disponible dans Aide & tutoriel.'}
 ];
 const PLAYER=[
- {title:'Bienvenue !',text:'Cette visite d’une minute vous montre l’essentiel. Rien n’est modifié pendant la visite. Touche Échap pour quitter à tout moment.'},
+ {title:'Bienvenue !',text:'Cette visite d’une minute vous montre l’essentiel. Rien n’est modifié pendant la visite. Appuyez sur Échap pour quitter à tout moment.'},
  {nav:'character',target:'.char-compact|.char-hero',title:'Votre personnage',text:'Votre fiche résumée : classe d’armure, initiative, vitesse et états. Le bouton « ⋯ » permet de changer de portrait.'},
  {nav:'character',target:'.hp-quick|.sheet-strip',title:'Vos points de vie',text:'Après un vrai jet de dés, notez les dégâts ou les soins avec ces boutons. Rien n’est jamais lancé par l’application.'},
- {nav:'combat',target:'.player-turn|.initiative-panel|.combat-band|.workspace-heading',title:'Le combat',text:'Pendant un combat, ce panneau regroupe l’essentiel : vos PV, vos actions, vos emplacements de sorts et vos potions. Quand c’est à vous, votre téléphone vibre et « À toi de jouer ! » s’affiche.'},
+ {nav:'combat',target:'.player-turn|.initiative-panel|.combat-band|.workspace-heading',title:'Le combat',text:'Pendant un combat, ce panneau regroupe l’essentiel : vos PV, vos actions, vos emplacements de sorts et vos potions. Quand c’est à vous, votre téléphone vibre et « À vous de jouer ! » s’affiche.'},
  {nav:'inventory',target:'.gear-summary|.inventory-list',title:'Votre équipement',text:'Buvez une potion (lancez les dés indiqués), équipez armure et bouclier pour calculer votre CA, donnez un objet à un autre joueur ou déposez-le dans le coffre du groupe, et achetez chez les marchands ouverts par le MJ.'},
  {nav:'chronicle',target:'.page-tabs|.handouts|.schedule',title:'Journal & quêtes',text:'Indiquez vos disponibilités pour la prochaine séance et lisez les documents envoyés par le MJ (un badge signale les nouveaux).'},
  {nav:'overview',target:'.whisper-btn',title:'Chuchoter au MJ',text:'Le bouton ✉ ouvre une conversation privée avec le MJ : une action discrète, une question, sans que les autres joueurs le voient.'},

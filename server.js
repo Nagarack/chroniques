@@ -134,7 +134,7 @@ function createServer(opts={}){
  const backupRoot=opts.backupRoot||(opts.dataFile?path.join(path.dirname(dataFile),'..'):root);
  let backupCache={at:0,days:null};
  function lastBackupDays(){if(Date.now()-backupCache.at<60000)return backupCache.days;let newest=0;try{for(const f of fs.readdirSync(path.join(backupRoot,'backups')))if(/^chroniques-backup-.*\.json$/.test(f))newest=Math.max(newest,fs.statSync(path.join(backupRoot,'backups',f)).mtimeMs);}catch{}backupCache={at:Date.now(),days:newest?Math.floor((Date.now()-newest)/86400000):null};return backupCache.days;}
- if(!['127.0.0.1','localhost'].includes(host))throw new Error('SECURITE : serveur uniquement sur 127.0.0.1. Utilisez Cloudflare Tunnel pour un acces distant.');
+ if(!['127.0.0.1','localhost'].includes(host))throw new Error('SÉCURITÉ : serveur uniquement sur 127.0.0.1. Utilisez Cloudflare Tunnel pour un accès distant.');
  const publicOrigin=getRemoteOrigin(opts,root);
  const expectedHost=publicOrigin?new URL(publicOrigin).host:null;
  const secureCookies=Boolean(publicOrigin);
