@@ -104,4 +104,6 @@ Les permissions sont vérifiées **côté serveur** par campagne et par rôle : 
 
 ## Crédits et licences
 
+**Chroniques est sous droits d’auteur, tous droits réservés** : le code est visible mais pas libre (voir `LICENSE.md`). Utilisation personnelle des versions publiées autorisée ; copie, modification, redistribution ou hébergement pour d’autres interdits sans autorisation écrite.
+
 Voir `CREDITS_ILLUSTRATIONS.md` (illustrations, bestiaire SRD, règles et sorts en français du SRD 5.1 — licence CC BY 4.0, Wizards of the Coast) et `assets/fonts/LICENSES.txt` (polices IM Fell English et Alegreya Sans, licence SIL OFL 1.1). Repères de règles : SRD 5.1 et 5.2.1.
