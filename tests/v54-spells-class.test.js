@@ -1,0 +1,11 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const P=require('../src/progression.js');const G=require('../src/spell-guide.js');
+test('sorts par classe : caractéristique, attaque et DD de chaque classe',()=>{const pc={level:5,job:'Clerc',stats:{abilities:{str:10,dex:12,con:14,int:16,wis:14,cha:8}},progression:{classId:'cleric',multiclass:[{classId:'wizard',level:2}]}};
+ const rows=G.byClass(pc,P);assert.deepStrictEqual(rows.map(r=>[r.classId,r.ability,r.attack,r.saveDC]),[['cleric','wis',5,13],['wizard','int',6,14]]);
+ const fighter={level:3,job:'Guerrier',progression:{classId:'fighter',multiclass:[{classId:'rogue',level:1}]}};assert.deepStrictEqual(G.byClass(fighter,P),[]);});
+test('sorts par classe : le grimoire retient la classe du sort',async t=>{const f=await require('./_fixture.js').fixture(t);
+ let r=await f.action('levelUp',{id:f.a.id,hpGain:4,classId:'wizard'},f.pa);assert.strictEqual(r.status,200,JSON.stringify(r.data));
+ const S=require('../src/spells.js');const sp=S.CATALOG.find(x=>x.classes.includes('wizard')&&!x.classes.includes('ranger')&&x.level===1);
+ r=await f.action('addSpell',{id:f.a.id,spellId:sp.id,prepared:true,classId:'wizard'},f.pa);assert.strictEqual(r.status,200,JSON.stringify(r.data));
+ r=await f.action('addSpell',{id:f.a.id,spellId:S.CATALOG.find(x=>x.classes.includes('wizard')&&!x.classes.includes('ranger')&&x.level===1&&x.id!==sp.id).id,prepared:true},f.pa);assert.strictEqual(r.status,400,'sans classe : liste de la classe de départ');
+ const me=(await f.call('/api/state',{cookie:f.pa})).data.state.characters.find(p=>p.id===f.a.id);assert.strictEqual(me.grimoire.find(e=>e.spellId===sp.id).cls,'wizard');});

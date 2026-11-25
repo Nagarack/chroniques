@@ -1,0 +1,14 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const ICS=require('../src/calendar-ics.js');
+test('agenda : fichier iCalendar de la séance fixée',()=>{const s={title:'La Couronne, de cendres',schedule:{options:[{id:'date-1',at:'2026-12-05T20:30',note:'Chez Léa; apporter les dés'}],chosen:'date-1'}};
+ const t=ICS.build(s,{hours:4,now:Date.UTC(2026,10,25),url:'https://jdr.example'});
+ assert.ok(t.startsWith('BEGIN:VCALENDAR\r\n'));assert.match(t,/DTSTART:20261205T203000\r\n/);assert.match(t,/DTEND:20261206T003000\r\n/);
+ assert.match(t,/SUMMARY:Séance de D&D · La Couronne\\, de cendres/);assert.match(t,/Chez Léa\; apporter les dés/);
+ for(const l of t.split('\r\n'))assert.ok(Buffer.byteLength(l)<=75,l);
+ assert.strictEqual(ICS.build({schedule:{options:[],chosen:null}}),null);});
+test('agenda : route /api/calendar.ics',async t=>{const f=await require('./_fixture.js').fixture(t);
+ let r=await fetch(f.base+'/api/calendar.ics',{headers:{cookie:f.pa}});assert.strictEqual(r.status,404);
+ r=await f.action('scheduleAdd',{values:{at:'2026-12-05T20:30',note:''}});assert.strictEqual(r.status,200);
+ const st=(await f.call('/api/state',{cookie:f.gm})).data.state;await f.action('scheduleChoose',{optionId:st.schedule.options[0].id});
+ r=await fetch(f.base+'/api/calendar.ics',{headers:{cookie:f.pa}});assert.strictEqual(r.status,200);assert.match(r.headers.get('content-type'),/text\/calendar/);assert.match(await r.text(),/DTSTART:20261205T203000/);
+ r=await fetch(f.base+'/api/calendar.ics');assert.strictEqual(r.status,401);});

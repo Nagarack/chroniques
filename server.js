@@ -32,6 +32,7 @@ const GEAR=require('./src/gear');
 const SH=require('./src/shops');
 const HO=require('./src/handouts');
 const SC=require('./src/schedule');
+const ICS=require('./src/calendar-ics.js');
 const CG=require('./src/class-guide');
 const WH=require('./src/whispers');
 const CMP=require('./src/companions');
@@ -50,6 +51,8 @@ const TR=require('./src/travel.js');
 const RT=require('./src/random-tables.js');
 const TCH=require('./src/table-charter.js');
 const DT=require('./src/downtime.js');
+const MAD=require('./src/madness.js');
+const GC=require('./src/group-checks.js');
 const AD=require('./src/area-damage.js');
 const WA=require('./src/webauthn.js');
 const I18N=require('./src/i18n-core.js');
@@ -102,6 +105,9 @@ const allowedStatic=new Map([
  ['/src/data/srd-items.en.js',['src/data/srd-items.en.js','text/javascript; charset=utf-8']],
  ['/src/table-charter.js',['src/table-charter.js','text/javascript; charset=utf-8']],
  ['/src/downtime.js',['src/downtime.js','text/javascript; charset=utf-8']],
+ ['/src/data/srd-madness.js',['src/data/srd-madness.js','text/javascript; charset=utf-8']],
+ ['/src/madness.js',['src/madness.js','text/javascript; charset=utf-8']],
+ ['/src/group-checks.js',['src/group-checks.js','text/javascript; charset=utf-8']],
  ['/src/spells.js',['src/spells.js','text/javascript; charset=utf-8']],
  ['/src/spell-guide.js',['src/spell-guide.js','text/javascript; charset=utf-8']],
  ['/src/creatures.js',['src/creatures.js','text/javascript; charset=utf-8']],
@@ -225,6 +231,8 @@ function createServer(opts={}){
   for(const m of recs){if(move){m.entityId=toItem;m.characterId=toChar;continue;}if(M.list(s).length>=M.MAX_MEDIA)break;
    if(m.builtinId){s.media.push({...m,id:'img-'+random(12),entityId:toItem,characterId:toChar});continue;}
    const rec=copyLibraryImage(s,m);if(rec)s.media.push({id:'img-'+random(12),kind:'item',entityId:toItem,characterId:toChar,visibility:m.visibility,caption:m.caption||'',featured:!!m.featured,...rec});}}
+ // 5.4 : proportions d’une carte importée avant la 5.4 (lues dans l’en-tête de l’image).
+ function ensureAspect(map){if(!map||map.aspect||!map.filename||!/^[A-Za-z0-9_-]{32}\.(png|webp)$/.test(map.filename))return;try{const fd=fs.openSync(path.join(mediaDir,map.filename),'r');const buf=Buffer.alloc(64);fs.readSync(fd,buf,0,64,0);fs.closeSync(fd);const sz=CM.imageSize(buf);if(sz&&sz.w&&sz.h)map.aspect=Math.round(sz.w/sz.h*10000)/10000;}catch{}}
  // 5.3 : vision dans le noir d’un personnage (traits d’espèce), en mètres.
  function darkvisionOf(s){return refId=>{const pc=L.findPc(s,refId);if(!pc)return 0;let best=0;try{for(const f of H.features(pc,s.edition)||[])if(/^Vision dans le noir/.test(f.name||'')){const mt=/(\d+(?:[.,]\d+)?)\s*m/.exec(f.description||'');if(mt)best=Math.max(best,Number(mt[1].replace(',','.')));}}catch{}return best;};}
  function logGm(s,msg){s.combat.log.unshift({id:random(5),msg,audience:'gm',when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});s.combat.log=s.combat.log.slice(0,60);}
@@ -325,6 +333,7 @@ function createServer(opts={}){
  full.media=M.projected(c.state,u);
  full.ambience=AMB.projected(c.state); // Jamais les noms de fichiers sur disque.
  if(u.role!=='gm')full.randomTables=RT.projected(c.state); // Tables privées du MJ : jamais envoyées.
+ if(u.role!=='gm'&&c.state.groupChecks)full.groupChecks=GC.projected(c.state,u.characterId?[u.characterId]:[]); // DD caché et totaux des autres non transmis.
  if(u.role!=='gm'&&c.state.downtime)full.downtime=DT.projected(c.state,u.characterId); // Intermèdes des autres personnages : non transmis.
  if(u.role!=='gm'&&c.state.tableCharter)full.tableCharter=TCH.projected(c.state); // Signaux (carte X) et règles du MJ : jamais envoyés.
  full.maps=CM.projected(c.state,u);
@@ -405,7 +414,7 @@ function createServer(opts={}){
   if(Array.isArray(c.history))pc.history=c.history.slice(-CH.MAX).map(e=>({id:random(8),at:/^\d{4}-\d\d-\d\dT/.test(String(e?.at||''))?String(e.at).slice(0,30):new Date().toISOString(),world:String(e?.world||'').slice(0,60),session:null,text:String(e?.text||'').replace(/[\u0000-\u001f]/g,' ').slice(0,300)})).filter(e=>e.text.trim());
   (pc.history??=[]).push({id:random(8),at:new Date().toISOString(),world:'',session:null,text:'Rejoint la campagne'+(data.from?.campaign?' (venant de « '+String(data.from.campaign).slice(0,60)+' »)':'')+'.'});
   logPublic(s,'Personnage importé : '+pc.name+(skipped.length?' ('+skipped.length+' élément(s) ignoré(s) : '+[...new Set(skipped)].slice(0,6).join(', ')+')':'')+'.');return pc;}
- const UNDOABLE={hp:'PV',areaDamage:'dégâts de zone',tableRemove:'suppression de table',exhaustion:'épuisement',inspiration:'inspiration',charterRuleRemove:'règle de la table',downtimeRemove:'activité d’intermède',charterLimitRemove:'limite de la table',npcLegendary:'action légendaire',defense:'défense',npcDefense:'défense de créature',npcHp:'PV créature',tempHp:'PV temporaires',condition:'état',npcCondition:'état créature',next:'tour suivant',conditionTimer:'durée d’état',start:'début du combat',end:'fin du combat',deathSave:'jet contre la mort',init:'initiative',sortInitiative:'tri de l’initiative',move:'déplacement',moveInitiative:'ordre d’initiative',resetTurn:'réinitialisation du tour',spend:'dépense d’action',slot:'emplacement de sort',castSpell:'sort lancé',resource:'ressource',concentration:'concentration',resolveConcentration:'concentration',rest:'repos',npcAdd:'ajout de créature',npcUpdate:'modification de créature',npcRemove:'retrait de créature',libItemDelete:'objet maison supprimé',handoutDelete:'document supprimé',shopDelete:'marchand supprimé',shopItemRemove:'article retiré',mapAreaClear:'zones effacées',scheduleClear:'dates effacées',scheduleRemove:'date retirée',templateDelete:'monstre supprimé',encounterDelete:'rencontre supprimée',restLongAll:'repos long du groupe',xpAward:'XP distribuée',milestone:'jalon'};
+ const UNDOABLE={hp:'PV',areaDamage:'dégâts de zone',tableRemove:'suppression de table',exhaustion:'épuisement',inspiration:'inspiration',charterRuleRemove:'règle de la table',downtimeRemove:'activité d’intermède',madnessRemove:'folie',charterLimitRemove:'limite de la table',npcLegendary:'action légendaire',defense:'défense',npcDefense:'défense de créature',npcHp:'PV créature',tempHp:'PV temporaires',condition:'état',npcCondition:'état créature',next:'tour suivant',conditionTimer:'durée d’état',start:'début du combat',end:'fin du combat',deathSave:'jet contre la mort',init:'initiative',sortInitiative:'tri de l’initiative',move:'déplacement',moveInitiative:'ordre d’initiative',resetTurn:'réinitialisation du tour',spend:'dépense d’action',slot:'emplacement de sort',castSpell:'sort lancé',resource:'ressource',concentration:'concentration',resolveConcentration:'concentration',rest:'repos',npcAdd:'ajout de créature',npcUpdate:'modification de créature',npcRemove:'retrait de créature',libItemDelete:'objet maison supprimé',handoutDelete:'document supprimé',shopDelete:'marchand supprimé',shopItemRemove:'article retiré',mapAreaClear:'zones effacées',scheduleClear:'dates effacées',scheduleRemove:'date retirée',templateDelete:'monstre supprimé',encounterDelete:'rencontre supprimée',restLongAll:'repos long du groupe',xpAward:'XP distribuée',milestone:'jalon'};
  const undoStacks=new Map();
  function canUndo(c){const st=undoStacks.get(c.id);const top=st&&st[st.length-1];return Boolean(top&&top.version===c.version);}
  function undo(c,u){requireGm(u);const st=undoStacks.get(c.id)||[];const top=st[st.length-1];if(!top||top.version!==c.version){undoStacks.delete(c.id);badRequest('Rien à annuler : l’état a changé depuis la dernière action.');}
@@ -431,8 +440,8 @@ function createServer(opts={}){
    const added=CM.tokenAdd(s,id,'tok-'+random(10),{...v,label:String(label||'').slice(0,40),visible});CM.visionReveal(s,id,darkvisionOf(s),added.id);break;}
   case 'mapTokenMove':{const map=CM.read(s,id);if(!map||!CM.canRead(u,map))throw sleepBlock('Carte non accessible.');const t=CM.tokenRead(s,id,String(b.tokenId||''));if(!t)badRequest('Jeton introuvable.');
    const cmpNpc=t.kind==='npc'?N.find(s,t.refId):null;
-   if(u.role!=='gm'&&!(t.kind==='pc'&&t.visible&&L.canEdit(s,a,t.refId))&&!(cmpNpc?.ownerPc&&t.visible&&L.canEdit(s,a,cmpNpc.ownerPc)))throw sleepBlock('Vous ne pouvez déplacer que votre propre jeton.');CM.tokenMove(s,id,t.id,b.x,b.y);CM.visionReveal(s,id,darkvisionOf(s),t.id);break;}
-  case 'mapVision':{requireGm(u);CM.setVision(s,id,b.values);CM.visionReveal(s,id,darkvisionOf(s));break;}
+   if(u.role!=='gm'&&!(t.kind==='pc'&&t.visible&&L.canEdit(s,a,t.refId))&&!(cmpNpc?.ownerPc&&t.visible&&L.canEdit(s,a,cmpNpc.ownerPc)))throw sleepBlock('Vous ne pouvez déplacer que votre propre jeton.');CM.tokenMove(s,id,t.id,b.x,b.y);ensureAspect(CM.read(s,id));CM.visionReveal(s,id,darkvisionOf(s),t.id);break;}
+  case 'mapVision':{requireGm(u);CM.setVision(s,id,b.values);ensureAspect(CM.read(s,id));CM.visionReveal(s,id,darkvisionOf(s));break;}
   case 'mapTokenLight':{const map=CM.read(s,id);if(!map||!CM.canRead(u,map))throw sleepBlock('Carte non accessible.');const t=CM.tokenRead(s,id,String(b.tokenId||''));if(!t)badRequest('Jeton introuvable.');
    if(u.role!=='gm'&&!(t.kind==='pc'&&t.visible&&L.canEdit(s,a,t.refId)))throw sleepBlock('Vous ne pouvez régler que votre propre jeton.');if(u.role!=='gm'&&b.values&&b.values.sight!==undefined)badRequest('Seul le MJ règle la vision d’un jeton.');
    CM.tokenLight(s,id,t.id,b.values);CM.visionReveal(s,id,darkvisionOf(s),t.id);break;}
@@ -443,6 +452,11 @@ function createServer(opts={}){
   case 'mapAreaClear':{requireGm(u);CM.areaClear(s,id);break;}
   case 'mapMarkerAdd':{requireGm(u);CM.markerAdd(s,id,'pin-'+random(10),b.values);break;}
   case 'mapMarkerUpdate':{requireGm(u);const before=CM.markerRead(s,id,String(b.markerId||''))?.image;const after=CM.markerUpdate(s,id,String(b.markerId||''),b.values);if(before?.source==='upload'&&before.filename!==after.image?.filename)deletedMapFiles.push(before.filename);break;}
+  case 'mapWallAdd':{requireGm(u);ensureAspect(CM.read(s,id));CM.wallAdd(s,id,'wall-'+random(8),b.values);break;}
+  case 'mapWallRemove':{requireGm(u);CM.wallRemove(s,id,String(b.wallId||''));break;}
+  case 'mapWallClear':{requireGm(u);CM.wallClear(s,id);break;}
+  case 'mapDoor':{requireGm(u);ensureAspect(CM.read(s,id));CM.doorSet(s,id,String(b.wallId||''),b.open===true);CM.visionReveal(s,id,darkvisionOf(s));break;}
+  case 'mapTrapSet':{requireGm(u);const before=CM.markerRead(s,id,String(b.markerId||''))?.trap?.state;const m=CM.trapSet(s,id,String(b.markerId||''),b.values);if(m.trap.state!==before&&m.trap.state!=='hidden')(m.visibility==='shared'?logPublic:logGm)(s,'⚠ '+m.title+' · '+({spotted:'piège repéré',disarmed:'piège désamorcé',triggered:'piège déclenché'})[m.trap.state]);break;}
   case 'mapMarkerDelete':{requireGm(u);const removed=CM.markerRemove(s,id,String(b.markerId||''));if(removed.image?.source==='upload')deletedMapFiles.push(removed.image.filename);break;}
   case 'mapLootAdd':{requireGm(u);try{MT.add(s,id,String(b.markerId||''),'chest-'+random(9),b.values);}catch(e){badRequest(e.message);}break;}
   case 'mapLootFromStash':{requireGm(u);try{MT.fromStash(s,id,String(b.markerId||''),String(b.lootId||''),'chest-'+random(9),b.quantity);}catch(e){badRequest(e.message);}break;}
@@ -530,9 +544,9 @@ function createServer(opts={}){
   case 'tableMap':{requireGm(u);const mid=b.mapId==null?null:String(b.mapId);if(mid){const m=CM.read(s,mid);if(!m)badRequest('Carte introuvable.');if(m.visibility!=='shared')badRequest('Partagez d’abord la carte avec les joueurs : l’écran de table n’affiche que ce qu’ils peuvent voir.');}s.tableMapId=mid;break;}
   case 'restShort':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');const cls=pc.progression?.classId||P.detectClass(pc.job);const info=CG.info(cls);
    const avail=Math.max(0,pc.level-(pc.hitDiceUsed||0));const dice=intValue(b.dice??0,'Dés de vie',0,avail);let healed=0;
-   if(dice>0){const die=info?info.die:12;const total=intValue(b.total,'Total des dés',dice,dice*die);const con=CG.mod(pc.stats?.abilities?.con??10);const gain=Math.max(dice,total+dice*con);const before=pc.hp;L.changeHp(s,a,id,gain,'');healed=pc.hp-before;pc.hitDiceUsed=(pc.hitDiceUsed||0)+dice;}
-   L.rest(s,a,id,'short');P.recoverSlots(pc,s.edition,'short');H.recover(pc,s.edition,'short');if(dice)logPublic(s,pc.name+' dépense '+dice+' dé'+(dice>1?'s':'')+' de vie : +'+healed+' PV.');break;}
-  case 'restLongAll':{requireGm(u);if(s.worldTime?.enabled&&b.advanceTime!==false){const reached=WT.advance(s,480);logPublic(s,'⏳ 8 heures passent · '+WT.format(s.worldTime,s.worldTime.minutes));logEvents(s,reached);}const done=[],skipped=[];for(const pc of s.characters){if(pc.hp<=0){skipped.push(pc.name);continue;}L.rest(s,'mj',pc.id,'long');P.recoverSlots(pc,s.edition,'long');H.recover(pc,s.edition,'long');done.push(pc.name);}
+   if(dice>0){const pool=P.hitDice?P.hitDice(pc):[];const die=pool.length?pool[0].die:(info?info.die:12);const total=intValue(b.total,'Total des dés',dice,dice*die);const con=CG.mod(pc.stats?.abilities?.con??10);const gain=Math.max(dice,total+dice*con);const before=pc.hp;L.changeHp(s,a,id,gain,'');healed=pc.hp-before;pc.hitDiceUsed=(pc.hitDiceUsed||0)+dice;}
+   L.rest(s,a,id,'short');P.recoverSlots(pc,s.edition,'short');H.recover(pc,s.edition,'short');I.restRecharge(pc,'short');if(dice)logPublic(s,pc.name+' dépense '+dice+' dé'+(dice>1?'s':'')+' de vie : +'+healed+' PV.');break;}
+  case 'restLongAll':{requireGm(u);if(s.worldTime?.enabled&&b.advanceTime!==false){const reached=WT.advance(s,480);logPublic(s,'⏳ 8 heures passent · '+WT.format(s.worldTime,s.worldTime.minutes));logEvents(s,reached);}const done=[],skipped=[];for(const pc of s.characters){if(pc.hp<=0){skipped.push(pc.name);continue;}L.rest(s,'mj',pc.id,'long');P.recoverSlots(pc,s.edition,'long');H.recover(pc,s.edition,'long');I.restRecharge(pc,'long');done.push(pc.name);}
    logPublic(s,'Repos long du groupe'+(done.length?' : '+done.join(', '):'')+(skipped.length?' · à 0 PV, pas de repos : '+skipped.join(', '):'')+'.');break;}
   case 'xpAward':{requireGm(u);const ids=Array.isArray(b.ids)?[...new Set(b.ids.map(String))]:[];const pcs=ids.map(x=>L.findPc(s,x)).filter(Boolean);if(!pcs.length||pcs.length!==ids.length)badRequest('Choisissez au moins un personnage.');
    const amount=intValue(b.amount,'XP par personnage',1,1000000);const reason=cleanText(b.reason||'','Raison',80,0);const ready=[];
@@ -688,6 +702,14 @@ function createServer(opts={}){
   case 'downtimeUpdate':case 'downtimeRemove':case 'downtimeSpend':{const act=(s.downtime?.activities||[]).find(x=>x.id===id);if(!act)badRequest('Activité introuvable.');if(!L.canEdit(s,a,act.pcId))throw sleepBlock('Accès refusé à cette fiche.');
    if(b.kind==='downtimeUpdate')DT.update(s,id,b.values);else if(b.kind==='downtimeRemove')DT.remove(s,id);
    else{const r=DT.spend(s,id,b.days);const pc=L.findPc(s,act.pcId);if(r.finished)logPublic(s,(pc?.name||'Personnage')+' · intermède terminé : '+act.title);}break;}
+  case 'groupCheckStart':{requireGm(u);GC.start(s,'gc-'+random(8),b.values);break;}
+  case 'groupCheckAnswer':{const pcId=String(b.pcId||'');if(!L.findPc(s,pcId)||!L.canEdit(s,a,pcId))throw sleepBlock('Vous répondez uniquement pour votre personnage.');GC.answer(s,pcId,b.total);break;}
+  case 'groupCheckClose':{requireGm(u);const r=GC.close(s);const c0=r.check,v=r.verdict;const name=id=>L.findPc(s,id)?.name||'?';const ok=c0.ids.filter(id=>c0.results[id]!==undefined&&c0.results[id]>=c0.dc).map(name),ko=c0.ids.filter(id=>c0.results[id]!==undefined&&c0.results[id]<c0.dc).map(name);
+   const head=(c0.kind==='save'?'Sauvegarde de groupe':'Test de groupe')+' ('+c0.label+(c0.showDc?', DD '+c0.dc:'')+')';
+   logPublic(s,c0.kind==='check'?head+' : '+(v.groupSuccess?'réussi':'raté')+' ('+v.successes+' réussite'+(v.successes>1?'s':'')+' sur '+v.total+')':head+' · réussite : '+(ok.join(', ')||'aucune')+' · échec : '+(ko.join(', ')||'aucun'));break;}
+  case 'groupCheckCancel':{requireGm(u);GC.cancel(s);break;}
+  case 'madnessAdd':{requireGm(u);const pc=L.findPc(s,id);if(!pc)badRequest('Personnage introuvable.');const m=MAD.add(pc,'mad-'+random(8),b.values);logPublic(s,pc.name+' · '+MAD.KINDS[m.kind].label.toLowerCase()+' ('+MAD.durationText(m)+')');break;}
+  case 'madnessRemove':{requireGm(u);const pc=L.findPc(s,id);if(!pc)badRequest('Personnage introuvable.');MAD.remove(pc,String(b.madnessId||''));logPublic(s,pc.name+' · folie guérie');break;}
   case 'charterRuleAdd':{requireGm(u);TCH.ruleAdd(s,'hr-'+random(10),b.values);break;}
   case 'charterRuleUpdate':{requireGm(u);TCH.ruleUpdate(s,id,b.values);break;}
   case 'charterRuleRemove':{requireGm(u);TCH.ruleRemove(s,id);break;}
@@ -714,7 +736,8 @@ function createServer(opts={}){
   case 'concentration':L.toggleConcentration(s,a,id,String(b.value||''));break;
   case 'resource':L.changeResource(s,a,id,String(b.resourceId||''),n(b.delta,-999,999));break;
   case 'deathSave':L.deathSave(s,a,id,String(b.result||''));break;
-  case 'rest':L.rest(s,a,id,String(b.type||''));P.recoverSlots(L.findPc(s,id),s.edition,b.type);H.recover(L.findPc(s,id),s.edition,b.type);break;
+  case 'rest':{L.rest(s,a,id,String(b.type||''));const pc=L.findPc(s,id);P.recoverSlots(pc,s.edition,b.type);H.recover(pc,s.edition,b.type);const rr=I.restRecharge(pc,String(b.type||''));if(rr.done.length)logPublic(s,pc.name+' · charges récupérées : '+rr.done.map(x=>x.name).join(', '));break;}
+  case 'itemRecharge':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');const it=I.recharge(pc,String(b.itemId||''),b.amount===null?null:Number(b.amount));if(b.amount!==null)logPublic(s,pc.name+' · '+it.name+' : '+it.charges+' / '+it.chargesMax+' charges');break;}
   case 'setOrigin':{
    const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');
    let result;try{result=O.compute(b.origin,s.edition);}catch(e){badRequest(e.message);}
@@ -788,7 +811,7 @@ function createServer(opts={}){
   case 'addSpell':case 'prepareSpell':case 'removeSpell':case 'castSpell':{
    const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé au grimoire.');
    try{
-    if(b.kind==='addSpell')S.add(pc,P.progression(pc,s.edition).classId,s.edition,b,'sp-'+random(8));
+    if(b.kind==='addSpell'){const own=P.classesOf?P.classesOf(pc):[];const cls=b.classId&&own.some(c=>c.classId===b.classId)?String(b.classId):P.progression(pc,s.edition).classId;const e=S.add(pc,cls,s.edition,b,'sp-'+random(8));if(own.length>1&&cls)e.cls=cls;}
     if(b.kind==='prepareSpell')S.edit(pc,String(b.entryId||''),b.prepared);
     if(b.kind==='removeSpell')S.remove(pc,String(b.entryId||''));
     if(b.kind==='castSpell'){
@@ -1018,6 +1041,10 @@ function createServer(opts={}){
    if(req.method==='GET'&&pathname==='/api/reports'){const u=requireUser(req),c=currentCampaign(u);if(c.ownerId!==u.id)throw Object.assign(new Error('Réservé au MJ propriétaire.'),{status:403});
      const file=path.join(path.dirname(dataFile),'signalements.jsonl');let list=[];try{list=fs.readFileSync(file,'utf8').split('\n').filter(Boolean).map(l=>{try{return JSON.parse(l);}catch{return null;}}).filter(Boolean);}catch{}
      send(res,200,{reports:list.slice(-200).reverse(),file:'data/signalements.jsonl'});return;}
+    // 5.4 : prochaine séance pour l’agenda du téléphone ou de l’ordinateur.
+    if(req.method==='GET'&&pathname==='/api/calendar.ics'){const u=requireUser(req),c=currentCampaign(u);const h=Number(new URL(req.url,'http://x').searchParams.get('h'))||4;
+     const body=ICS.build(c.state,{title:c.name||c.state.title,hours:h,lang:u.lang,url:publicOrigin||'',campaignId:c.id});if(!body){send(res,404,{error:u.lang==='en'?'No session scheduled.':'Aucune séance fixée.'});return;}
+     res.writeHead(200,{'content-type':'text/calendar; charset=utf-8','content-disposition':'attachment; filename="chroniques-seance.ics"','cache-control':'no-store'});res.end(body);return;}
     if(req.method==='GET'&&pathname==='/api/export'){const u=requireUser(req),c=currentCampaign(u);requireGm(u);send(res,200,{format:5,exportedAt:new Date().toISOString(),state:L.clone(c.state)});return;}
    if(req.method==='GET'&&pathname==='/api/events'){
     const u=requireUser(req),c=currentCampaign(u);res.writeHead(200,{'content-type':'text/event-stream; charset=utf-8','cache-control':'no-cache, no-transform','connection':'keep-alive','x-accel-buffering':'no'});
@@ -1221,7 +1248,7 @@ function createServer(opts={}){
      fs.mkdirSync(mediaDir,{recursive:true,mode:0o700});
      const filename=random(24)+'.'+check.extension, dest=path.join(mediaDir,filename),old=map.filename;
      fs.writeFileSync(dest,bytes,{flag:'wx',mode:0o600});
-     try{map.filename=filename;map.mime=check.mime;c.version++;persist();publish(c);}catch(e){map.filename=old;try{fs.unlinkSync(dest);}catch{}throw e;}
+     try{map.filename=filename;map.mime=check.mime;{const sz=CM.imageSize(bytes);if(sz&&sz.w&&sz.h)map.aspect=Math.round(sz.w/sz.h*10000)/10000;}c.version++;persist();publish(c);}catch(e){map.filename=old;try{fs.unlinkSync(dest);}catch{}throw e;}
      if(old){try{fs.unlinkSync(path.join(mediaDir,old));}catch{}}
      send(res,200,projected(c,u));return;
     }

@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 5.4.0 — Murs et portes, pièges, tests de groupe, folie, recharges, agenda
+**Cartes**
+- **Murs et portes** : nouvel outil « Murs et portes » (MJ) pour tracer des murs et des portes, aimantés à la grille. La vision des jetons s’arrête aux murs et aux portes fermées ; une porte s’ouvre ou se ferme d’un clic sur la carte, et le brouillard se lève alors derrière elle. Les murs restent invisibles pour les joueurs.
+- **Pièges** : un repère « Piège » a désormais un état (caché, repéré, désamorcé, déclenché), des DD pour le repérer, le désamorcer et y résister, et peut s’inspirer d’un des huit pièges d’exemple du SRD (DD pré-remplis, extraits de la règle affichés). « Repéré » ou « Déclenché » le révèle aux joueurs ; les DD restent réservés au MJ.
+
+**À la table**
+- **Tests et sauvegardes de groupe** : le MJ choisit la compétence ou la sauvegarde, le DD (montré ou caché) et les participants ; chaque joueur saisit le total de son vrai d20. Verdict automatique : le groupe réussit si au moins la moitié réussit (test) ou réussite / échec de chacun (sauvegarde), noté dans le journal.
+- **Recharge des objets magiques** : chaque objet à charges peut se recharger à l’aube, après un repos long ou après un repos court. Après le repos, les objets dont la recharge se lance aux dés (ex. 1d6+1) attendent le total de vos vrais dés ; les autres se rechargent seuls. Les objets du catalogue SRD arrivent avec leurs charges et leur recharge.
+- **Folie** (règle optionnelle du SRD 5.1) : le MJ applique une folie passagère, persistante ou illimitée avec les résultats du d100 et du d10 ; l’effet du SRD s’affiche sur la fiche jusqu’à guérison.
+- **Sorts par classe (multiclassage)** : caractéristique, bonus d’attaque et DD pour chaque classe qui lance des sorts ; chaque sort du grimoire est rattaché à sa classe.
+- **Agenda** : « 📅 Ajouter à mon agenda » sur la prochaine séance (fichier .ics pour Google Agenda, l’iPhone, Outlook), avec un rappel deux heures avant.
+
+**Autres**
+- Repos court d’un personnage multiclassé : le total maximal tient compte du plus grand dé de vie.
+- Licence : Chroniques est sous droits d’auteur, tous droits réservés (`LICENSE.md`) ; les contenus du SRD restent sous CC BY 4.0.
+
+**Limites connues** : les murs ne gênent pas la révélation manuelle du MJ ; la vision ne tient pas compte des murs pour les zones déjà découvertes avant leur tracé.
+
 ## 5.3.0 — Multiclassage, charte de la table, intermèdes, vision des jetons
 **À la table**
 - **Multiclassage** : « Monter de niveau » demande quelle classe gagne le niveau (classe actuelle ou nouvelle classe, avec vérification des prérequis à 13). Panneau « Classes » sur la fiche (Progression & règles) : niveaux par classe, sous-classes, dés de vie par type, maîtrises acquises (table du SRD 5.1). Emplacements de sorts combinés selon les règles de multiclassage (moitié et tiers arrondis à l’inférieur en 2014, au supérieur en 2024) ; la magie de pacte reste à part et revient au repos court.

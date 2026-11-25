@@ -13,7 +13,7 @@ function canRead(u,map){return !!map&&(u.role==='gm'||map.visibility==='shared')
 function markerImage(marker){const image=marker.image||null;return {builtinId:image?.source==='builtin'?image.id:null,hasImage:!!(image&&(image.source==='upload'||image.source==='media'))};}
 // Joueurs : le lien vers une fiche du carnet n'est transmis que si cette fiche est publiée.
 function publicLink(s,p){const l=p.linked;const sec=l&&PLANNER_LINKS[l.kind];if(!sec)return {};const e=((s.campaignPlanner||{})[sec]||[]).find(x=>x.id===l.id);return e&&e.visibility==='shared'?{plannerLink:{kind:l.kind,id:e.id,title:e.title}}:{};}
-function projected(s,u){return (s.maps||[]).filter(m=>canRead(u,m)).map(m=>({id:m.id,title:m.title,summary:m.summary,visibility:m.visibility,hasImage:!!m.filename,grid:gridOf(m),vision:m.vision?{...m.vision}:{enabled:false,light:'lit',range:18},fog:{enabled:!!(m.fog&&m.fog.enabled),revealed:(m.fog&&Array.isArray(m.fog.revealed)?m.fog.revealed:[]).map(c=>c.slice())},tokens:(m.tokens||[]).filter(t=>u.role==='gm'||t.visible).map(t=>({...t})),areas:(m.areas||[]).map(a=>({...a})),markers:(m.markers||[]).filter(p=>u.role==='gm'||p.visibility==='shared').map(p=>({id:p.id,title:p.title,description:p.description,visibility:p.visibility,x:p.x,y:p.y,symbol:SYMBOLS[p.symbol]?p.symbol:'point',...markerImage(p),...(u.role==='gm'?{linked:p.linked||null,loot:Array.isArray(p.loot)?p.loot:[],lootRevealed:p.lootRevealed===true}:{...(p.lootRevealed===true?{lootRevealed:true,publicLoot:(p.loot||[]).map(x=>({name:x.name,quantity:x.quantity??1}))}:{}),...publicLink(s,p)})}))}));}
+function projected(s,u){return (s.maps||[]).filter(m=>canRead(u,m)).map(m=>({id:m.id,title:m.title,summary:m.summary,visibility:m.visibility,hasImage:!!m.filename,grid:gridOf(m),vision:m.vision?{...m.vision}:{enabled:false,light:'lit',range:18},aspect:Number(m.aspect)||null,...(u.role==='gm'?{walls:(m.walls||[]).map(w=>({...w}))}:{}),fog:{enabled:!!(m.fog&&m.fog.enabled),revealed:(m.fog&&Array.isArray(m.fog.revealed)?m.fog.revealed:[]).map(c=>c.slice())},tokens:(m.tokens||[]).filter(t=>u.role==='gm'||t.visible).map(t=>({...t})),areas:(m.areas||[]).map(a=>({...a})),markers:(m.markers||[]).filter(p=>u.role==='gm'||p.visibility==='shared').map(p=>({id:p.id,title:p.title,description:p.description,visibility:p.visibility,x:p.x,y:p.y,symbol:SYMBOLS[p.symbol]?p.symbol:'point',...markerImage(p),...(p.trap?{trap:u.role==='gm'?{...p.trap}:{state:p.trap.state}}:{}),...(u.role==='gm'?{linked:p.linked||null,loot:Array.isArray(p.loot)?p.loot:[],lootRevealed:p.lootRevealed===true}:{...(p.lootRevealed===true?{lootRevealed:true,publicLoot:(p.loot||[]).map(x=>({name:x.name,quantity:x.quantity??1}))}:{}),...publicLink(s,p)})}))}));}
 function add(s,id,v){if(maps(s).length>=MAX_MAPS)bad('Maximum 24 cartes.');if(!/^map-[A-Za-z0-9_-]{7,48}$/.test(id))bad('Identifiant invalide.');const m={id,title:text(v?.title,'Titre',90,true),summary:text(v?.summary||'','Description',500),visibility:visibility(v?.visibility),markers:[],filename:null,mime:null};maps(s).push(m);return m;}
 function update(s,id,v){const m=read(s,id);if(!m)bad('Carte introuvable.');m.title=text(v?.title,'Titre',90,true);m.summary=text(v?.summary||'','Description',500);m.visibility=visibility(v?.visibility);return m;}
 function setMapVisibility(s,id,v){const m=read(s,id);if(!m)bad('Carte introuvable.');m.visibility=visibility(v);return m;}
@@ -51,6 +51,16 @@ function imageValue(s,v,previous){
  }
  bad('Source d’illustration invalide.');
 }
+// 5.4 : pièges. Un repère « piège » porte un état (caché, repéré, désamorcé, déclenché), des DD et l’exemple du SRD dont il s’inspire.
+const TRAP_REFS=Object.freeze({'Aiguille empoisonnée':'Poison Needle','Effondrement de plafond':'Collapsing Roof','Filet suspendu':'Falling Net','Fléchettes empoisonnées':'Poison Darts','Fosses':'Pits','Sphère d’annihilation':'Sphere of Annihilation','Sphère roulante':'Rolling Sphere','Statue au souffle de feu':'Fire-Breathing Statue'});
+const TRAP_STATES=['hidden','spotted','disarmed','triggered'];
+function trapSet(s,mapId,id,v){const mark=markerRead(s,mapId,id);if(!mark)bad('Repère introuvable.');if(mark.symbol!=='trap')bad('Ce repère n’est pas un piège.');
+ const dc=(x,label)=>{if(x===''||x==null)return null;const n=Number(x);if(!Number.isInteger(n)||n<1||n>40)bad(label+' : de 1 à 40.');return n;};
+ const old=mark.trap||{};const state=v?.state===undefined?(old.state||'hidden'):v.state;if(!TRAP_STATES.includes(state))bad('État du piège inconnu.');
+ const ref=v?.ref===undefined?(old.ref||''):String(v.ref||'');if(ref&&!Object.hasOwn(TRAP_REFS,ref))bad('Exemple de piège inconnu.');
+ mark.trap={ref,state,detectDc:v?.detectDc===undefined?(old.detectDc??null):dc(v.detectDc,'DD pour repérer'),disarmDc:v?.disarmDc===undefined?(old.disarmDc??null):dc(v.disarmDc,'DD pour désamorcer'),saveDc:v?.saveDc===undefined?(old.saveDc??null):dc(v.saveDc,'DD de sauvegarde'),effect:v?.effect===undefined?(old.effect||''):text(v.effect||'','Effet du piège',300)};
+ // Repéré ou déclenché : les joueurs le voient sur la carte.
+ if((state==='spotted'||state==='triggered')&&mark.visibility!=='shared')mark.visibility='shared';return mark;}
 function markerValues(s,v,old){
  const symbol=v?.symbol===undefined?(old?.symbol||'point'):v.symbol;
  if(!Object.hasOwn(SYMBOLS,symbol))bad('Icône de repère invalide.');
@@ -96,15 +106,46 @@ function tokenLight(s,mapId,id,v){const t=tokenRead(s,mapId,id);if(!t)bad('Jeton
 function tokenRadius(m,t,darkvision){const vi=visionOf(m);const own=Number(t.sight)>0?Number(t.sight):Number(darkvision)||0;const light=LIGHTS[t.light||'']||0;
  return vi.light==='dark'?Math.max(own,light):Math.max(vi.range||18,light);}
 // Révèle autour des jetons de personnages visibles (ou d’un seul). `darkvisionOf(refId)` donne la vision dans le noir en mètres.
+// 5.4 : murs et portes. Coordonnées 0–1000 sur chaque axe ; `aspect` = largeur / hauteur de l’image.
+const MAX_WALLS=500;
+// Dimensions d’une image PNG ou WebP (en-tête seulement).
+function imageSize(b){if(!b||b.length<30)return null;if(b.readUInt32BE(0)===0x89504e47)return {w:b.readUInt32BE(16),h:b.readUInt32BE(20)};
+ if(b.toString('ascii',0,4)==='RIFF'&&b.toString('ascii',8,12)==='WEBP'){const c=b.toString('ascii',12,16);
+  if(c==='VP8X')return {w:1+b.readUIntLE(24,3),h:1+b.readUIntLE(27,3)};if(c==='VP8 ')return {w:b.readUInt16LE(26)&0x3fff,h:b.readUInt16LE(28)&0x3fff};
+  if(c==='VP8L'){const v=b.readUInt32LE(21);return {w:1+(v&0x3fff),h:1+((v>>14)&0x3fff)};}}return null;}
+// Empreinte de l’état des murs (portes ouvertes comprises) : une nouvelle ouverture de porte permet une nouvelle révélation au même endroit.
+function wallsKey(m){let h=0;for(const w of m.walls||[])h=(h*31+(w.x1+w.y1*7+w.x2*13+w.y2*17)+(w.door&&w.open?1:0))%1000003;return h;}
+function wallsOf(m){if(!Array.isArray(m.walls))m.walls=[];return m.walls;}
+function wallAdd(s,mapId,id,v){const m=read(s,mapId);if(!m)bad('Carte introuvable.');const w=wallsOf(m);if(w.length>=MAX_WALLS)bad('Maximum '+MAX_WALLS+' murs par carte.');
+ const n=k=>{const x=Number(v?.[k]);if(!Number.isFinite(x)||x<0||x>1000)bad('Position de mur invalide.');return Math.round(x);};const wall={id,x1:n('x1'),y1:n('y1'),x2:n('x2'),y2:n('y2'),door:v?.door===true,open:false};
+ if(wall.x1===wall.x2&&wall.y1===wall.y2)bad('Mur trop court.');w.push(wall);return wall;}
+function wallRemove(s,mapId,id){const m=read(s,mapId);if(!m)bad('Carte introuvable.');const w=wallsOf(m);const i=id==='__last'?w.length-1:w.findIndex(x=>x.id===id);if(i<0)bad('Mur introuvable.');return w.splice(i,1)[0];}
+function wallClear(s,mapId){const m=read(s,mapId);if(!m)bad('Carte introuvable.');m.walls=[];}
+function doorSet(s,mapId,id,open){const m=read(s,mapId);if(!m)bad('Carte introuvable.');const d=wallsOf(m).find(x=>x.id===id&&x.door);if(!d)bad('Porte introuvable.');d.open=!!open;return d;}
+// Polygone de visibilité : rayons vers chaque extrémité de mur proche et 48 rayons réguliers, arrêtés au premier mur fermé.
+function visibilityPolygon(ox,oy,R,walls,aspect){const k=aspect>0?aspect:1;const O={x:ox,y:oy/k};
+ const segs=[];for(const w of walls||[]){if(w.door&&w.open)continue;const A={x:w.x1,y:w.y1/k},B={x:w.x2,y:w.y2/k};
+  const dx=B.x-A.x,dy=B.y-A.y,len2=dx*dx+dy*dy;const t=len2?Math.max(0,Math.min(1,((O.x-A.x)*dx+(O.y-A.y)*dy)/len2)):0;if(Math.hypot(A.x+t*dx-O.x,A.y+t*dy-O.y)<=R)segs.push([A,B]);}
+ if(!segs.length)return null;
+ const angles=[];for(let i=0;i<48;i++)angles.push(i*Math.PI/24);for(const [A,B] of segs)for(const P of [A,B]){if(Math.hypot(P.x-O.x,P.y-O.y)>R*1.02)continue;const a=Math.atan2(P.y-O.y,P.x-O.x);angles.push(a-1e-4,a+1e-4);}
+ angles.sort((a,b)=>a-b);const pts=[];
+ for(const a of angles){const dx=Math.cos(a),dy=Math.sin(a);let t=R;for(const [A,B] of segs){const ex=B.x-A.x,ey=B.y-A.y;const den=dx*ey-dy*ex;if(Math.abs(den)<1e-9)continue;const wx=A.x-O.x,wy=A.y-O.y;const tt=(wx*ey-wy*ex)/den,u=(wx*dy-wy*dx)/den;if(tt>0&&u>=0&&u<=1&&tt<t)t=tt;}
+  const px=Math.round(O.x+dx*t),py=Math.round((O.y+dy*t)*k);const last=pts[pts.length-1];if(!last||last[0]!==px||last[1]!==py)pts.push([px,py]);}
+ return pts;}
 function visionReveal(s,mapId,darkvisionOf,onlyTokenId){const m=read(s,mapId);if(!m)return 0;const vi=visionOf(m);const f=fogState(m);if(!vi.enabled||!f.enabled)return 0;const cells=gridOf(m).cells;if(!cells)return 0;
  const unit=1000/cells/scaleMeters(m);let n=0;
  for(const t of m.tokens||[]){if(t.kind!=='pc'||!t.visible||(onlyTokenId&&t.id!==onlyTokenId))continue;const meters=tokenRadius(m,t,darkvisionOf?darkvisionOf(t.refId):0);if(!(meters>0))continue;
   const r=Math.max(5,Math.min(1000,Math.round(meters*unit)));
+  // Murs : polygone de visibilité (les zones déjà vues restent visibles).
+  const poly=(m.walls||[]).length?visibilityPolygon(t.x,t.y,r,m.walls,Number(m.aspect)||1):null;
+  if(poly){const near=Math.max(2,Math.round(unit*0.4));if(f.revealed.some(e=>e[0]==='p'&&Math.hypot(e[1]-t.x,e[2]-t.y)<=near&&e[3]===r&&e[4]===wallsKey(m)))continue;
+   if(f.revealed.length>=MAX_VISION_REVEALS)bad('Trop de zones révélées sur cette carte : utilisez « Tout recouvrir » ou désactivez la vision.');
+   f.revealed.push(['p',t.x,t.y,r,wallsKey(m),...poly.flat()]);n++;continue;}
   // Déjà entièrement révélé : rien à ajouter.
-  if(f.revealed.some(([x,y,rr])=>Math.hypot(x-t.x,y-t.y)+r<=rr))continue;
+  if(f.revealed.some(e=>typeof e[0]==='number'&&Math.hypot(e[0]-t.x,e[1]-t.y)+r<=e[2]))continue;
   // Les anciens cercles contenus dans le nouveau deviennent inutiles.
-  f.revealed=f.revealed.filter(([x,y,rr])=>Math.hypot(x-t.x,y-t.y)+rr>r);
-  if(f.revealed.length>=MAX_VISION_REVEALS)bad('Trop de zones révélées sur cette carte : utilisez « Recommencer » ou désactivez la vision.');
+  f.revealed=f.revealed.filter(e=>typeof e[0]!=='number'||Math.hypot(e[0]-t.x,e[1]-t.y)+e[2]>r);
+  if(f.revealed.length>=MAX_VISION_REVEALS)bad('Trop de zones révélées sur cette carte : utilisez « Tout recouvrir » ou désactivez la vision.');
   f.revealed.push([t.x,t.y,r]);n++;}
  return n;}
 const AREA_SHAPES=['circle','cone','line','cube'],AREA_COLORS=['or','rouge','bleu','vert','violet'],MAX_AREAS=30;
@@ -113,4 +154,4 @@ function areaAdd(s,mapId,id,v,by){const m=read(s,mapId);if(!m)bad('Carte introuv
  const a={id,shape,size:Math.round(size*10)/10,x:checkPoint(v?.x),y:checkPoint(v?.y),angle:Math.round(angle),color:AREA_COLORS.includes(v?.color)?v.color:'rouge',label:text(String(v?.label??''),'Nom de la zone',40,false),by:String(by||'').slice(0,60)};m.areas.push(a);return a;}
 function areaRemove(s,mapId,areaId){const m=read(s,mapId),i=m?.areas?.findIndex(a=>a.id===areaId);if(i==null||i<0)bad('Zone introuvable.');return m.areas.splice(i,1)[0];}
 function areaClear(s,mapId){const m=read(s,mapId);if(!m)bad('Carte introuvable.');m.areas=[];return m;}
-module.exports={LIGHTS,setVision,tokenLight,tokenRadius,visionReveal,scaleMeters,PLANNER_LINKS,AREA_SHAPES,MAX_AREAS,areaAdd,areaRemove,areaClear,MAX_TOKENS,TOKEN_COLORS,setGrid,setFog,tokenRead,tokenAdd,tokenMove,tokenSet,tokenRemove,MAX_MAPS,MAX_MARKERS,SYMBOLS,maps,read,canRead,projected,add,update,setMapVisibility,setMarkerVisibility,remove,markerRead,markerAdd,markerUpdate,markerRemove};
+module.exports={imageSize,MAX_WALLS,wallAdd,wallRemove,wallClear,doorSet,visibilityPolygon,TRAP_REFS,TRAP_STATES,trapSet,LIGHTS,setVision,tokenLight,tokenRadius,visionReveal,scaleMeters,PLANNER_LINKS,AREA_SHAPES,MAX_AREAS,areaAdd,areaRemove,areaClear,MAX_TOKENS,TOKEN_COLORS,setGrid,setFog,tokenRead,tokenAdd,tokenMove,tokenSet,tokenRemove,MAX_MAPS,MAX_MARKERS,SYMBOLS,maps,read,canRead,projected,add,update,setMapVisibility,setMarkerVisibility,remove,markerRead,markerAdd,markerUpdate,markerRemove};

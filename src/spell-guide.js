@@ -9,6 +9,12 @@ function ability(pc,progression){const p=progression.progression(pc,pc.origin?.e
  if(id==='rogue'&&p.subclass.toLocaleLowerCase('fr').includes('filou arcanique'))return 'int';
  return null;
 }
+// 5.4 : multiclassage — caractéristique, attaque et DD pour chaque classe qui lance des sorts.
+function abilityFor(classId,subclass){if(Object.hasOwn(BY_CLASS,classId))return BY_CLASS[classId];const sub=String(subclass||'').toLocaleLowerCase('fr');
+ if(classId==='fighter'&&sub.includes('chevalier occulte'))return 'int';if(classId==='rogue'&&sub.includes('filou arcanique'))return 'int';return null;}
+function byClass(pc,progression){if(!progression.classesOf)return [];const pb=Number.isInteger(pc.level)&&pc.level>=1&&pc.level<=20?2+Math.floor((pc.level-1)/4):null;
+ return progression.classesOf(pc).map(c=>{const attr=abilityFor(c.classId,c.subclass);if(!attr)return null;const raw=pc.stats?.abilities?.[attr];const modifier=Number.isInteger(raw)&&raw>=1&&raw<=30?Math.floor((raw-10)/2):null;
+  return {classId:c.classId,className:progression.CLASSES[c.classId]?.name||c.classId,level:c.level,ability:attr,abilityLabel:LABELS[attr],modifier,proficiency:pb,attack:modifier===null||pb===null?null:modifier+pb,saveDC:modifier===null||pb===null?null:8+modifier+pb};}).filter(Boolean);}
 function stats(pc,progression){const attr=ability(pc,progression);const pb=Number.isInteger(pc.level)&&pc.level>=1&&pc.level<=20?2+Math.floor((pc.level-1)/4):null;
  const raw=pc.stats?.abilities?.[attr];const modifier=Number.isInteger(raw)&&raw>=1&&raw<=30?Math.floor((raw-10)/2):null;
  return {ability:attr,abilityLabel:LABELS[attr]||null,modifier,proficiency:pb,attack:modifier===null||pb===null?null:modifier+pb,saveDC:modifier===null||pb===null?null:8+modifier+pb};
@@ -42,5 +48,5 @@ function validateRoll(b,pc,entries,spells){if(!['attack','save','damage','healin
  const spell=spells.spellFor(entry);if(!spell)throw Error('Sort inconnu.');
  return {spellName:spell.name,rollKind:b.rollKind,total:b.total,at:new Date().toISOString(),source:'physical'};
 }
-return {BY_CLASS,stats,hint,validateRoll};
+return {BY_CLASS,stats,hint,validateRoll,abilityFor,byClass};
 });

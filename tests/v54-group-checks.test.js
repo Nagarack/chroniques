@@ -1,0 +1,16 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const G=require('../src/group-checks.js');
+test('test de groupe : verdict « la moitié réussit »',()=>{const s={characters:[{id:'a'},{id:'b'},{id:'c'},{id:'d'}]};
+ assert.throws(()=>G.start(s,'g1',{label:'Discrétion',dc:15,ids:[]}),/participant/);
+ G.start(s,'g1',{kind:'check',label:'Discrétion',dc:15,ids:['a','b','c','d','zzz']});assert.deepStrictEqual(s.groupChecks.active.ids,['a','b','c','d']);
+ assert.throws(()=>G.start(s,'g2',{label:'x',dc:10,ids:['a']}),/déjà en cours/);
+ G.answer(s,'a',16);G.answer(s,'b',9);G.answer(s,'c',15);let v=G.verdict(s.groupChecks.active);assert.strictEqual(v.groupSuccess,true);assert.strictEqual(v.complete,false);
+ assert.throws(()=>G.answer(s,'a',99),/-10 à 60/);const r=G.close(s);assert.strictEqual(r.verdict.successes,2);assert.strictEqual(s.groupChecks.active,null);assert.strictEqual(s.groupChecks.history.length,1);});
+test('test de groupe : DD caché et totaux des autres non transmis',async t=>{const f=await require('./_fixture.js').fixture(t);
+ let r=await f.action('groupCheckStart',{values:{kind:'save',label:'Sauvegarde de Dextérité',dc:14,ids:[f.a.id,f.b.id]}},f.pa);assert.strictEqual(r.status,403);
+ r=await f.action('groupCheckStart',{values:{kind:'save',label:'Sauvegarde de Dextérité',dc:14,ids:[f.a.id,f.b.id]}});assert.strictEqual(r.status,200);
+ r=await f.action('groupCheckAnswer',{pcId:f.b.id,total:12},f.pa);assert.strictEqual(r.status,403);
+ r=await f.action('groupCheckAnswer',{pcId:f.a.id,total:17},f.pa);assert.strictEqual(r.status,200);r=await f.action('groupCheckAnswer',{pcId:f.b.id,total:8},f.pb);assert.strictEqual(r.status,200);
+ const pa=(await f.call('/api/state',{cookie:f.pa})).data.state.groupChecks.active;assert.strictEqual(pa.dc,null);assert.deepStrictEqual(pa.results,{[f.a.id]:17});assert.strictEqual(pa.answeredIds.length,2);
+ r=await f.action('groupCheckClose',{});assert.strictEqual(r.status,200);
+ const gm=(await f.call('/api/state',{cookie:f.gm})).data.state;assert.ok(gm.combat.log.some(e=>/Sauvegarde de groupe .* réussite : .* échec :/.test(e.msg)));assert.ok(!gm.combat.log.some(e=>/DD 14/.test(e.msg)));});

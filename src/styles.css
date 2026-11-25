@@ -1753,3 +1753,23 @@ fieldset{min-width:0}
 .fight-turnopt{margin-top:8px;padding-top:8px;border-top:1px solid var(--rule-soft,var(--rule))}
 
 .charter-intro-form>.btn,.dt-grant .btn,.mc-add-form>.btn{align-self:flex-start}
+.next-session-side{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px}
+/* 5.4 : folie, recharges */
+.madness-row{margin:12px 0;padding-top:12px;border-top:1px solid var(--rule-soft,var(--rule))}.madness-item{margin-bottom:8px}.madness-item p{margin:.25rem 0}
+.madness-form{display:flex;flex-direction:column;gap:8px;margin-top:6px}.madness-form label{display:flex;flex-direction:column;gap:4px}.madness-form>.btn{align-self:flex-start}
+.recharge-form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px;padding:8px 0;border-bottom:1px solid var(--rule-soft,var(--rule))}.recharge-form>span{flex:1 1 200px}.recharge-form label{display:flex;flex-direction:column;gap:3px}.recharge-form input{width:6em}
+/* 5.4 : tests de groupe */
+.gc-start{display:flex;flex-direction:column;gap:8px}.gc-start label{display:flex;flex-direction:column;gap:4px}.gc-start label.check{flex-direction:row;align-items:center;gap:6px}.gc-start>.btn{align-self:flex-start}
+.gc-who{display:flex;flex-wrap:wrap;gap:4px 14px;border:1px solid var(--rule-soft,var(--rule));border-radius:8px;padding:6px 10px}.gc-who label{flex-direction:row!important;align-items:center;gap:6px}
+.gc-list{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:6px}.gc-list li{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}.gc-list li>span:first-child{flex:1 1 140px;font-weight:600}
+.gc-answer{display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px}.gc-answer label{display:flex;flex-direction:column;gap:3px}.gc-answer input{width:6em}
+.gc-ok{color:var(--green,#5fa36b)}.gc-ko{color:var(--red,#c0392b)}
+/* 5.4 : pièges */
+.trap-panel{margin:8px 0;display:flex;flex-direction:column;gap:6px}.trap-states{display:flex;flex-wrap:wrap;gap:6px}.trap-srd ul{margin:4px 0 0 1.1rem;padding:0}.trap-srd li{margin:2px 0}
+.trap-form{display:flex;flex-direction:column;gap:8px;margin-top:6px}.trap-form label{display:flex;flex-direction:column;gap:4px}.trap-form>.btn{align-self:flex-start}
+.magic-by-class{display:flex;flex-direction:column;gap:8px}
+/* 5.4 : murs et portes */
+.map-walls{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+.map-walls .wall{stroke:#e0523c;stroke-width:4;stroke-linecap:round}.map-walls .wall-door{stroke:#f2b84b;stroke-width:5;stroke-linecap:round}.map-walls .wall-door.open{stroke:#7fd18a;stroke-dasharray:6 5}
+.map-door{position:absolute;transform:translate(-50%,-50%);z-index:6;min-width:28px;min-height:28px;padding:0 6px;border-radius:8px;border:2px solid #f2b84b;background:rgba(20,14,10,.85);color:#f2b84b;font-weight:700;cursor:pointer}.map-door.open{border-color:#7fd18a;color:#7fd18a}
+.campaign-map-stage.tool-walls{cursor:crosshair}

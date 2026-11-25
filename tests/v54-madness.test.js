@@ -1,0 +1,10 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert');const M=require('../src/madness.js');
+test('folie : tables du SRD et saisie des dés',()=>{assert.match(M.effect('short',15,'fr'),/paralysé/);assert.match(M.effect('long',100,'en'),/unconscious/);assert.match(M.effect('indefinite',1,'fr'),/Je bois/);
+ const pc={};assert.throws(()=>M.add(pc,'m1',{kind:'short',roll:0,duration:3}),/d100/);assert.throws(()=>M.add(pc,'m1',{kind:'long',roll:50,duration:11}),/d10/);
+ const m=M.add(pc,'m1',{kind:'long',roll:50,duration:3});assert.strictEqual(m.duration,30);assert.strictEqual(M.durationText(m),'30 heures');
+ M.add(pc,'m2',{kind:'indefinite',roll:99});assert.strictEqual(pc.madness.length,2);M.remove(pc,'m1');M.remove(pc,'m2');assert.strictEqual(pc.madness,undefined);});
+test('folie : réservée au MJ',async t=>{const f=await require('./_fixture.js').fixture(t);
+ let r=await f.action('madnessAdd',{id:f.a.id,values:{kind:'short',roll:40,duration:5}},f.pa);assert.strictEqual(r.status,403);
+ r=await f.action('madnessAdd',{id:f.a.id,values:{kind:'short',roll:40,duration:5}});assert.strictEqual(r.status,200);
+ const me=(await f.call('/api/state',{cookie:f.pa})).data.state.characters.find(p=>p.id===f.a.id);assert.strictEqual(me.madness[0].roll,40);});
