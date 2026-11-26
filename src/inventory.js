@@ -10,12 +10,12 @@ function list(pc){return Array.isArray(pc.inventoryItems)?pc.inventoryItems:[];}
 function items(pc){pc.inventoryItems??=[];return pc.inventoryItems;}
 function validate(v){if(!v||typeof v!=='object'||Array.isArray(v))throw new Error('Objet invalide.');const category=v.category||'other';if(!CATEGORIES.includes(category))throw new Error('Catégorie invalide.');
  const qty=integer(v.quantity??1,1,999,'Quantité'),weight=Number(v.weight??0);
- if(!Number.isFinite(weight)||weight<0||weight>10000||Math.round(weight*100)!==weight*100)throw new Error('Poids invalide.');
+ if(!Number.isFinite(weight)||weight<0||weight>10000||Math.abs(Math.round(weight*100)-weight*100)>1e-6)throw new Error('Poids invalide.'); // 5.14 : 0,07 × 100 = 7,000000000000001 en virgule flottante.
  const chargesMax=integer(v.chargesMax??0,0,999,'Charges maximum'),charges=integer(v.charges??chargesMax,0,chargesMax,'Charges restantes');
  // 5.4 : recharge des charges (aube, repos long, repos court) ; dés de recharge lancés à la table (ex. « 1d6+1 ») ou recharge complète.
  const recharge=RECHARGE.includes(v.recharge)?v.recharge:'';const rechargeDice=String(v.rechargeDice??'').replace(/\s+/g,'').toLowerCase();
  if(rechargeDice&&!/^(\d{1,2}d\d{1,3}([+-]\d{1,3})?|\d{1,3})$/.test(rechargeDice))throw new Error('Charges récupérées : par exemple 1d6+1, 1d3 ou 2 (vide = toutes).');
- const out={name:text(v.name,'Nom',85),description:text(v.description??'','Description',280,true),category,quantity:qty,weight,chargesMax,charges,equipped:Boolean(v.equipped),attuned:Boolean(v.attuned)};
+ const out={name:text(v.name,'Nom',85),description:text(v.description??'','Description',280,true),category,quantity:qty,weight:Math.round(weight*100)/100,chargesMax,charges,equipped:Boolean(v.equipped),attuned:Boolean(v.attuned)};
  if(chargesMax&&recharge){out.recharge=recharge;if(rechargeDice)out.rechargeDice=rechargeDice;}
  // 5.6 : contenant (sac, coffre, sac sans fond…) : capacité en kg ; holdMagic = le poids du contenu ne compte pas.
  const capacity=Number(v.capacity??0);if(!Number.isFinite(capacity)||capacity<0||capacity>2000)throw new Error('Capacité : de 0 à 2 000 kg.');

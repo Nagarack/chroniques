@@ -103,8 +103,23 @@
     for(const p of state.characters)p.concentrationChecks=[];
     for(const p of state.characters)p.economy={action:false,bonus:false,reaction:false,movement:0};
     log(state,'Combat lancé · ordre d’initiative défini');
+    surpriseAtStart(state);
     return state;
   }
+  // 5.14 : surprise. Règles 2014 (SRD 5.1) : une créature surprise ne se déplace pas et n’agit pas à son premier tour,
+  // et ne réagit pas avant la fin de ce tour. Règles 2024 (SRD 5.2) : la surprise donne seulement le désavantage au jet d’initiative.
+  function toggleSurprise(state,actor,id){if(actor!=='mj')throw new Error('Seul le MJ décide qui est surpris.');
+    if(state.combat.started&&state.combat.round>1)throw new Error('La surprise se décide avant le combat ou pendant le premier round.');
+    if(!participants(state).some(p=>p.id===id))throw new Error('Participant introuvable.');
+    const l=state.combat.surprised=Array.isArray(state.combat.surprised)?state.combat.surprised:[];const i=l.indexOf(id);if(i>=0)l.splice(i,1);else l.push(id);return state;}
+  function surprisedNames(state,ids){const all=participants(state);const pub=[],secret=[];for(const id of ids){const p=all.find(x=>x.id===id);if(!p)continue;(findPc(state,id)||p.visible!==false?pub:secret).push(p.name);}return {pub,secret};}
+  function surpriseAtStart(state){const sur=(state.combat.surprised||[]).filter(id=>participants(state).some(p=>p.id===id));
+    if(state.edition==='2024'||!sur.length){state.combat.surprised=[];return;}
+    state.combat.surprised=sur;const {pub,secret}=surprisedNames(state,sur);const rule=' : ni déplacement ni action à leur premier tour, pas de réaction avant la fin de ce tour';
+    if(pub.length)log(state,'Surpris · '+pub.join(', ')+rule);if(secret.length)noteTurn(state,'Surpris (caché) · '+secret.join(', ')+rule,true);
+    surpriseTurnNote(state);}
+  function surpriseTurnNote(state){const now=activeId(state);if(state.combat.round!==1||!(state.combat.surprised||[]).includes(now))return;const who=participants(state).find(x=>x.id===now);
+    noteTurn(state,(who?.name||'Participant')+' est surpris : ce tour, ni déplacement ni action (réaction possible après ce tour)',!findPc(state,now)&&who?.visible===false);}
   function activeId(state){ return state.combat.order[state.combat.index]; }
   function validOrder(state){const ids=participants(state).map(p=>p.id);return state.combat.order?.length===ids.length && new Set(state.combat.order).size===ids.length && ids.every(id=>state.combat.order.includes(id));}
   // L'ordre vient des initiatives lancées réellement ; le MJ tranche les égalités.
@@ -181,7 +196,8 @@
     const groupOf=id=>{const n=(state.combat.npcs||[]).find(x=>x.id===id);return n&&n.group?n.group:'';};
     const g=groupOf(activeId(state));if(!opts.delaying)tickConditionTimers(state,activeId(state));
     let steps=1;if(g){while(state.combat.index+steps<state.combat.order.length&&groupOf(state.combat.order[state.combat.index+steps])===g){tickConditionTimers(state,state.combat.order[state.combat.index+steps]);steps++;}}
-    state.combat.index+=steps;if(state.combat.index>=state.combat.order.length){state.combat.index=0;state.combat.round++;}
+    if((state.combat.surprised||[]).length){const ended=state.combat.order.slice(state.combat.index,state.combat.index+steps);state.combat.surprised=state.combat.surprised.filter(id=>!ended.includes(id));}
+    state.combat.index+=steps;if(state.combat.index>=state.combat.order.length){state.combat.index=0;state.combat.round++;state.combat.surprised=[];}
     {const first=(state.combat.npcs||[]).find(x=>x.id===activeId(state));const ng=first&&first.group;for(const n of state.combat.npcs||[])if(n.legendaryMax&&(n.id===activeId(state)||(ng&&n.group===ng)))n.legendaryLeft=n.legendaryMax;}
     {const now=activeId(state);const ng=groupOf(now);tickConditionTimers(state,now,'start');if(ng)for(const id of state.combat.order)if(id!==now&&groupOf(id)===ng)tickConditionTimers(state,id,'start');}
     state.combat.turnStartedAt=new Date().toISOString();
@@ -192,6 +208,7 @@
      if((state.combat.delayed||[]).some(d=>d.id===now)){state.combat.delayed=state.combat.delayed.filter(d=>d.id!==now);noteTurn(state,(who?.name||'Participant')+' n’a pas repris son tour retardé : il est perdu',secret);}
      // Une action préparée dure jusqu’au début du tour suivant de celui qui l’a préparée.
      if((state.combat.readied||[]).some(r=>r.id===now)){state.combat.readied=state.combat.readied.filter(r=>r.id!==now);noteTurn(state,(who?.name||'Participant')+' · action préparée non déclenchée : elle est perdue',secret);}}
+    surpriseTurnNote(state);
     const pc=findPc(state,activeId(state));
     if(pc){pc.economy={action:false,bonus:false,reaction:false,movement:0}; log(state,'Début de tour · '+pc.name+' · round '+state.combat.round);}
     else {const npc=(state.combat.npcs||[]).find(n=>n.id===activeId(state));if(npc){state.combat.log.unshift({id:'npc-turn-'+state.combat.round+'-'+state.combat.index,msg:'Début de tour · '+npc.name+' · round '+state.combat.round,when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),audience:'gm'});}}
@@ -225,7 +242,7 @@
   function checkLair(state){const lair=(state.combat.npcs||[]).filter(n=>n.lair&&n.hp>0);if(!lair.length)return;const id=activeId(state);const p=participants(state).find(x=>x.id===id);
     if(!p||state.combat.lairRound===state.combat.round||Number(p.initiative)>=20)return;state.combat.lairRound=state.combat.round;state.combat.lairPending=lair.map(n=>n.id);
     state.combat.log.unshift({id:'lair-'+state.combat.round,msg:'Initiative 20 · actions de repaire : '+lair.map(n=>n.name).join(', '),when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),audience:'gm'});}
-  function endCombat(state,actor){if(actor!=='mj')throw new Error('Accès réservé au MJ.');state.combat.started=false;state.combat.timers=[];state.combat.delayed=[];state.combat.readied=[];log(state,'Fin du combat');return state;}
+  function endCombat(state,actor){if(actor!=='mj')throw new Error('Accès réservé au MJ.');state.combat.started=false;state.combat.timers=[];state.combat.delayed=[];state.combat.readied=[];state.combat.surprised=[];log(state,'Fin du combat');return state;}
   function setInitiative(state,actor,id,n){if(actor!=='mj')throw new Error('Accès réservé au MJ.');const p=findPc(state,id);if(!p)throw new Error('Personnage introuvable.');p.initiative=Math.floor(CLAMP(n,-99,99));if(!state.combat.started&&!state.combat.manualOrder)sortInitiative(state,actor);return state;}
   function spendType(state,actor,id,type){
     const p=requireEdit(state,actor,id);if(!['action','bonus','reaction'].includes(type))throw new Error('Type inconnu.');
@@ -319,5 +336,5 @@
     if(!data||data.schemaVersion!==4||!Array.isArray(data.characters)||!data.combat||!data.characters.every(p=>typeof p.id==='string'&&typeof p.name==='string'&&p.stats&&Number.isFinite(+p.hp)&&Array.isArray(p.abilities)&&Array.isArray(p.resources)&&Array.isArray(p.conditions)&&p.economy))throw new Error('Fichier V0.4 invalide ou non compatible.');
     return true;
   }
-  return {STATES,CORE_ACTIONS,initialState,clone,findPc,actorPc,canViewDetail,canEdit,actionSet,abilityModifier,proficiencyBonus,baseRulesSummary,summary,isBlocked,speedAvailable,abilityAvailable,startCombat,nextTurn,setConditionTimer,saveSharedNote,deleteSharedNote,endCombat,activeId,setInitiative,sortInitiative,moveInitiative,concentrationDC,resolveConcentration,spendType,resetEconomy,useAbility,updateMovement,changeHp,setTempHp,setExhaustion,setInspiration,setFallen,delayTurn,actNow,readyAction,readyResolve,DAMAGE_TYPES,DEFENSE_STATES,cleanDefenses,adjustDamage,setDefense,toggleCondition,toggleConcentration,changeResource,deathSave,rest,setPrivateNotes,addPc,validImport};
+  return {STATES,CORE_ACTIONS,initialState,clone,findPc,actorPc,canViewDetail,canEdit,actionSet,abilityModifier,proficiencyBonus,baseRulesSummary,summary,isBlocked,speedAvailable,abilityAvailable,startCombat,toggleSurprise,nextTurn,setConditionTimer,saveSharedNote,deleteSharedNote,endCombat,activeId,setInitiative,sortInitiative,moveInitiative,concentrationDC,resolveConcentration,spendType,resetEconomy,useAbility,updateMovement,changeHp,setTempHp,setExhaustion,setInspiration,setFallen,delayTurn,actNow,readyAction,readyResolve,DAMAGE_TYPES,DEFENSE_STATES,cleanDefenses,adjustDamage,setDefense,toggleCondition,toggleConcentration,changeResource,deathSave,rest,setPrivateNotes,addPc,validImport};
 });
