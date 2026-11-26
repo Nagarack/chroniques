@@ -1015,6 +1015,17 @@ table.srd-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--c
 .health-bloodied,.health-critical,.health-down{color:var(--red)}
 .form-card{border:1px solid var(--rule-soft,var(--border));background:var(--card2)}
 .container-box{border-left:3px solid var(--gold);background:var(--card2)}
+.clock-card{border:1px solid var(--border);background:var(--card2)}
+.clock-svg path{stroke:var(--bg)}
+.clock-svg .clock-off{fill:color-mix(in srgb,var(--text) 14%,transparent)}
+.clock-danger .clock-on{fill:var(--red)}
+.clock-progress .clock-on{fill:var(--gold)}
+.clock-full{border-color:var(--gold)}
+.feedback-list li{border-left:3px solid var(--gold);background:var(--card2)}
+.clue-card{border:1px solid var(--border);background:var(--card2)}
+.map-drawings polyline,.map-drawings line{fill:none}
+.draw-swatch{border:2px solid #fbfaf959}
+.tok-elev{background:#f2eeeb;color:#564312;border:1px solid #a57e1e}
 :root{color-scheme:light;--grain:none;--c-bg:#f4efe4;--c-bg-2:#ede5d6;--c-surface:#fbf8f1;--c-surface-2:#f0e9dc;--c-line:#dcd1be;--c-line-soft:#e7dfcf;--c-text:#2b2118;--c-muted:#5c4b37;--c-accent:#9a3a26;--c-accent-strong:#8c2f1f;--c-on-accent:#fffaf3;--c-ok:#3d6a4c;--c-warn:#a8741a;--c-danger:#b3402c;--c-focus:#8c2f1f}
 .workspace-parchment :is(p,span,small,li,strong,em,h1,h2,h3,h4,label,div){color:#3d2f1d}
 .workspace-parchment .muted,.workspace-parchment .muted *{color:#6b5a42}

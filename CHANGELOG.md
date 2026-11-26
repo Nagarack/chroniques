@@ -1,5 +1,17 @@
 # Journal des modifications
 
+## 5.8.0 — Horloges, étoiles et souhaits, tableau d’enquête, dessins et altitude sur les cartes
+**Préparer et raconter**
+- **Horloges de progression** (Séance du jour) : un cercle de 4 à 12 segments pour une menace qui approche ou un projet qui avance. Le MJ remplit ou retire un segment, l’horloge pleine est annoncée au journal. Visible des joueurs (accueil, écran de table, spectateur) ou secrète ; la note reste au MJ.
+- **Tableau d’enquête** (Chronique → Enquête) : indices classés (personnes, lieux, objets, événements, questions), révélés au fil de la partie et reliés entre eux. La note du MJ n’est jamais envoyée ; les joueurs ne voient que les indices révélés et les liens entre eux, et y notent leurs théories (chacun retire les siennes, le MJ toutes).
+
+**Autour de la table**
+- **Étoiles et souhaits** (Chronique → Séances) : retour de fin de séance. Chaque joueur écrit une étoile et un souhait depuis son accueil et peut les modifier tant que le tour est ouvert. En mode anonyme, aucun nom n’est envoyé au MJ ; les dix derniers tours restent consultables.
+
+**Cartes**
+- **Dessiner** : trait libre ou flèche, cinq couleurs, pour le MJ et les joueurs, en direct pour toute la table. Chacun annule ou efface ses propres traits ; le MJ peut tout effacer.
+- **Altitude des jetons** (vol, lévitation, fosse) : réglée dans le panneau du jeton (le joueur pour son propre jeton), affichée en mètres ou en pieds sur le jeton.
+
 ## 5.7.0 — Hébergement sur un autre serveur
 - **Guide d’hébergement** (`HEBERGEMENT.md`, en anglais `HOSTING.en.md`) : serveur loué Linux, mini-PC ou tunnel Cloudflare ; transfert des données, adresse HTTPS, service qui redémarre seul, côté joueurs (application Android, icônes, clés d’accès).
 - **Modèles prêts à copier** (dossier `hebergement/`) : Caddy (HTTPS automatique), nginx (flux en direct non retenu, envois jusqu’à 50 Mo) et service systemd qui lance `scripts/launcher.js`, pour que les mises à jour depuis l’application s’installent aussi sous Linux.

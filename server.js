@@ -58,6 +58,9 @@ const AFF=require('./src/afflictions.js');
 const TG=require('./src/tongues.js');
 const PX=require('./src/proxy.js');
 const WX=require('./src/weather.js');
+const CLK=require('./src/clocks.js');
+const FB=require('./src/session-feedback.js');
+const CLU=require('./src/clues.js');
 const SHP=require('./src/shapes.js');
 const BS=require('./src/bestiary.js');BS.loadFull().catch(()=>{});
 const AD=require('./src/area-damage.js');
@@ -122,6 +125,9 @@ const allowedStatic=new Map([
  ['/src/hex.js',['src/hex.js','text/javascript; charset=utf-8']],
  ['/src/weather.js',['src/weather.js','text/javascript; charset=utf-8']],
  ['/src/shapes.js',['src/shapes.js','text/javascript; charset=utf-8']],
+ ['/src/clocks.js',['src/clocks.js','text/javascript; charset=utf-8']],
+ ['/src/session-feedback.js',['src/session-feedback.js','text/javascript; charset=utf-8']],
+ ['/src/clues.js',['src/clues.js','text/javascript; charset=utf-8']],
  ['/src/spells.js',['src/spells.js','text/javascript; charset=utf-8']],
  ['/src/spell-guide.js',['src/spell-guide.js','text/javascript; charset=utf-8']],
  ['/src/creatures.js',['src/creatures.js','text/javascript; charset=utf-8']],
@@ -352,6 +358,8 @@ function createServer(opts={}){
  if(u.role!=='gm')full=N.project(full);
  full.media=M.projected(c.state,u);
  if(c.state.votes){const nameOf=uid=>{const m=c.members.find(x=>x.userId===uid);const pc=m&&m.characterId&&c.state.characters.find(p=>p.id===m.characterId);return pc?pc.name:(db.users.find(x=>x.id===uid)?.name||'?');};full.votes=TV.projected(c.state,u.id,nameOf);} // Votes anonymes : qui a voté quoi n’est jamais envoyé.
+ if(c.state.feedback){const nameOf=uid=>{const m=c.members.find(x=>x.userId===uid);const pc=m&&m.characterId&&c.state.characters.find(p=>p.id===m.characterId);return pc?pc.name:(db.users.find(x=>x.id===uid)?.name||'?');};full.feedback=FB.projected(c.state,u,nameOf);} // Anonymat : aucun nom envoyé.
+ if(u.role!=='gm'){full.clocks=CLK.projected(c.state);full.clues=CLU.projected(c.state,u.id);} // Horloges secrètes, notes et indices non révélés : MJ seulement.
  full.ambience=AMB.projected(c.state); // Jamais les noms de fichiers sur disque.
  if(u.role!=='gm')full.randomTables=RT.projected(c.state); // Tables privées du MJ : jamais envoyées.
  if(u.role!=='gm')for(const pc of full.characters||[])if(Array.isArray(pc.inventoryItems))pc.inventoryItems=pc.inventoryItems.map(I.playerView);
@@ -756,6 +764,30 @@ function createServer(opts={}){
   case 'voteCast':{TV.cast(s,u.id,b.optionId===null?null:String(b.optionId||''));break;}
   case 'voteClose':{requireGm(u);const r=TV.close(s);const w=r.vote.options.filter(o=>r.tally.winners.includes(o.id)).map(o=>o.text);logPublic(s,'🗳 Vote · '+r.vote.question+' · '+(w.length?(w.length>1?'égalité : ':'')+w.join(' / ')+' ('+r.tally.counts[r.tally.winners[0]]+' voix sur '+r.tally.total+')':'aucune voix'));break;}
   case 'voteCancel':{requireGm(u);TV.cancel(s);break;}
+  // 5.8 : horloges, étoiles et souhaits, tableau d’enquête, dessins et altitude sur les cartes.
+  case 'clockAdd':{requireGm(u);const c=CLK.add(s,'clock-'+random(8),b.values);logGm(s,'⏳ Horloge créée : '+c.label);break;}
+  case 'clockUpdate':{requireGm(u);CLK.update(s,String(b.clockId||''),b.values);break;}
+  case 'clockTick':{requireGm(u);const r=CLK.tick(s,String(b.clockId||''),b.delta);if(r.completed)(r.clock.visible?logPublic:logGm)(s,'⏳ L’horloge « '+r.clock.label+' » est pleine.');break;}
+  case 'clockRemove':{requireGm(u);CLK.remove(s,String(b.clockId||''));break;}
+  case 'feedbackOpen':{requireGm(u);FB.open(s,'fb-'+random(8),b.values);logPublic(s,'⭐ Étoiles et souhaits : donnez votre avis sur la séance.');break;}
+  case 'feedbackSend':{FB.send(s,u.id,b.values);break;}
+  case 'feedbackClose':{requireGm(u);FB.close(s);break;}
+  case 'feedbackRemove':{requireGm(u);FB.remove(s,String(b.roundId||''));break;}
+  case 'clueAdd':{requireGm(u);const c=CLU.add(s,'clue-'+random(8),b.values);if(c.revealed)logPublic(s,'🔎 Nouvel indice : '+c.title);break;}
+  case 'clueUpdate':{requireGm(u);CLU.update(s,String(b.clueId||''),b.values);break;}
+  case 'clueReveal':{requireGm(u);const c=CLU.reveal(s,String(b.clueId||''),b.on===true);if(c.revealed)logPublic(s,'🔎 Nouvel indice : '+c.title);break;}
+  case 'clueLink':{requireGm(u);CLU.link(s,String(b.clueId||''),String(b.otherId||''));break;}
+  case 'clueRemove':{requireGm(u);CLU.remove(s,String(b.clueId||''));break;}
+  case 'clueTheory':{const clue=(s.clues||[]).find(x=>x.id===String(b.clueId||''));if(!clue||(u.role!=='gm'&&!clue.revealed))badRequest('Indice introuvable.');
+   const pc=u.role!=='gm'&&u.characterId?L.findPc(s,u.characterId):null;CLU.theory(s,clue.id,'th-'+random(8),{id:u.id,name:pc?pc.name:(u.role==='gm'?'MJ':String(u.name||'?'))},b.text);break;}
+  case 'clueTheoryRemove':{const clue=(s.clues||[]).find(x=>x.id===String(b.clueId||''));const th=clue&&(clue.theories||[]).find(t=>t.id===String(b.theoryId||''));if(!th||(u.role!=='gm'&&!clue.revealed))badRequest('Théorie introuvable.');
+   if(u.role!=='gm'&&th.by!==u.id)throw sleepBlock('Seul le MJ ou l’auteur peut retirer cette théorie.');CLU.theoryRemove(s,clue.id,th.id);break;}
+  case 'mapDrawAdd':{const map=CM.read(s,id);if(!map||!CM.canRead(u,map))throw sleepBlock('Carte non accessible.');CM.drawAdd(s,id,'draw-'+random(8),b.values,a);break;}
+  case 'mapDrawRemove':{const map=CM.read(s,id);if(!map||!CM.canRead(u,map))throw sleepBlock('Carte non accessible.');const d=(map.drawings||[]).find(x=>x.id===String(b.drawId||''));if(!d)badRequest('Dessin introuvable.');if(u.role!=='gm'&&d.by!==a)throw sleepBlock('Seul le MJ ou l’auteur peut effacer ce dessin.');CM.drawRemove(s,id,d.id);break;}
+  case 'mapDrawClear':{const map=CM.read(s,id);if(!map||!CM.canRead(u,map))throw sleepBlock('Carte non accessible.');CM.drawClear(s,id,u.role==='gm'&&b.all===true?null:a);break;}
+  case 'mapTokenElev':{const map=CM.read(s,id);if(!map||!CM.canRead(u,map))throw sleepBlock('Carte non accessible.');const t=CM.tokenRead(s,id,String(b.tokenId||''));if(!t)badRequest('Jeton introuvable.');
+   const cmpNpc=t.kind==='npc'?N.find(s,t.refId):null;
+   if(u.role!=='gm'&&!(t.kind==='pc'&&t.visible&&L.canEdit(s,a,t.refId))&&!(cmpNpc?.ownerPc&&t.visible&&L.canEdit(s,a,cmpNpc.ownerPc)))throw sleepBlock('Vous ne pouvez régler que votre propre jeton.');CM.tokenElev(s,id,t.id,b.elev);break;}
   // 5.6 : météo, états de santé, formes temporaires, contenants.
   case 'weatherSet':{requireGm(u);const w=WX.set(s,b.values===null?null:(b.values||{}));if(w)logPublic(s,WX.icon(w)+' Météo : '+WX.label(w)+(w.note?' — '+w.note:''));break;}
   case 'healthWords':{requireGm(u);if(b.on===false)s.healthWords=false;else delete s.healthWords;break;}
@@ -1104,7 +1136,7 @@ function createServer(opts={}){
    if(req.method==='GET'&&pathname==='/api/spectate-state'){const sp=spectator(req);if(!sp)throw Object.assign(new Error('Lien spectateur invalide ou révoqué.'),{status:404});
     res.setHeader('Set-Cookie',`chroniques_spectateur=${sp.token}; HttpOnly; SameSite=Lax; Path=/api; Max-Age=86400${secureCookies?'; Secure':''}`);
     const out=projected(sp.c,sp.u);out.state.tableMapId=sp.c.state.tableMapId||null;out.state.recapTable=sp.c.state.recap?.table&&sp.c.state.recap?.text?sp.c.state.recap.text:null;
-    delete out.state.whispers;delete out.state.tongueMessages;delete out.state.votes;delete out.state.groupChecks;delete out.state.tableCharter;delete out.state.downtime;
+    delete out.state.whispers;delete out.state.tongueMessages;delete out.state.votes;delete out.state.feedback;delete out.state.clues;delete out.state.groupChecks;delete out.state.tableCharter;delete out.state.downtime;
     out.viewer={role:'spectator',name:'Spectateur'};send(res,200,out);return;}
    if(req.method==='GET'&&pathname==='/api/spectator'){const u=requireUser(req),c=currentCampaign(u);requireGm(u);send(res,200,{enabled:!!c.spectator,createdAt:c.spectator?.createdAt||null});return;}
    if(req.method==='GET'&&pathname==='/api/table-state'){const u=requireUser(req),c=currentCampaign(u);requireGm(u);
