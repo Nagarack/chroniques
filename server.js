@@ -62,7 +62,7 @@ const CLK=require('./src/clocks.js');
 const FB=require('./src/session-feedback.js');
 const CLU=require('./src/clues.js');
 const SUG=require('./src/suggestions.js');
-const PERS=require('./src/personality.js');
+const PERS=require('./src/personality.js');const MARCH=require('./src/marching.js');const LOOK=require('./src/campaign-look.js');
 const TJ=require('./src/travel-journal.js');
 const SHP=require('./src/shapes.js');
 const BS=require('./src/bestiary.js');BS.loadFull().catch(()=>{});
@@ -134,6 +134,8 @@ const allowedStatic=new Map([
  ['/src/personality.js',['src/personality.js','text/javascript; charset=utf-8']],
  ['/src/travel-journal.js',['src/travel-journal.js','text/javascript; charset=utf-8']],
  ['/src/jumps.js',['src/jumps.js','text/javascript; charset=utf-8']],
+ ['/src/marching.js',['src/marching.js','text/javascript; charset=utf-8']],
+ ['/src/campaign-look.js',['src/campaign-look.js','text/javascript; charset=utf-8']],
  ['/src/spells.js',['src/spells.js','text/javascript; charset=utf-8']],
  ['/src/spell-guide.js',['src/spell-guide.js','text/javascript; charset=utf-8']],
  ['/src/creatures.js',['src/creatures.js','text/javascript; charset=utf-8']],
@@ -334,6 +336,8 @@ function createServer(opts={}){
  // Date du monde lisible (après `extra` minutes), si le calendrier du monde est actif.
  function wtLabel(s){return s.worldTime?.enabled?WT.format(s.worldTime,s.worldTime.minutes):'';}
  function adminId(){return db.adminId||db.users[0]?.id||null;}
+ // 5.12 : historique des gestes de l’administrateur (200 derniers), gardé hors des campagnes.
+ function adminLog(u,action,target){if(!Array.isArray(db.adminLog))db.adminLog=[];db.adminLog.push({at:new Date().toISOString(),by:String(u?.name||'').slice(0,60),action,target:String(target||'').slice(0,120)});if(db.adminLog.length>200)db.adminLog=db.adminLog.slice(-200);}
  function isAdmin(u){return !!u&&!!u.id&&!u.tableMode&&u.id===adminId();}
  function viewerOrSpectator(req){const u=who(req);if(u)return {u,c:currentCampaign(u)};const sp=spectator(req);if(sp)return sp;throw Object.assign(new Error('Connexion nécessaire.'),{status:401});}
  function currentCampaign(u){const c=db.campaigns.find(x=>x.id===u.activeCampaignId);if(!c||!memberOf(c,u.id))throw sleepBlock('Vous ne participez pas à cette campagne.');return c;}
@@ -342,7 +346,7 @@ function createServer(opts={}){
  function campaign(){return db.campaigns[0];}
  function listCampaigns(u){return {activeId:u.activeCampaignId,mode:u.viewMode,
   campaigns:memberCampaigns(u.id).map(c=>({id:c.id,title:c.state?.title||'Campagne',role:memberOf(c,u.id).role,
-   isOwner:c.ownerId===u.id,characterId:memberOf(c,u.id).characterId||null}))};}
+   isOwner:c.ownerId===u.id,characterId:memberOf(c,u.id).characterId||null,look:LOOK.of(c.state)}))};}
  // V5 : synchronisation légère. Chaque réponse porte une étiquette ; si l'appareil renvoie l'étiquette de
  // la dernière réponse reçue, on ne lui envoie que les différences.
  const syncCache=new Map();
@@ -352,7 +356,7 @@ function createServer(opts={}){
   if(since&&prev&&prev.tag===since){try{const ops=SD.diff(JSON.parse(prev.text),full.state);if(ops){out={...full,patch:ops,base:since};delete out.state;}}catch{}}
   syncCache.delete(key);syncCache.set(key,{tag,text});while(syncCache.size>300)syncCache.delete(syncCache.keys().next().value);
   return {...out,syncTag:tag};}
- function projected(c,u){let full=L.clone(c.state);if(u.role!=='gm'){{const fp=FA.projected(c.state);full.factionMeta=fp.factionMeta;full.relations=fp.relations;}if(full.recap?.published)full.recap={text:full.recap.text,published:true,updatedAt:full.recap.updatedAt};else delete full.recap;
+ function projected(c,u){let full=L.clone(c.state);if(full.marching)MARCH.prune(full);if(u.role!=='gm'){{const fp=FA.projected(c.state);full.factionMeta=fp.factionMeta;full.relations=fp.relations;}if(full.recap?.published)full.recap={text:full.recap.text,published:true,updatedAt:full.recap.updatedAt};else delete full.recap;
   delete full.gmNotes;
   delete full.lootStash; // Trésor du MJ : jamais envoyé au joueur.
   delete full.storyPlans; // Scénarios et secrets de préparation réservés MJ/co-MJ.
@@ -803,6 +807,10 @@ function createServer(opts={}){
   case 'voteCancel':{requireGm(u);TV.cancel(s);break;}
   // 5.8 : horloges, étoiles et souhaits, tableau d’enquête, dessins et altitude sur les cartes.
   // 5.10 : personnalité (traits, idéaux, liens, défauts) et liens entre personnages.
+  case 'marchRank':{const pcId=String(b.pcId||'');if(!L.findPc(s,pcId))badRequest('Personnage introuvable.');if(u.role!=='gm'&&!L.canEdit(s,a,pcId))throw sleepBlock('Vous ne placez que votre personnage.');
+   MARCH.setRank(s,pcId,String(b.rank||''),Number.isInteger(b.position)?b.position:undefined);break;}
+  case 'marchWatches':{requireGm(u);MARCH.setWatches(s,b.watches,b.nightHours);break;}
+  case 'marchClear':{requireGm(u);MARCH.clear(s);break;}
   case 'personalitySet':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');PERS.set(pc,b.values);break;}
   case 'tieSet':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');PERS.tie(s,pc,String(b.to||''),b.text);break;}
   case 'travelNote':{const kind=['note','encounter','place'].includes(b.noteKind)?b.noteKind:'note';const pc=u.role!=='gm'&&u.characterId?L.findPc(s,u.characterId):null;if(u.role!=='gm'&&!pc)throw sleepBlock('Choisissez d’abord votre personnage.');
@@ -983,6 +991,7 @@ function createServer(opts={}){
   case 'removeResource':resourceOperation(s,a,id,b,true);break;
   case 'addAbility':abilityOperation(s,a,id,b,false);break;
   case 'removeAbility':abilityOperation(s,a,id,b,true);break;
+  case 'campaignLook':{requireGm(u);LOOK.set(s,b.values||{});break;}
   case 'campaignTitle':requireGm(u);s.title=cleanText(b.value,'Nom de campagne',80);break;
   case 'addPc':requireGm(u);if(s.characters.length>=30)badRequest('Maximum 30 personnages.');L.addPc(s,a,b.values||{});break;
   case 'edition':{
@@ -1132,7 +1141,7 @@ function createServer(opts={}){
     let reports=[];try{reports=fs.readFileSync(path.join(path.dirname(dataFile),'signalements.jsonl'),'utf8').split('\n').filter(Boolean).map(l=>{try{return JSON.parse(l);}catch{return null;}}).filter(Boolean).slice(-100).reverse();}catch{}
     send(res,200,{server:{version:APP_VERSION,node:process.version,platform:process.platform,uptime:Math.round(process.uptime()),publicOrigin:publicOrigin||null,proxy:proxyMode},
      users,campaigns,storage:{database:fileSize(dataFile),media:sizeOf(mediaDir),backups:sizeOf(path.join(backupRoot,'backups')),autoBackups:sizeOf(path.join(path.dirname(dataFile),'auto-backups')),disk},
-     backups:{count:backups.length,latest:backups[0]||null,latestFull:backups.find(x=>x.kind!=='auto')||null,mirror:db.backupMirror||'',daily:dailyBackup},reports});return;}
+     backups:{count:backups.length,recent:backups.filter(x=>x.kind!=='auto').slice(0,10),latest:backups[0]||null,latestFull:backups.find(x=>x.kind!=='auto')||null,mirror:db.backupMirror||'',daily:dailyBackup},reports,adminLog:(db.adminLog||[]).slice(-100).reverse()});return;}
    if(req.method==='GET'&&pathname==='/api/backups'){
     const u=requireUser(req),c=currentCampaign(u);if(c.ownerId!==u.id)throw sleepBlock('Réservé au MJ propriétaire de la campagne.');
     send(res,200,{backups:BK.list(backupRoot,dataFile).slice(0,40),mirror:db.backupMirror||'',daily:dailyBackup});return;
@@ -1270,17 +1279,21 @@ function createServer(opts={}){
      st.subs.push({id:random(9),userId:u.id,...sub,createdAt:new Date().toISOString()});persist();send(res,200,{ok:true,devices:st.subs.filter(x=>x.userId===u.id).length});return;}
     if(pathname==='/api/push/unsubscribe'){const u=requireUser(req);const st=pushStore();const n=st.subs.length;st.subs=st.subs.filter(x=>!(x.userId===u.id&&(b.all===true||x.endpoint===String(b.endpoint||''))));if(st.subs.length!==n)persist();send(res,200,{ok:true,devices:st.subs.filter(x=>x.userId===u.id).length});return;}
     if(pathname==='/api/lang'){const u=requireUser(req);const rec=db.users.find(x=>x.id===u.id);const l=b.lang==='en'?'en':'fr';if(rec.lang!==l){rec.lang=l;persist();}send(res,200,{lang:l});return;}
+    // 5.12 : sauvegarde complète lancée depuis l’Administration.
+    if(pathname==='/api/admin/backup'){const u=requireUser(req);if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');limit(req,'media');
+     const dest=BK.backup(backupRoot,{source:dataFile,mediaDir,mirror:db.backupMirror||''});backupCache={at:0,days:null};const file=path.relative(backupRoot,dest).replace(/\\/g,'/');adminLog(u,'backup',file);persist();
+     send(res,200,{ok:true,file,mirrored:!!db.backupMirror});return;}
     // 5.11 : gestion des comptes par l’administrateur du serveur (lien de nouveau mot de passe, déconnexion partout, suspension).
     if(pathname==='/api/admin/account'){const u=requireUser(req);if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');
      const tu=db.users.find(x=>x.id===String(b.userId||''));if(!tu)badRequest('Compte introuvable.');const self=tu.id===u.id,mine=sha(cookie(req,'chroniques_sid')||'');
      const closeSessions=keep=>{let n=0;for(const [token,session] of [...sessions]){if(session.uid===tu.id&&token!==keep){sessions.delete(token);endSessionStreams(token);n++;}}return n;};
      if(b.op==='reset'){if(self)badRequest('Pour votre propre compte, changez le mot de passe dans Mon compte (ou utilisez reset-password.js sur le serveur).');if(!Array.isArray(db.resets))db.resets=[];
-      db.resets=db.resets.filter(x=>x.userId!==tu.id&&!x.used&&x.expires>Date.now());const code=random(15);db.resets.push({codeHash:sha(code),userId:tu.id,used:false,expires:Date.now()+2*3600_000});persist();
+      db.resets=db.resets.filter(x=>x.userId!==tu.id&&!x.used&&x.expires>Date.now());const code=random(15);db.resets.push({codeHash:sha(code),userId:tu.id,used:false,expires:Date.now()+2*3600_000});adminLog(u,'reset',tu.name);persist();
       send(res,200,{code,name:tu.name,expiresHours:2});return;}
-     if(b.op==='logout'){const n=closeSessions(self?mine:null);send(res,200,{closed:n});return;}
+     if(b.op==='logout'){const n=closeSessions(self?mine:null);adminLog(u,'logout',tu.name);persist();send(res,200,{closed:n});return;}
      if(b.op==='suspend'||b.op==='restore'){if(self)badRequest('L’administrateur ne peut pas suspendre son propre compte.');
-      if(b.op==='suspend'){tu.suspended=new Date().toISOString();const n=closeSessions(null);persist();send(res,200,{suspended:true,closed:n});return;}
-      delete tu.suspended;persist();send(res,200,{suspended:false});return;}
+      if(b.op==='suspend'){tu.suspended=new Date().toISOString();const n=closeSessions(null);adminLog(u,'suspend',tu.name);persist();send(res,200,{suspended:true,closed:n});return;}
+      delete tu.suspended;adminLog(u,'restore',tu.name);persist();send(res,200,{suspended:false});return;}
      badRequest('Opération inconnue.');}
     // 5.11 : signal éphémère sur une carte (onde visible quelques secondes par toute la table) ; rien n’est enregistré.
     if(pathname==='/api/map-ping'){const u=requireUser(req),c=currentCampaign(u);const m=CM.read(c.state,String(b.mapId||''));if(!m||!CM.canRead(u,m))badRequest('Carte introuvable.');
@@ -1523,8 +1536,8 @@ function createServer(opts={}){
      // 5.9 : suggestions d’amélioration (tous les comptes) et suivi par l’administrateur du serveur.
      if(pathname==='/api/suggestion'){limit(req,'suggest');const sg=SUG.add(db,'sug-'+random(10),u,b,{campaign:c.state.title,version:APP_VERSION});persist();send(res,200,{ok:true,id:sg.id,suggestions:SUG.forUser(db,u.id)});return;}
      if(pathname==='/api/suggestion/vote'){limit(req,'suggest-vote');const on=SUG.vote(db,String(b.id||''),u.id);persist();send(res,200,{ok:true,voted:on,board:SUG.forBoard(db,u.id)});return;}
-     if(pathname==='/api/suggestion/status'){if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');SUG.setStatus(db,String(b.id||''),String(b.status||''),b.reply===undefined?undefined:String(b.reply));persist();send(res,200,{ok:true,suggestions:SUG.forAdmin(db),counts:SUG.counts(db)});return;}
-     if(pathname==='/api/suggestion/delete'){if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');SUG.remove(db,String(b.id||''));persist();send(res,200,{ok:true,suggestions:SUG.forAdmin(db),counts:SUG.counts(db)});return;}
+     if(pathname==='/api/suggestion/status'){if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');{const sg=SUG.setStatus(db,String(b.id||''),String(b.status||''),b.reply===undefined?undefined:String(b.reply));adminLog(u,'suggestion-status',sg.title+' → '+(SUG.STATUS[sg.status]||sg.status));}persist();send(res,200,{ok:true,suggestions:SUG.forAdmin(db),counts:SUG.counts(db)});return;}
+     if(pathname==='/api/suggestion/delete'){if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');{const sg=SUG.remove(db,String(b.id||''));adminLog(u,'suggestion-delete',sg.title);}persist();send(res,200,{ok:true,suggestions:SUG.forAdmin(db),counts:SUG.counts(db)});return;}
      if(pathname==='/api/report'){
       limit(req,'report');
       const clip=(v,n)=>String(v??'').replace(/[\u0000-\u0008\u000b-\u001f]/g,' ').slice(0,n);
