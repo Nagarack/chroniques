@@ -1,0 +1,10 @@
+# Chroniques derrière Caddy (HTTPS automatique avec Let's Encrypt).
+# 1. Remplacez jeu.mondomaine.fr par votre domaine (son enregistrement DNS doit pointer vers ce serveur).
+# 2. Copiez ce fichier dans /etc/caddy/Caddyfile, puis : sudo systemctl reload caddy
+# 3. Côté Chroniques : CHRONIQUES_PROXY=standard (voir chroniques.service).
+jeu.mondomaine.fr {
+	encode gzip
+	# Caddy transmet le domaine demandé (Host) et l'adresse du visiteur (X-Forwarded-For),
+	# et laisse passer le flux en direct (/api/events) sans le retenir.
+	reverse_proxy 127.0.0.1:8080
+}

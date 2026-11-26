@@ -1,0 +1,8 @@
+{
+ "HTTPS": "HTTPS",
+ "Héberger Chroniques sur un autre serveur (serveur loué, mini-PC) : guide HEBERGEMENT.md et modèles du dossier hebergement, dans le dossier de Chroniques.": "Hosting Chroniques on another server (rented server, mini PC): see HOSTING.en.md and the templates in the hebergement folder, inside the Chroniques folder.",
+ "L’adresse est publique : les comptes Chroniques la protègent ; avec un tunnel Cloudflare, Cloudflare Access peut ajouter un contrôle.": "The address is public: Chroniques accounts protect it; with a Cloudflare Tunnel, Cloudflare Access can add another check.",
+ "Serveur loué, mini-PC ou tunnel : guide et modèles prêts à copier.": "Rented server, mini PC or tunnel: a guide and ready-to-copy templates.",
+ "🖥 Héberger ailleurs": "🖥 Host elsewhere",
+ "Attention : HOST={0}. Les en-têtes du proxy ne sont crus que pour les connexions venant de cette machine.": "Warning: HOST={0}. Proxy headers are only trusted for connections coming from this machine."
+}

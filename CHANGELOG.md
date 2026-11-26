@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 5.7.0 — Hébergement sur un autre serveur
+- **Guide d’hébergement** (`HEBERGEMENT.md`, en anglais `HOSTING.en.md`) : serveur loué Linux, mini-PC ou tunnel Cloudflare ; transfert des données, adresse HTTPS, service qui redémarre seul, côté joueurs (application Android, icônes, clés d’accès).
+- **Modèles prêts à copier** (dossier `hebergement/`) : Caddy (HTTPS automatique), nginx (flux en direct non retenu, envois jusqu’à 50 Mo) et service systemd qui lance `scripts/launcher.js`, pour que les mises à jour depuis l’application s’installent aussi sous Linux.
+- **Réglage `CHRONIQUES_PROXY`** (`cloudflare`, `standard` ou `none`) : derrière Caddy ou nginx, la limite des essais de mot de passe s’applique à chaque visiteur, et non plus à tous les joueurs à la fois. Les en-têtes du proxy ne sont crus que pour les connexions venant de la machine elle-même : un visiteur ne peut plus s’inventer une adresse en envoyant un en-tête Cloudflare. Sans réglage, le comportement ne change pas pour un tunnel Cloudflare.
+- **Transfert des données sous Windows, Linux et macOS** : `node scripts/migrate-data.js <ancien dossier>` copie la base, les connexions, les images, les signalements et les réglages de mise à jour, refuse d’écraser une base existante ; `--sans-adresse` en cas de changement de domaine.
+- Arrêt du serveur plus fiable : les connexions restées ouvertes (navigateur, proxy) sont fermées au lieu de bloquer l’arrêt. Les tests automatiques de GitHub s’arrêtent désormais au bout de 3 minutes sur un test bloqué, au lieu de tourner 6 heures.
+
 ## 5.6.0 — Formes temporaires, contenants, lumières reliées aux cartes, jour et nuit, météo, états de santé
 **Personnages**
 - **Forme sauvage et Métamorphose** : fiche → En partie → « 🐾 Se transformer », à partir d’une bête du bestiaire SRD ou d’une forme personnalisée (le niveau maximum de FP de la Forme sauvage est rappelé). Règles 2014 : la forme a ses propres PV ; les dégâts la frappent d’abord et, à 0 PV, le personnage reprend sa forme normale et subit le surplus. Règles 2024 : PV temporaires (niveau pour la Forme sauvage, PV de la bête pour Métamorphose). Le groupe voit la forme dans l’ordre d’initiative.

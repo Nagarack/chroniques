@@ -56,6 +56,7 @@ const GC=require('./src/group-checks.js');
 const TV=require('./src/table-votes.js');
 const AFF=require('./src/afflictions.js');
 const TG=require('./src/tongues.js');
+const PX=require('./src/proxy.js');
 const WX=require('./src/weather.js');
 const SHP=require('./src/shapes.js');
 const BS=require('./src/bestiary.js');BS.loadFull().catch(()=>{});
@@ -985,7 +986,12 @@ function createServer(opts={}){
   if(mode==='delete'&&targetMedia?.filename)try{fs.unlinkSync(path.join(mediaDir,targetMedia.filename));}catch(e){console.warn('Illustration non supprimée :',e.message);}
   return projected(c,u);
  }
- function limit(req,key){const visitor=publicOrigin&&typeof req.headers['cf-connecting-ip']==='string'&&/^[a-fA-F0-9:.]{2,45}$/.test(req.headers['cf-connecting-ip'])?req.headers['cf-connecting-ip']:(req.socket.remoteAddress||'');const k=visitor+':'+key;if(attempts.size>500)for(const [ak,av] of attempts)if(Date.now()-av.at>15*60*1000)attempts.delete(ak);const old=attempts.get(k)||{count:0,at:Date.now()};if(Date.now()-old.at>15*60*1000){old.count=0;old.at=Date.now();}old.count++;attempts.set(k,old);if(old.count>30)throw Object.assign(new Error('Trop de tentatives. Réessayez plus tard.'),{status:429});}
+ // 5.7 : adresse du visiteur derrière un proxy. Les en-têtes ne sont crus que si la connexion vient de la machine elle-même
+ // (cloudflared, Caddy ou nginx installés sur le serveur) ; sinon, un visiteur pourrait s’inventer une adresse.
+ // cloudflare : CF-Connecting-IP ; standard (Caddy, nginx…) : dernière adresse de X-Forwarded-For ; none : adresse de la connexion.
+ const proxyMode=PX.mode(opts.proxy??process.env.CHRONIQUES_PROXY,publicOrigin);
+ const clientIp=req=>PX.clientIp(req,proxyMode);
+ function limit(req,key){const visitor=clientIp(req);const k=visitor+':'+key;if(attempts.size>500)for(const [ak,av] of attempts)if(Date.now()-av.at>15*60*1000)attempts.delete(ak);const old=attempts.get(k)||{count:0,at:Date.now()};if(Date.now()-old.at>15*60*1000){old.count=0;old.at=Date.now();}old.count++;attempts.set(k,old);if(old.count>30)throw Object.assign(new Error('Trop de tentatives. Réessayez plus tard.'),{status:429});}
  function validateHost(req){
   const actual=String(req.headers.host||'').toLowerCase();
   if(publicOrigin){if(actual!==expectedHost)throw sleepBlock('Hôte non autorisé : ouvrez l’URL HTTPS Chroniques configurée.');}
@@ -1471,12 +1477,17 @@ function createServer(opts={}){
    send(res,404,{error:'Page introuvable.'});
   }catch(e){if(!e.status&&/^(Accès refusé|Seul le MJ|Accès réservé|Notes privées)/.test(e.message))e.status=403;else if(!e.status&&/^(Le combat|Ce personnage|Ressource|Condition|Type inconnu|Déplacement|Fichier|Valeur|Initiative|Action|Repos|Rappel de concentration|Résultat de sauvegarde|Sens de déplacement|Déplacement hors|Jet |Impossible |Cette possibilité|Une |Personnage |La |Aucun |Seules )/.test(e.message))e.status=400;if(!res.headersSent)send(res,e.status||500,{error:e.status?e.message:'Erreur interne du serveur.'});else res.end();if(!e.status)console.error('Chroniques:',e);}
  });
- return {server,setupKey,dataFile,db,sessionReminders,remoteCheck,close:()=>new Promise(r=>{if(reminderTimer)clearInterval(reminderTimer);if(updateTimer)clearInterval(updateTimer);saveSessions(true);for(const c of listeners){try{c.res.end();}catch{}}server.close(r);})};
+ return {server,setupKey,dataFile,proxyMode,db,sessionReminders,remoteCheck,close:()=>new Promise(r=>{if(reminderTimer)clearInterval(reminderTimer);if(updateTimer)clearInterval(updateTimer);saveSessions(true);for(const c of listeners){try{c.res.end();}catch{}}server.close(r);
+  // Connexions gardées ouvertes par un navigateur ou un proxy : fermées tout de suite si inactives, de force après 1 s.
+  server.closeIdleConnections?.();const t=setTimeout(()=>server.closeAllConnections?.(),1000);t.unref?.();})};
 }
 if(require.main===module){const host=process.env.HOST||'127.0.0.1',port=Number(process.env.PORT||8080),app=createServer({host,onRestart:process.env.CHRONIQUES_LAUNCHER==='1'?()=>{app.close().finally(()=>process.exit(75));setTimeout(()=>process.exit(75),4000).unref?.();}:undefined});app.server.listen(port,host,()=>{
  const addr=app.server.address();console.log(`\nChroniques v${APP_VERSION} : http://127.0.0.1:${addr.port}/ (HTTP local uniquement)`);
  const remote=getRemoteOrigin({},root);
- if(remote)console.log(`HTTPS public (Cloudflare Tunnel) : ${remote}/ (comptes et invitations Chroniques requis)`);
+ if(remote)console.log(`HTTPS public : ${remote}/ via ${PX.label(app.proxyMode)} (comptes et invitations Chroniques requis)`);
+ if(app.proxyMode!=='none'&&!PX.isLoopback(host)&&host!=='localhost')console.log(`Attention : HOST=${host}. Les en-têtes du proxy ne sont crus que pour les connexions venant de cette machine.`);
  if(app.db.users.length===0)console.log(`\nCLE DE PREMIERE CONFIGURATION (MJ) : ${app.setupKey}\n`);
- });}
+ });
+ // Arrêt demandé (Ctrl+C, systemctl stop…) : connexions enregistrées avant de quitter.
+ let stopping=false;const stop=()=>{if(stopping)return;stopping=true;app.close().finally(()=>process.exit(0));setTimeout(()=>process.exit(0),4000).unref?.();};process.on('SIGINT',stop);process.on('SIGTERM',stop);}
 module.exports={createServer};

@@ -9,6 +9,7 @@ Historique : voir `CHANGELOG.md`. Recette de test : `GUIDE_TESTEURS.md`.
 1. Installer [Node.js](https://nodejs.org) 20 ou plus récent.
 2. Double-cliquer **`DEMARRER_CHRONIQUES.bat`** (ou `npm start`). Au premier lancement, la console affiche une **clé initiale** : elle sert à créer le compte du Maître du Jeu sur `http://127.0.0.1:8080`.
 3. Pour jouer à distance : `CONFIGURER_URL_HTTPS.bat` enregistre l'adresse publique (tunnel Cloudflare vers `http://127.0.0.1:8080`) ; `REVENIR_MODE_LOCAL.bat` la retire. `PROTEGER_CLOUDFLARE_ACCESS.bat` aide à restreindre l'accès.
+4. **Héberger sur un autre serveur** (serveur loué Linux avec Caddy ou nginx, mini-PC, tunnel Cloudflare) : voir [HEBERGEMENT.md](HEBERGEMENT.md) (en anglais : [HOSTING.en.md](HOSTING.en.md)) et les modèles du dossier `hebergement/`. Transfert des données : `node scripts/migrate-data.js <ancien dossier>`.
 
 ## Inviter des joueurs
 

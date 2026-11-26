@@ -1,0 +1,35 @@
+# Service systemd : Chroniques démarre avec le serveur, redémarre s'il s'arrête, et installe
+# les mises à jour lancées depuis l'application (scripts/launcher.js).
+# Installation (Debian/Ubuntu) :
+#   sudo apt install nodejs unzip          # Node.js 20 ou plus récent (node -v)
+#   sudo useradd --system --home /opt/chroniques --shell /usr/sbin/nologin chroniques
+#   sudo chown -R chroniques:chroniques /opt/chroniques
+#   sudo cp hebergement/chroniques.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now chroniques
+#   journalctl -u chroniques -f            # messages du serveur (clé de première configuration, erreurs)
+[Unit]
+Description=Chroniques (assistant de table D&D)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=chroniques
+Group=chroniques
+WorkingDirectory=/opt/chroniques
+Environment=HOST=127.0.0.1
+Environment=PORT=8080
+# standard : Caddy ou nginx sur cette machine ; cloudflare : tunnel Cloudflare (cloudflared) sur cette machine.
+Environment=CHRONIQUES_PROXY=standard
+ExecStart=/usr/bin/node scripts/launcher.js
+Restart=on-failure
+RestartSec=5
+# Protections : Chroniques n'écrit que dans son propre dossier.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/opt/chroniques
+
+[Install]
+WantedBy=multi-user.target

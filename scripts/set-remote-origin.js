@@ -8,7 +8,7 @@ try{
  const value=process.argv[2];
  if(value==='--off'){
   if(fs.existsSync(dest))fs.unlinkSync(dest);
-  console.log('Mode local Chroniques configuré. La route publique Cloudflare DOIT être désactivée séparément.');
+  console.log('Mode local Chroniques configuré. La route publique (tunnel Cloudflare, Caddy ou nginx) DOIT être désactivée séparément.');
  }else{
   const origin=validateRemoteOrigin(value);
   if(!origin)throw new Error('Une URL HTTPS avec nom de domaine est obligatoire.');
@@ -18,6 +18,6 @@ try{
   fs.mkdirSync(path.dirname(dest),{recursive:true});
   const tmp=dest+'.tmp';fs.writeFileSync(tmp,origin+'\n',{mode:0o600});fs.renameSync(tmp,dest);
   console.log('URL enregistrée : '+origin+'/');
-  console.log('Redémarrez Chroniques. Le tunnel Cloudflare reste à activer séparément.');
+  console.log('Redémarrez Chroniques. Le tunnel Cloudflare ou le proxy (Caddy, nginx) reste à configurer séparément : voir HEBERGEMENT.md.');
  }
 }catch(e){console.error('ERREUR : '+e.message);process.exitCode=1;}
