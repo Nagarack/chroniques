@@ -20,7 +20,7 @@ Les copies (« forks ») que permet l’interface de GitHub servent seulement à
 Certains contenus inclus restent sous leur propre licence, qui prime pour eux :
 - **SRD 5.1 et SRD 5.2** (règles, sorts, créatures, objets) : Wizards of the Coast LLC, licence **Creative Commons Attribution 4.0** (CC BY 4.0) — <https://creativecommons.org/licenses/by/4.0/>. Ce travail inclut du contenu du System Reference Document 5.1 et 5.2 de Wizards of the Coast LLC, disponible sous licence CC BY 4.0.
 - **Icônes Game-icons.net** : CC BY 3.0 (auteurs cités dans `CREDITS_ILLUSTRATIONS.md`).
-- **Polices** IM Fell English et Alegreya Sans : SIL Open Font License 1.1 (`assets/fonts/LICENSES.txt`).
+- **Polices** IM Fell English, Alegreya Sans et OpenDyslexic : SIL Open Font License 1.1 (`assets/fonts/LICENSES.txt`).
 
 Dungeons & Dragons et D&D sont des marques de Wizards of the Coast LLC. Chroniques est un projet indépendant, non affilié à Wizards of the Coast.
 

@@ -62,6 +62,8 @@ const CLK=require('./src/clocks.js');
 const FB=require('./src/session-feedback.js');
 const CLU=require('./src/clues.js');
 const SUG=require('./src/suggestions.js');
+const PERS=require('./src/personality.js');
+const TJ=require('./src/travel-journal.js');
 const SHP=require('./src/shapes.js');
 const BS=require('./src/bestiary.js');BS.loadFull().catch(()=>{});
 const AD=require('./src/area-damage.js');
@@ -129,6 +131,8 @@ const allowedStatic=new Map([
  ['/src/clocks.js',['src/clocks.js','text/javascript; charset=utf-8']],
  ['/src/session-feedback.js',['src/session-feedback.js','text/javascript; charset=utf-8']],
  ['/src/clues.js',['src/clues.js','text/javascript; charset=utf-8']],
+ ['/src/personality.js',['src/personality.js','text/javascript; charset=utf-8']],
+ ['/src/travel-journal.js',['src/travel-journal.js','text/javascript; charset=utf-8']],
  ['/src/spells.js',['src/spells.js','text/javascript; charset=utf-8']],
  ['/src/spell-guide.js',['src/spell-guide.js','text/javascript; charset=utf-8']],
  ['/src/creatures.js',['src/creatures.js','text/javascript; charset=utf-8']],
@@ -171,6 +175,8 @@ const allowedStatic=new Map([
  ['/assets/fonts/alegreya-sans-latin-400-italic.woff2',['assets/fonts/alegreya-sans-latin-400-italic.woff2','font/woff2']],
  ['/assets/fonts/alegreya-sans-latin-500-normal.woff2',['assets/fonts/alegreya-sans-latin-500-normal.woff2','font/woff2']],
  ['/assets/fonts/alegreya-sans-latin-700-normal.woff2',['assets/fonts/alegreya-sans-latin-700-normal.woff2','font/woff2']],
+ ['/assets/fonts/opendyslexic-latin-400-normal.woff2',['assets/fonts/opendyslexic-latin-400-normal.woff2','font/woff2']],
+ ['/assets/fonts/opendyslexic-latin-700-normal.woff2',['assets/fonts/opendyslexic-latin-700-normal.woff2','font/woff2']],
  ]);
 const sleepBlock=(err)=>Object.assign(new Error(err),{status:403});
 function normalizeName(s){const v=String(s||'').trim();if(!/^[\p{L}\p{N}_ .'-]{3,40}$/u.test(v))throw Object.assign(new Error('Identifiant : 3 à 40 caractères (lettres, chiffres, espaces, - _ .).'),{status:400});return v;}
@@ -306,6 +312,8 @@ function createServer(opts={}){
   if(!c){c=available[0];session.campaignId=c?.id||null;session.mode=null;}
   if(!c)return null;
   const membership=memberOf(c,original.id);
+  // 5.10 : mode table unique : la session du MJ devient celle d’un joueur, pour le personnage choisi sur la tablette partagée.
+  if(session.table&&membership.role==='gm')return {...original,role:'player',accessRole:membership.role,characterId:session.table.pc||null,activeCampaignId:c.id,viewMode:'player',tableMode:true};
   const mode=membership.role==='gm'&&session.mode==='player'?'player':membership.role;
   return {...original,role:mode,accessRole:membership.role,characterId:membership.characterId||null,
    activeCampaignId:c.id,viewMode:mode};
@@ -319,8 +327,12 @@ function createServer(opts={}){
  // 5.9 : rencontre posée sur une carte (jetons en formation autour du point touché) : carte vérifiée avant tout ajout.
  function deployMap(s,b,encId){if(!b.mapId)return null;const map=CM.read(s,String(b.mapId));if(!map)badRequest('Carte introuvable.');const enc=E.encounters(s).find(x=>x.id===encId);const n=enc?E.count(enc):0;
   if((map.tokens||[]).length+n>CM.MAX_TOKENS)badRequest('Pas assez de place sur la carte : '+CM.MAX_TOKENS+' jetons au maximum.');return map;}
+ // 5.10 : en mode table unique, seules les routes utiles aux joueurs restent ouvertes (pas de compte, d’invitations ni d’administration).
+ const TABLE_OK=/^(GET \/api\/(state|events|me|status|notify\/poll|push\/status|media\/|map-image\/|map-pin-image\/|handout-image\/|scene-image\/|audio\/)|POST \/api\/(action|table-mode|logout|presence|lang|notify\/poll|media\/change)$)/;
+ // Date du monde lisible (après `extra` minutes), si le calendrier du monde est actif.
+ function wtLabel(s){return s.worldTime?.enabled?WT.format(s.worldTime,s.worldTime.minutes):'';}
  function adminId(){return db.adminId||db.users[0]?.id||null;}
- function isAdmin(u){return !!u&&!!u.id&&u.id===adminId();}
+ function isAdmin(u){return !!u&&!!u.id&&!u.tableMode&&u.id===adminId();}
  function viewerOrSpectator(req){const u=who(req);if(u)return {u,c:currentCampaign(u)};const sp=spectator(req);if(sp)return sp;throw Object.assign(new Error('Connexion nécessaire.'),{status:401});}
  function currentCampaign(u){const c=db.campaigns.find(x=>x.id===u.activeCampaignId);if(!c||!memberOf(c,u.id))throw sleepBlock('Vous ne participez pas à cette campagne.');return c;}
  function requireGm(u){if(u.assistantElevated)return;const c=currentCampaign(u);if(u.role!=='gm'||memberOf(c,u.id)?.role!=='gm')throw sleepBlock('Accès réservé au MJ.');}
@@ -356,7 +368,7 @@ function createServer(opts={}){
    if(p.id===u.characterId)return {...p,history:CH.forPlayer(p.history)}; // Notes secrètes du MJ retirées.
    // Shared party combat summary only; never send other characters' abilities, inventories or private notes.
    return {id:p.id,name:p.name,role:p.role,job:p.job,level:p.level,stats:{hp:p.stats.hp,ac:p.stats.ac},speed:p.speed,hp:p.hp,tempHp:p.tempHp,initiative:p.initiative,
-    owner:null,conditions:p.conditions,concentration:p.concentration,exhaustion:p.exhaustion,inspiration:!!p.inspiration,economy:{...p.economy},...(p.form?{form:SHP.summary(p.form)}:{}),
+    owner:null,conditions:p.conditions,concentration:p.concentration,exhaustion:p.exhaustion,inspiration:!!p.inspiration,economy:{...p.economy},...(p.form?{form:SHP.summary(p.form)}:{}),...(p.ties?.length?{ties:p.ties.map(t=>({...t}))}:{}),...(p.personality?.shared?{personality:{...p.personality}}:{}),
     resources:[],abilities:[],deathSaves:{success:0,failure:0}};
   });
   if(full.combat)full.combat.timers=(full.combat.timers||[]).filter(t=>full.characters.some(p=>p.id===t.id)); // Durées des créatures du MJ : jamais envoyées.
@@ -367,6 +379,7 @@ function createServer(opts={}){
  if(c.state.votes){const nameOf=uid=>{const m=c.members.find(x=>x.userId===uid);const pc=m&&m.characterId&&c.state.characters.find(p=>p.id===m.characterId);return pc?pc.name:(db.users.find(x=>x.id===uid)?.name||'?');};full.votes=TV.projected(c.state,u.id,nameOf);} // Votes anonymes : qui a voté quoi n’est jamais envoyé.
  if(c.state.feedback){const nameOf=uid=>{const m=c.members.find(x=>x.userId===uid);const pc=m&&m.characterId&&c.state.characters.find(p=>p.id===m.characterId);return pc?pc.name:(db.users.find(x=>x.id===uid)?.name||'?');};full.feedback=FB.projected(c.state,u,nameOf);} // Anonymat : aucun nom envoyé.
  {const ts=c.state.tableScene&&(c.state.sessionFlow||[]).find(x=>x.id===c.state.tableScene.id);full.tableScene=ts?{id:ts.id,title:ts.title,readAloud:ts.readAloud||'',hasImage:!!ts.image,imageKey:ts.image?ts.image.filename.slice(0,8):'',at:c.state.tableScene.at}:null;} // Scène mise en avant : seulement son titre, son texte à lire et son image.
+ if(u.role!=='gm'&&c.state.travelLog)full.travelLog=TJ.projected(c.state); // Notes secrètes du MJ retirées.
  if(u.role!=='gm'){full.clocks=CLK.projected(c.state);full.clues=CLU.projected(c.state,u.id);} // Horloges secrètes, notes et indices non révélés : MJ seulement.
  full.ambience=AMB.projected(c.state); // Jamais les noms de fichiers sur disque.
  if(u.role!=='gm')full.randomTables=RT.projected(c.state); // Tables privées du MJ : jamais envoyées.
@@ -385,9 +398,9 @@ function createServer(opts={}){
  full.claimedCharacterIds=c.members.filter(m=>m.characterId).map(m=>m.characterId);
   // V5 — co-MJ restreint (« assistant ») : vue de joueur + combat complet + monstres et rencontres de la bibliothèque.
   if(u.role==='assistant'&&full.combat){full.combat={...L.clone(c.state.combat),log:full.combat.log};const lib=c.state.gmLibrary||{};full.gmLibrary={templates:L.clone(lib.templates||[]),encounters:L.clone(lib.encounters||[])};}
-  return {version:c.version,viewer:{name:u.name,role:u.role,accessRole:u.accessRole,characterId:u.characterId||null,isOwner:c.ownerId===u.id,isAdmin:isAdmin(u),...(isAdmin(u)?{newSuggestions:SUG.list(db).filter(x=>x.status==='nouvelle').length}:{}),campaignId:c.id,canUndo:u.role==='gm'&&canUndo(c),...(c.ownerId===u.id?{lastBackupDays:lastBackupDays()}:{})},state:full};
+  return {version:c.version,viewer:{name:u.name,role:u.role,accessRole:u.accessRole,characterId:u.characterId||null,isOwner:!u.tableMode&&c.ownerId===u.id,tableMode:!!u.tableMode,isAdmin:isAdmin(u),...(isAdmin(u)?{newSuggestions:SUG.list(db).filter(x=>x.status==='nouvelle').length}:{}),campaignId:c.id,canUndo:u.role==='gm'&&canUndo(c),...(c.ownerId===u.id?{lastBackupDays:lastBackupDays()}:{})},state:full};
  }
- function publish(c){for(const x of [...listeners]){if(x.campaignId!==c.id)continue;try{const user=db.users.find(u=>u.id===x.userId),session=sessions.get(x.sessionHash),member=user&&memberOf(c,user.id);const role=member?.role==='gm'&&session?.mode==='player'?'player':member?.role||'player';x.res.write(`event: update\ndata: ${JSON.stringify({version:c.version,campaignId:c.id,role})}\n\n`);}catch{listeners.delete(x);}}}
+ function publish(c){for(const x of [...listeners]){if(x.campaignId!==c.id)continue;try{const user=db.users.find(u=>u.id===x.userId),session=sessions.get(x.sessionHash),member=user&&memberOf(c,user.id);const role=member?.role==='gm'&&(session?.mode==='player'||session?.table)?'player':member?.role||'player';x.res.write(`event: update\ndata: ${JSON.stringify({version:c.version,campaignId:c.id,role})}\n\n`);}catch{listeners.delete(x);}}}
  function badRequest(msg){throw Object.assign(new Error(msg),{status:400});}
  function cleanText(value,label,max=70,min=1){if(typeof value!=='string'){badRequest(label+' invalide.');}const v=value.trim();if(v.length<min||v.length>max)badRequest(label+' : '+min+' à '+max+' caractères.');return v;}
  function intValue(value,label,min,max){if(typeof value!=='number'||!Number.isSafeInteger(value)||value<min||value>max)badRequest(label+' : valeur invalide.');return value;}
@@ -500,6 +513,7 @@ function createServer(opts={}){
   case 'mapHexFog':{requireGm(u);CM.hexFog(s,id,b.on===true);break;}
   case 'mapHexParty':{requireGm(u);ensureAspect(CM.read(s,id));const r=CM.hexMove(s,id,String(b.hex||''));if(r.steps>0){const TRm=require('./src/travel.js');const pace=TRm.PACES[b.pace]?b.pace:(s.travel?.pace&&TRm.PACES[s.travel.pace]?s.travel.pace:'normal');const p=TRm.PACES[pace];
    const km=r.km?Math.round(r.km*r.steps*10)/10:null;const minutes=km!==null?Math.round(km/p.kmh*60):null;
+   TJ.add(s,'tj-'+random(8),{kind:'hex',text:r.steps+' hexagone'+(r.steps>1?'s':'')+' parcouru'+(r.steps>1?'s':'')+' sur « '+(CM.read(s,id)?.title||'la carte')+' »'+(minutes!==null?', environ '+Math.floor(minutes/60)+' h '+String(minutes%60).padStart(2,'0'):''),km:km??undefined,world:wtLabel(s),tripTitle:s.travel?.active?s.travel.destination:'Exploration'});
    logPublic(s,'🧭 Le groupe parcourt '+r.steps+' hexagone'+(r.steps>1?'s':'')+(km!==null?' ('+String(km).replace('.',',')+' km, environ '+Math.floor(minutes/60)+' h '+String(minutes%60).padStart(2,'0')+' de marche, allure '+({lent:'lente',normal:'normale',rapide:'rapide'})[pace]+')':''));
    if(b.advanceTime===true&&minutes&&s.worldTime?.enabled)timePassed(s,minutes);}break;}
   case 'mapWallAdd':{requireGm(u);ensureAspect(CM.read(s,id));CM.wallAdd(s,id,'wall-'+random(8),b.values);break;}
@@ -711,11 +725,12 @@ function createServer(opts={}){
   case 'stashRemove':{requireGm(u);PS.remove(s,String(b.itemId||''));break;}
   case 'stashSettings':{requireGm(u);PS.settings(s,b);break;}
   // Voyage et exploration.
-  case 'travelStart':{requireGm(u);const t=TR.start(s,b.values||{});logPublic(s,'🧭 Départ vers '+t.destination+(t.distanceKm?' ('+t.distanceKm.toLocaleString('fr-FR')+' km)':'')+' · rythme '+TR.PACES[t.pace].label.toLowerCase()+'.');break;}
+  case 'travelStart':{requireGm(u);const t=TR.start(s,b.values||{});TJ.begin(s,'trip-'+random(8),{title:t.destination});TJ.add(s,'tj-'+random(8),{kind:'start',text:'Départ vers '+t.destination+(t.distanceKm?' ('+String(t.distanceKm).replace('.',',')+' km à parcourir)':''),day:1,world:wtLabel(s)});logPublic(s,'🧭 Départ vers '+t.destination+(t.distanceKm?' ('+t.distanceKm.toLocaleString('fr-FR')+' km)':'')+' · rythme '+TR.PACES[t.pace].label.toLowerCase()+'.');break;}
   case 'travelPace':{requireGm(u);TR.setPace(s,String(b.pace||''));logPublic(s,'🧭 Rythme '+TR.PACES[s.travel.pace].label.toLowerCase()+(TR.PACES[s.travel.pace].note?' — '+TR.PACES[s.travel.pace].note:'')+'.');break;}
   case 'travelAdvance':{requireGm(u);const hours=Number(b.hours);const msgs=TR.advance(s,hours);if(s.worldTime?.enabled){const reached=WT.advance(s,hours*60);logEvents(s,reached);}
+   {const arrived=msgs.some(m=>/^Arrivée/.test(m.text));TJ.add(s,'tj-'+random(8),{kind:'march',text:hours+' h de marche, allure '+({lent:'lente',normal:'normale',rapide:'rapide'})[s.travel.pace]+(s.travel.distanceKm?' · '+String(s.travel.doneKm).replace('.',',')+' / '+String(s.travel.distanceKm).replace('.',',')+' km':''),km:Math.round(TR.PACES[s.travel.pace].kmh*hours*10)/10,day:s.travel.days,world:wtLabel(s),tripTitle:s.travel.destination});if(arrived)TJ.add(s,'tj-'+random(8),{kind:'arrival',text:'Arrivée : '+s.travel.destination,day:s.travel.days,world:wtLabel(s)});}
    logPublic(s,'🧭 '+hours+' h de marche · '+String(s.travel.doneKm).replace('.',',')+(s.travel.distanceKm?' / '+String(s.travel.distanceKm).replace('.',','):'')+' km'+(s.worldTime?.enabled?' · '+WT.format(s.worldTime,s.worldTime.minutes):''));for(const m of msgs)logPublic(s,m.text);lightsChanged(s);break;}
-  case 'travelCamp':{requireGm(u);for(const m of TR.camp(s))logPublic(s,'⛺ '+m.text);break;}
+  case 'travelCamp':{requireGm(u);TJ.add(s,'tj-'+random(8),{kind:'camp',text:'Campement, fin du jour '+(s.travel?.days||1),day:s.travel?.days||1,world:wtLabel(s),tripTitle:s.travel?.destination});for(const m of TR.camp(s))logPublic(s,'⛺ '+m.text);break;}
   case 'travelRations':{requireGm(u);const missing=TR.eatRations(s,I);logPublic(s,'🍞 Une ration décomptée pour chacun'+(missing.length?' · '+missing.join(', '):'')+'.');break;}
   case 'areaDamage':{requireGm(u);const type=String(b.damageType||'');if(type&&!L.DAMAGE_TYPES.includes(type))badRequest('Type de dégâts inconnu.');
    const lookup=(kind,tid)=>kind==='pc'?(()=>{const p=L.findPc(s,tid);return p?{name:p.name,defenses:p.defenses||{}}:null;})():kind==='npc'?(()=>{const n=N.find(s,tid);return n?{name:n.name,defenses:n.defenses||{}}:null;})():null;
@@ -728,7 +743,7 @@ function createServer(opts={}){
   case 'tableUpdate':{requireGm(u);RT.update(s,String(b.tableId||''),b.values||{});break;}
   case 'tableRemove':{requireGm(u);RT.remove(s,String(b.tableId||''));break;}
   case 'tableRoll':{requireGm(u);const r=RT.roll(s,String(b.tableId||''),b.total,b.shared===true);const msg='🎲 '+r.table.name+' ('+r.table.die+' : '+r.entry.total+') → '+(r.row?r.row.text:'aucune ligne');if(r.entry.shared)logPublic(s,msg);else logGm(s,msg);break;}
-  case 'travelEnd':{requireGm(u);TR.end(s);logPublic(s,'🧭 Fin du voyage.');break;}
+  case 'travelEnd':{requireGm(u);TR.end(s);if(TJ.current(s)){TJ.add(s,'tj-'+random(8),{kind:'end',text:'Fin du voyage',world:wtLabel(s)});TJ.end(s);}logPublic(s,'🧭 Fin du voyage.');break;}
   case 'lightAdd':{const pc=b.values?.pcId?L.findPc(s,String(b.values.pcId)):null;if(b.values?.pcId&&!pc)badRequest('Personnage introuvable.');
    if(u.role!=='gm'&&!(pc&&L.canEdit(s,a,pc.id)))throw sleepBlock('Vous n’allumez que la lumière de votre personnage.');
    const kind=String(b.values?.kind||'');if(!TR.LIGHTS[kind])badRequest('Source de lumière inconnue.');
@@ -782,6 +797,14 @@ function createServer(opts={}){
   case 'voteClose':{requireGm(u);const r=TV.close(s);const w=r.vote.options.filter(o=>r.tally.winners.includes(o.id)).map(o=>o.text);logPublic(s,'🗳 Vote · '+r.vote.question+' · '+(w.length?(w.length>1?'égalité : ':'')+w.join(' / ')+' ('+r.tally.counts[r.tally.winners[0]]+' voix sur '+r.tally.total+')':'aucune voix'));break;}
   case 'voteCancel':{requireGm(u);TV.cancel(s);break;}
   // 5.8 : horloges, étoiles et souhaits, tableau d’enquête, dessins et altitude sur les cartes.
+  // 5.10 : personnalité (traits, idéaux, liens, défauts) et liens entre personnages.
+  case 'personalitySet':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');PERS.set(pc,b.values);break;}
+  case 'tieSet':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');PERS.tie(s,pc,String(b.to||''),b.text);break;}
+  case 'travelNote':{const kind=['note','encounter','place'].includes(b.noteKind)?b.noteKind:'note';const pc=u.role!=='gm'&&u.characterId?L.findPc(s,u.characterId):null;if(u.role!=='gm'&&!pc)throw sleepBlock('Choisissez d’abord votre personnage.');
+   TJ.add(s,'tj-'+random(8),{kind,text:b.text,world:wtLabel(s),day:s.travel?.active?s.travel.days:undefined,by:pc?pc.name:'',gm:u.role==='gm'&&b.secret===true,tripTitle:s.travel?.active?s.travel.destination:'Journal de route'});break;}
+  case 'travelNoteRemove':{const g=TJ.get(s);const e=g.trips.flatMap(t=>t.entries).find(x=>x.id===String(b.entryId||''));if(!e)badRequest('Étape introuvable.');const pc=u.characterId?L.findPc(s,u.characterId):null;
+   if(u.role!=='gm'&&!(e.by&&pc&&e.by===pc.name&&['note','encounter','place'].includes(e.kind)))throw sleepBlock('Seul le MJ ou l’auteur peut retirer cette note.');TJ.remove(s,e.id);break;}
+  case 'travelTripRemove':{requireGm(u);TJ.removeTrip(s,String(b.tripId||''));break;}
   case 'clockAdd':{requireGm(u);const c=CLK.add(s,'clock-'+random(8),b.values);logGm(s,'⏳ Horloge créée : '+c.label);break;}
   case 'clockUpdate':{requireGm(u);CLK.update(s,String(b.clockId||''),b.values);break;}
   case 'clockTick':{requireGm(u);const r=CLK.tick(s,String(b.clockId||''),b.delta);if(r.completed)(r.clock.visible?logPublic:logGm)(s,'⏳ L’horloge « '+r.clock.label+' » est pleine.');break;}
@@ -1057,7 +1080,7 @@ function createServer(opts={}){
  const sessionFile=dataFile+'.sessions';let lastSessions='[]';
   function sessionSnapshot(){const now=Date.now();return JSON.stringify([...sessions].filter(([,v])=>v&&v.expires>=now));}
   function saveSessions(force){const snap=sessionSnapshot();if(!force&&snap===lastSessions)return;lastSessions=snap;try{fs.mkdirSync(path.dirname(sessionFile),{recursive:true,mode:0o700});const tmp=sessionFile+'.tmp';fs.writeFileSync(tmp,snap,{mode:0o600});fs.renameSync(tmp,sessionFile);}catch(e){console.warn('Sessions non enregistrées :',e.message);}}
-  (function loadSessions(){try{const raw=JSON.parse(fs.readFileSync(sessionFile,'utf8'));if(Array.isArray(raw))for(const [k,v] of raw){if(typeof k==='string'&&/^[0-9a-f]{64}$/.test(k)&&v&&v.expires>=Date.now()&&db.users.some(u=>u.id===v.uid))sessions.set(k,{uid:v.uid,campaignId:v.campaignId||null,mode:v.mode==='player'||v.mode==='gm'?v.mode:null,expires:v.expires});}lastSessions=sessionSnapshot();}catch{}})();
+  (function loadSessions(){try{const raw=JSON.parse(fs.readFileSync(sessionFile,'utf8'));if(Array.isArray(raw))for(const [k,v] of raw){if(typeof k==='string'&&/^[0-9a-f]{64}$/.test(k)&&v&&v.expires>=Date.now()&&db.users.some(u=>u.id===v.uid))sessions.set(k,{uid:v.uid,campaignId:v.campaignId||null,mode:v.mode==='player'||v.mode==='gm'?v.mode:null,expires:v.expires,...(v.table&&typeof v.table.pinHash==='string'?{table:{pinHash:v.table.pinHash,salt:String(v.table.salt||''),pc:typeof v.table.pc==='string'?v.table.pc:null}}:{})});}lastSessions=sessionSnapshot();}catch{}})();
   const server=http.createServer(async(req,res)=>{res.on('finish',()=>saveSessions(false));
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','no-referrer');
   if(publicOrigin)res.setHeader('Strict-Transport-Security','max-age=31536000');
@@ -1065,6 +1088,7 @@ function createServer(opts={}){
   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'");
   try{
    validateHost(req);
+   {const pn=new URL(req.url,'http://localhost').pathname;if(pn.startsWith('/api/')&&!TABLE_OK.test(req.method+' '+pn)){const ts=sessionFor(req);if(ts?.table)throw Object.assign(new Error('Mode table unique : seul le MJ peut le quitter, avec son code.'),{status:403});}}
    const pathname=new URL(req.url,'http://localhost').pathname;
    if(req.method==='GET'&&iconFiles.has(pathname)){res.writeHead(200,{'content-type':'image/svg+xml','cache-control':'public, max-age=604800'});fs.createReadStream(path.join(root,'assets/icons',pathname.slice('/assets/icons/'.length))).pipe(res);return;}
     if(req.method==='GET'&&allowedStatic.has(pathname)){const [file,type]=allowedStatic.get(pathname);res.writeHead(200,{'content-type':type,'cache-control':'no-store'});fs.createReadStream(path.join(root,file)).pipe(res);return;}
@@ -1092,6 +1116,18 @@ function createServer(opts={}){
     const u=requireUser(req),c=currentCampaign(u);if(c.ownerId!==u.id)throw sleepBlock('Réservé au MJ propriétaire de la campagne.');
     send(res,200,updateStatus());return;
    }
+   // 5.10 : tableau de bord de l’administrateur du serveur (comptes, campagnes, stockage, sauvegardes, signalements).
+   if(req.method==='GET'&&pathname==='/api/admin/overview'){const u=requireUser(req);if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');
+    const sizeOf=(dir,depth=0)=>{let bytes=0,count=0;try{for(const f of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,f.name);if(f.isDirectory()){if(depth<4){const r=sizeOf(p,depth+1);bytes+=r.bytes;count+=r.count;}}else if(f.isFile()){bytes+=fs.statSync(p).size;count++;}}}catch{}return {bytes,count};};
+    const fileSize=f=>{try{return fs.statSync(f).size;}catch{return 0;}};const now=Date.now();
+    const active=uid=>[...sessions.values()].filter(x=>x.uid===uid&&x.expires>=now).length;
+    const users=db.users.map(x=>({name:x.name,admin:x.id===adminId(),passkeys:(x.passkeys||[]).length,sessions:active(x.id),campaigns:memberCampaigns(x.id).map(c=>({title:c.state.title,role:memberOf(c,x.id)?.role||'player'}))}));
+    const campaigns=db.campaigns.map(c=>({title:c.state.title,owner:db.users.find(x=>x.id===c.ownerId)?.name||'?',members:c.members.length,characters:(c.state.characters||[]).length,maps:(c.state.maps||[]).length,lastActivity:c.state.lastEdited||null,bytes:Buffer.byteLength(JSON.stringify(c))}));
+    const backups=BK.list(backupRoot,dataFile);let disk=null;try{const st=fs.statfsSync(path.dirname(dataFile));disk={free:st.bavail*st.bsize,total:st.blocks*st.bsize};}catch{}
+    let reports=[];try{reports=fs.readFileSync(path.join(path.dirname(dataFile),'signalements.jsonl'),'utf8').split('\n').filter(Boolean).map(l=>{try{return JSON.parse(l);}catch{return null;}}).filter(Boolean).slice(-100).reverse();}catch{}
+    send(res,200,{server:{version:APP_VERSION,node:process.version,platform:process.platform,uptime:Math.round(process.uptime()),publicOrigin:publicOrigin||null,proxy:proxyMode},
+     users,campaigns,storage:{database:fileSize(dataFile),media:sizeOf(mediaDir),backups:sizeOf(path.join(backupRoot,'backups')),autoBackups:sizeOf(path.join(path.dirname(dataFile),'auto-backups')),disk},
+     backups:{count:backups.length,latest:backups[0]||null,latestFull:backups.find(x=>x.kind!=='auto')||null,mirror:db.backupMirror||'',daily:dailyBackup},reports});return;}
    if(req.method==='GET'&&pathname==='/api/backups'){
     const u=requireUser(req),c=currentCampaign(u);if(c.ownerId!==u.id)throw sleepBlock('Réservé au MJ propriétaire de la campagne.');
     send(res,200,{backups:BK.list(backupRoot,dataFile).slice(0,40),mirror:db.backupMirror||'',daily:dailyBackup});return;
@@ -1168,7 +1204,7 @@ function createServer(opts={}){
    if(req.method==='GET'&&pathname==='/api/state'){const u=requireUser(req),c=currentCampaign(u);send(res,200,syncOut(req,c,projected(c,u),new URL(req.url,'http://localhost').searchParams.get('since')||''));return;}
    if(req.method==='GET'&&pathname==='/api/ai/status'){const u=requireUser(req);currentCampaign(u);requireGm(u);send(res,200,{enabled:aiEnabled,model:aiModel,localAvailable:true});return;}
    if(req.method==='GET'&&pathname==='/api/management'){const u=requireUser(req),c=currentCampaign(u);requireGm(u);send(res,200,gmOverview(c));return;}
-   if(req.method==='GET'&&pathname==='/api/suggestions'){const u=requireUser(req);const admin=isAdmin(u);send(res,200,admin?{admin:true,suggestions:SUG.forAdmin(db),counts:SUG.counts(db)}:{admin:false,suggestions:SUG.forUser(db,u.id)});return;}
+   if(req.method==='GET'&&pathname==='/api/suggestions'){const u=requireUser(req);const admin=isAdmin(u);send(res,200,admin?{admin:true,suggestions:SUG.forAdmin(db),counts:SUG.counts(db),board:SUG.forBoard(db,u.id)}:{admin:false,suggestions:SUG.forUser(db,u.id),board:SUG.forBoard(db,u.id)});return;}
    if(req.method==='GET'&&pathname==='/api/reports'){const u=requireUser(req),c=currentCampaign(u);if(c.ownerId!==u.id)throw Object.assign(new Error('Réservé au MJ propriétaire.'),{status:403});
      const file=path.join(path.dirname(dataFile),'signalements.jsonl');let list=[];try{list=fs.readFileSync(file,'utf8').split('\n').filter(Boolean).map(l=>{try{return JSON.parse(l);}catch{return null;}}).filter(Boolean);}catch{}
      send(res,200,{reports:list.slice(-200).reverse(),file:'data/signalements.jsonl'});return;}
@@ -1321,6 +1357,16 @@ function createServer(opts={}){
      session.campaignId=dest.id;session.mode=null;endSessionStreams(sha(cookie(req,'chroniques_sid')));
      send(res,200,{ok:true,activeId:dest.id});return;
     }
+    if(pathname==='/api/table-mode'){
+     const session=sessionFor(req);const u=requireUser(req),c=currentCampaign(u),member=memberOf(c,u.id);if(!session||member.role!=='gm')throw sleepBlock('Réservé au MJ.');const op=String(b.op||'');
+     const pinOk=pin=>{if(!/^[0-9]{4,8}$/.test(String(pin||'')))return false;const h=crypto.scryptSync(String(pin),session.table.salt,32).toString('hex');return crypto.timingSafeEqual(Buffer.from(h,'hex'),Buffer.from(session.table.pinHash,'hex'));};
+     if(op==='start'){if(!/^[0-9]{4,8}$/.test(String(b.pin||'')))badRequest('Code : 4 à 8 chiffres.');const salt=crypto.randomBytes(16).toString('hex');session.table={salt,pinHash:crypto.scryptSync(String(b.pin),salt,32).toString('hex'),pc:null};}
+     else if(op==='pick'){if(!session.table)badRequest('Mode table non actif.');const pc=(c.state.characters||[]).find(p=>p.id===String(b.characterId||'')&&!p.fallen);if(!pc)badRequest('Personnage introuvable.');session.table.pc=pc.id;}
+     else if(op==='release'){if(!session.table)badRequest('Mode table non actif.');session.table.pc=null;}
+     else if(op==='stop'){if(!session.table)badRequest('Mode table non actif.');limit(req,'login');if(!pinOk(b.pin))throw sleepBlock('Code incorrect.');delete session.table;session.mode='gm';}
+     else badRequest('Opération inconnue.');
+     saveSessions(true);endSessionStreams(sha(cookie(req,'chroniques_sid')));send(res,200,{ok:true,table:session.table?{pc:session.table.pc}:null});return;
+    }
     if(pathname==='/api/view-mode'){
      const u=requireUser(req),c=currentCampaign(u),session=sessionFor(req),member=memberOf(c,u.id);
      if(!['player','gm'].includes(b.mode)||b.mode==='gm'&&member.role!=='gm')throw sleepBlock('Mode non autorisé.');
@@ -1453,6 +1499,7 @@ function createServer(opts={}){
      }
      // 5.9 : suggestions d’amélioration (tous les comptes) et suivi par l’administrateur du serveur.
      if(pathname==='/api/suggestion'){limit(req,'suggest');const sg=SUG.add(db,'sug-'+random(10),u,b,{campaign:c.state.title,version:APP_VERSION});persist();send(res,200,{ok:true,id:sg.id,suggestions:SUG.forUser(db,u.id)});return;}
+     if(pathname==='/api/suggestion/vote'){limit(req,'suggest-vote');const on=SUG.vote(db,String(b.id||''),u.id);persist();send(res,200,{ok:true,voted:on,board:SUG.forBoard(db,u.id)});return;}
      if(pathname==='/api/suggestion/status'){if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');SUG.setStatus(db,String(b.id||''),String(b.status||''),b.reply===undefined?undefined:String(b.reply));persist();send(res,200,{ok:true,suggestions:SUG.forAdmin(db),counts:SUG.counts(db)});return;}
      if(pathname==='/api/suggestion/delete'){if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');SUG.remove(db,String(b.id||''));persist();send(res,200,{ok:true,suggestions:SUG.forAdmin(db),counts:SUG.counts(db)});return;}
      if(pathname==='/api/report'){

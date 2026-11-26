@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 5.10.0 — Mode table unique, personnalité, journal de voyage, accessibilité, administration du serveur
+**Autour de la table**
+- **Mode table unique** (Mon compte, MJ) : une seule tablette posée sur la table. Elle affiche « Qui joue ? » ; chaque joueur touche son personnage et voit sa fiche comme sur son propre appareil, puis la rend avec « Changer de joueur ». Le serveur traite la tablette comme un joueur (aucun secret du MJ envoyé, seules les actions du personnage choisi) ; réglages du compte, invitations, export et administration y sont fermés. Seul le code du MJ (4 à 8 chiffres) en fait sortir, et le mode survit à un redémarrage du serveur.
+- **Personnalité** (fiche → Histoire) : traits, idéaux, liens et défauts (SRD 5.1), gardés pour le joueur et le MJ ou partagés avec le groupe ; liens avec les autres personnages (« doit la vie à Brunna »), visibles de toute la table, avec ce que les autres disent de chacun.
+
+**Exploration**
+- **Journal de voyage** (Chronique → Voyages) : départ, heures de marche, déplacements sur la carte en hexagones, campements et arrivée s’inscrivent seuls, jour par jour, avec la date du monde et les kilomètres. Chacun ajoute lieux et rencontres ; le MJ peut garder une note pour lui.
+
+**Accessibilité**
+- **Lecture facilitée** : police OpenDyslexic (SIL OFL 1.1, fournie avec Chroniques), texte plus espacé, sans italique.
+- **Couleurs pour daltoniens** : palette Okabe-Ito pour les jetons, zones de sort et dessins, symbole sur chaque jeton (● ▲ ■ ◆ ★ ✕) et tracés différents pour les zones et les dessins. Réglages propres à chaque appareil.
+
+**Améliorer Chroniques ensemble**
+- **Idées de tous** : chacun voit les idées des autres, sans leur auteur ni leur campagne, et les soutient d’un « +1 » (pas les siennes). L’administrateur trie par soutiens.
+- **Administration du serveur** : nouveaux onglets Serveur (version, durée de fonctionnement, adresse, comptes et leurs campagnes, campagnes avec MJ, membres, dernière activité et taille, base, images, sauvegardes, espace libre, dernière sauvegarde complète, copie miroir) et Signalements (toutes campagnes).
+
+**Corrections** : la ligne du groupe sur l’accueil ne contient plus d’élément interactif dans un bouton (accessibilité).
+
 ## 5.9.0 — Mise en scène, rencontres posées sur la carte, suggestions et administration
 **Raconter**
 - **Mise en scène** : une scène de séance reçoit un texte à lire et une image. « 🎭 Mettre en scène » l’affiche sur l’écran de table, sur l’accueil des joueurs et chez le spectateur, passe la scène « en cours » et lance son ambiance sonore. Les notes du MJ ne sont jamais envoyées ; l’image n’est servie aux joueurs que pendant la mise en scène.
