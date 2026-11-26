@@ -7,7 +7,7 @@ const http=require('node:http');
 const APP_VERSION=(()=>{try{return JSON.parse(require('node:fs').readFileSync(require('node:path').join(__dirname,'package.json'),'utf8')).version;}catch{return '0';}})();
 const fs=require('node:fs');
 const path=require('node:path');
-const crypto=require('node:crypto');
+const crypto=require('node:crypto');const zlib=require('node:zlib');
 const {URL}=require('node:url');
 const L=require('./src/logic');
 const P=require('./src/progression');
@@ -78,6 +78,18 @@ const sha=(s)=>crypto.createHash('sha256').update(s).digest('hex');
 const PASS_MIN=12, MAX_BODY=65_536;
 const SCORE_KEYS=['str','dex','con','int','wis','cha'];
 const iconFiles=new Set((()=>{try{return fs.readdirSync(path.join(__dirname,'assets','icons')).filter(f=>/^[a-z0-9-]+\.svg$/.test(f)).map(f=>'/assets/icons/'+f);}catch{return [];}})());
+// 5.15 : fichiers publics compressés (brotli ou gzip) et revalidés par ETag (réponse 304 si l’appareil a déjà la bonne version).
+// « no-cache » : le navigateur peut garder le fichier mais redemande toujours s’il a changé, donc une mise à jour est vue aussitôt.
+const staticCache=new Map(),COMPRESSIBLE=/^(text\/|application\/(javascript|json|manifest\+json)|image\/svg\+xml)/;
+function staticEntry(root,file,type){const full=path.join(root,file);const st=fs.statSync(full);let e=staticCache.get(full);
+ if(!e||e.mtimeMs!==st.mtimeMs||e.size!==st.size){const raw=fs.readFileSync(full);e={mtimeMs:st.mtimeMs,size:st.size,raw,etag:'W/"'+crypto.createHash('sha1').update(raw).digest('base64url').slice(0,22)+'"',gz:null,br:null,compressible:COMPRESSIBLE.test(type)&&raw.length>1024};staticCache.set(full,e);}
+ return e;}
+function sendStatic(req,res,root,file,type,cacheControl='no-cache'){const e=staticEntry(root,file,type);const headers={'content-type':type,'cache-control':cacheControl,etag:e.etag,vary:'Accept-Encoding'};
+ if(String(req.headers['if-none-match']||'').split(/\s*,\s*/).includes(e.etag)){res.writeHead(304,headers);res.end();return;}
+ let body=e.raw;const ae=String(req.headers['accept-encoding']||'').toLowerCase();
+ if(e.compressible){if(/(^|[\s,])br([\s;,]|$)/.test(ae)){e.br??=zlib.brotliCompressSync(e.raw,{params:{[zlib.constants.BROTLI_PARAM_QUALITY]:9,[zlib.constants.BROTLI_PARAM_SIZE_HINT]:e.raw.length}});body=e.br;headers['content-encoding']='br';}
+  else if(/(^|[\s,])gzip([\s;,]|$)/.test(ae)){e.gz??=zlib.gzipSync(e.raw,{level:9});body=e.gz;headers['content-encoding']='gzip';}}
+ headers['content-length']=body.length;res.writeHead(200,headers);res.end(body);}
 const allowedStatic=new Map([
  ['/', ['index.html','text/html; charset=utf-8']],
  ['/guide.html',['GUIDE_UTILISATION.html','text/html; charset=utf-8']],
@@ -1110,7 +1122,7 @@ function createServer(opts={}){
    {const pn=new URL(req.url,'http://localhost').pathname;if(pn.startsWith('/api/')&&!TABLE_OK.test(req.method+' '+pn)){const ts=sessionFor(req);if(ts?.table)throw Object.assign(new Error('Mode table unique : seul le MJ peut le quitter, avec son code.'),{status:403});}}
    const pathname=new URL(req.url,'http://localhost').pathname;
    if(req.method==='GET'&&iconFiles.has(pathname)){res.writeHead(200,{'content-type':'image/svg+xml','cache-control':'public, max-age=604800'});fs.createReadStream(path.join(root,'assets/icons',pathname.slice('/assets/icons/'.length))).pipe(res);return;}
-    if(req.method==='GET'&&allowedStatic.has(pathname)){const [file,type]=allowedStatic.get(pathname);res.writeHead(200,{'content-type':type,'cache-control':'no-store'});fs.createReadStream(path.join(root,file)).pipe(res);return;}
+    if(req.method==='GET'&&allowedStatic.has(pathname)){const [file,type]=allowedStatic.get(pathname);sendStatic(req,res,root,file,type);return;}
    if(req.method==='GET'&&pathname.startsWith('/api/media/')){
     const {u,c}=viewerOrSpectator(req),key=pathname.slice('/api/media/'.length);
     const media=M.list(c.state).find(x=>x.id===key);

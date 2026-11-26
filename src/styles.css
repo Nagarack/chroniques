@@ -1941,3 +1941,6 @@ details.jump-panel[open]>summary h3::after{content:" ⌃"}
 .map-tools .seg{flex-wrap:wrap;border-radius:12px}
 .map-tools .seg button{white-space:nowrap}
 @media(max-width:590px){.device-text{flex:0 1 auto}.device-row{gap:8px}}
+/* 5.15 : longues listes — le navigateur ne met en page que les lignes visibles (téléphones modestes). */
+.bestiary-row,.catalog-row,.spell-row,.art-choice,.tl-item,.memory-card,.planner-record{content-visibility:auto;contain-intrinsic-size:auto 72px}
+.art-choice{contain-intrinsic-size:auto 140px}

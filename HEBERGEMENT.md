@@ -53,6 +53,8 @@ Dans Cloudflare, créez un tunnel vers `http://127.0.0.1:8080` avec votre nom de
    - **nginx** : `hebergement/nginx-chroniques.conf` → `/etc/nginx/sites-available/chroniques`, puis certificat avec `certbot --nginx`.
 4. Dans le modèle, remplacez `jeu.mondomaine.fr` par votre domaine, puis rechargez Caddy ou nginx.
 
+Chroniques compresse lui-même ses fichiers (brotli ou gzip) : rien à activer de ce côté dans nginx ou Caddy.
+
 Ce qui compte dans les modèles : le domaine demandé (`Host`) est transmis tel quel, l’adresse du visiteur aussi (`X-Forwarded-For`), le flux en direct `/api/events` n’est pas retenu (`proxy_buffering off` pour nginx) et les envois jusqu’à 50 Mo passent.
 
 ## 5. Démarrer Chroniques comme un service

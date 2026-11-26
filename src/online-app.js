@@ -1109,6 +1109,7 @@ function playerTurnPanel(){if(actor==='mj'||!state.combat?.started)return '';con
  ${(p.conditions||[]).length?`<div class="pt-conds">${p.conditions.map(c=>conditionChip(c,p.id)).join('')}</div>`:''}</section>`;}
 // --- V4.5 : « Quoi de neuf ? » après une mise à jour ---
 const WHATS_NEW=[
+ ['5.15',[['⚡ Plus rapide','Fichiers compressés et longues listes allégées : chargement deux fois plus rapide en 3G.','']]],
  ['5.14',[['😮 Surprise','Sur la liste d’initiative, avec la règle de votre édition.',''],['Repos court du groupe','À côté du repos long : tout le groupe d’un geste.','gm'],['Import Foundry VTT','Paramètres → Importer un personnage : fichier exporté depuis Foundry (dnd5e).','gm']]],
  ['5.13',[['◐ Cet appareil','Langue, apparence, texte et écran réunis sur une page.',''],['📜 Chronique allégée','5 onglets au lieu de 9 : Séances, Monde, Carnet & enquête, Histoire, Documents.','']]],
  ['5.12',[['🔊 Lire à voix haute','Les scènes et documents lus par la voix de l’appareil.',''],['🚶 Ordre de marche','Qui marche devant, qui monte la garde la nuit.',''],['Écran toujours allumé','Plus de mise en veille pendant la séance (Cet appareil).','']]],

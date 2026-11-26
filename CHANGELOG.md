@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## 5.15.0 — Plus rapide sur téléphone
+- **Fichiers compressés** : le serveur envoie le code, les styles et les pages en brotli (ou gzip), soit environ 3,7 Mo ramenés à moins de 1 Mo pour l’installation complète. Mesuré en 3G simulée (1,6 Mbit/s, 150 ms) : premier affichage en 5,0 s au lieu de 11,9 s, 0,6 Mo transférés au lieu de 2,05 Mo. Les polices et images, déjà compressées, sont envoyées telles quelles.
+- **Revalidation au lieu de re-téléchargement** : chaque fichier porte une empreinte (ETag) ; un appareil qui a déjà la bonne version reçoit une réponse vide (304). Les mises à jour restent vues aussitôt (« no-cache » au lieu de « no-store »).
+- **Longues listes** (bestiaire SRD, catalogues d’objets et de sorts, illustrations, frise, carnet) : le navigateur ne met en page que les lignes visibles. Avec un processeur 6 fois plus lent (téléphone modeste simulé), l’ouverture de la Bibliothèque MJ passe d’environ 410 ms à 260 ms de calcul ; les mises à jour en direct ne provoquent aucune tâche longue.
+
 ## 5.14.0 — Surprise, repos court du groupe, import Foundry VTT
 - **Surprise** (liste d’initiative, MJ, avant le combat ou au premier round) : « 😮 Surprise ? » par créature. Règles 2014 (SRD 5.1) : rappel dans le journal au premier tour du surpris (ni déplacement ni action, pas de réaction avant la fin de ce tour), puis la mention disparaît ; règles 2024 (SRD 5.2) : rappel « désavantage à l’initiative » avant le combat, mention effacée au lancement. Les créatures cachées ne sont nommées qu’au MJ. Effacée en fin de combat.
 - **Repos court (groupe)** à côté du repos long du groupe : ressources de repos court, emplacements de pacte et recharges d’objets de tous les personnages debout, une heure qui passe si le calendrier du monde est actif ; annulable. Les dés de vie restent dépensés par chacun depuis sa fiche.

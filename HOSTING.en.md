@@ -42,6 +42,8 @@ or use the environment variable `CHRONIQUES_PUBLIC_ORIGIN=https://game.mydomain.
 3. Copy the template: **Caddy** `hebergement/Caddyfile` → `/etc/caddy/Caddyfile` (automatic HTTPS certificate); **nginx** `hebergement/nginx-chroniques.conf` → `/etc/nginx/sites-available/chroniques`, then get a certificate with `certbot --nginx`.
 4. Replace `jeu.mondomaine.fr` with your domain in the template and reload Caddy or nginx.
 
+Chroniques compresses its own files (brotli or gzip): nothing to turn on for that in nginx or Caddy.
+
 The templates pass the requested domain (`Host`) and the visitor’s address (`X-Forwarded-For`), never hold back the live stream `/api/events`, and accept uploads up to 50 MB.
 
 ## 5. Run Chroniques as a service

@@ -36,7 +36,7 @@ test('Tutos express : routes HTTP, fichiers de cache PWA et aucun stockage de do
  t.after(async()=>{await s.close();fs.rmSync(dir,{recursive:true,force:true});});
  const origin='http://127.0.0.1:'+s.server.address().port;
  for(const pathname of ['/src/quick-help.js','/tutos.html']){
-  const response=await fetch(origin+pathname);assert.equal(response.status,200,pathname);assert.equal(response.headers.get('cache-control'),'no-store');assert((await response.text()).length>1000);
+  const response=await fetch(origin+pathname);assert.equal(response.status,200,pathname);assert.equal(response.headers.get('cache-control'),'no-cache');assert((await response.text()).length>1000);
  }
  const sw=read('sw.js');assert(sw.includes("'/src/quick-help.js'"));assert.match(sw,/const CACHE='chroniques-public-v\d+/);
  assert(!sw.includes("'/api/state'"));assert(!sw.includes("'/tutos.html'"),'le cache hors ligne contient seulement le code, pas les données de campagne');
