@@ -1,5 +1,16 @@
 # Journal des modifications
 
+## 5.9.0 — Mise en scène, rencontres posées sur la carte, suggestions et administration
+**Raconter**
+- **Mise en scène** : une scène de séance reçoit un texte à lire et une image. « 🎭 Mettre en scène » l’affiche sur l’écran de table, sur l’accueil des joueurs et chez le spectateur, passe la scène « en cours » et lance son ambiance sonore. Les notes du MJ ne sont jamais envoyées ; l’image n’est servie aux joueurs que pendant la mise en scène.
+
+**Combat**
+- **Rencontre posée sur une carte** : en lançant une rencontre préparée, choisissez une carte puis touchez-la : un jeton par créature, en formation autour du point touché, masqué si la créature l’est. La place disponible sur la carte est vérifiée avant d’ajouter les créatures.
+
+**Améliorer Chroniques ensemble**
+- **Suggestions d’amélioration** : chaque compte, MJ ou joueur, envoie une idée depuis Mon compte → « 💡 Proposer une amélioration » (domaine, idée, détails) et retrouve ensuite son statut et la réponse.
+- **Administration** : l’administrateur du serveur (le compte créé à l’installation) lit les suggestions de toutes les campagnes, les filtre, les marque « nouvelle », « retenue », « faite » ou « non retenue », répond à l’auteur, les supprime ou copie la liste. Un compteur signale les nouvelles suggestions. Les suggestions sont gardées hors des campagnes, dans la base du serveur.
+
 ## 5.8.0 — Horloges, étoiles et souhaits, tableau d’enquête, dessins et altitude sur les cartes
 **Préparer et raconter**
 - **Horloges de progression** (Séance du jour) : un cercle de 4 à 12 segments pour une menace qui approche ou un projet qui avance. Le MJ remplit ou retire un segment, l’horloge pleine est annoncée au journal. Visible des joueurs (accueil, écran de table, spectateur) ou secrète ; la note reste au MJ.

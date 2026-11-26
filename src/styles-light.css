@@ -1026,6 +1026,20 @@ table.srd-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--c
 .map-drawings polyline,.map-drawings line{fill:none}
 .draw-swatch{border:2px solid #fbfaf959}
 .tok-elev{background:#f2eeeb;color:#564312;border:1px solid #a57e1e}
+.sug-status{border:1px solid var(--border)}
+.sug-nouvelle{color:var(--goldpale)}
+.sug-retenue{color:var(--gold);border-color:var(--gold)}
+.sug-faite{color:#30723a;border-color:#72af7d}
+.sug-non_retenue{color:var(--muted)}
+.sug-text{color:var(--text)!important}
+.sug-choices{border:0}
+.sug-choices legend{color:var(--muted)}
+.sug-mine li{border:1px solid var(--border)}
+.sug-reply{border-left:3px solid var(--gold)}
+.stage-image{background:#fbfaf9}
+.staged-card{border-color:var(--gold)}
+.scene-read{border-left:3px solid var(--gold);color:var(--soft)}
+.deploy-banner{border:1px solid var(--gold);background:var(--card2)}
 :root{color-scheme:light;--grain:none;--c-bg:#f4efe4;--c-bg-2:#ede5d6;--c-surface:#fbf8f1;--c-surface-2:#f0e9dc;--c-line:#dcd1be;--c-line-soft:#e7dfcf;--c-text:#2b2118;--c-muted:#5c4b37;--c-accent:#9a3a26;--c-accent-strong:#8c2f1f;--c-on-accent:#fffaf3;--c-ok:#3d6a4c;--c-warn:#a8741a;--c-danger:#b3402c;--c-focus:#8c2f1f}
 .workspace-parchment :is(p,span,small,li,strong,em,h1,h2,h3,h4,label,div){color:#3d2f1d}
 .workspace-parchment .muted,.workspace-parchment .muted *{color:#6b5a42}

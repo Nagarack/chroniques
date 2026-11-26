@@ -61,6 +61,7 @@ const WX=require('./src/weather.js');
 const CLK=require('./src/clocks.js');
 const FB=require('./src/session-feedback.js');
 const CLU=require('./src/clues.js');
+const SUG=require('./src/suggestions.js');
 const SHP=require('./src/shapes.js');
 const BS=require('./src/bestiary.js');BS.loadFull().catch(()=>{});
 const AD=require('./src/area-damage.js');
@@ -237,8 +238,8 @@ function createServer(opts={}){
  // V4.2 — images importées pour les monstres et objets maison (fiches MJ uniquement).
  // Chaque créature déployée ou objet donné reçoit sa propre copie du fichier : supprimer l'un n'efface jamais l'autre.
  const LIB_FILE=/^[A-Za-z0-9_-]{32}\.(png|webp)$/;
- function libraryEntry(s,target,id){if(target==='template')return E.templates(s).find(t=>t.id===id)||null;if(target==='libitem')return HB.find(s,id);if(target==='handout')return HO.find(s,id);return null;}
- function libraryBytes(s){const lib=s.gmLibrary||{};return [...(lib.templates||[]),...(lib.items||[]),...(s.handouts||[])].reduce((t,x)=>t+(x.image?.bytes||0),0);}
+ function libraryEntry(s,target,id){if(target==='template')return E.templates(s).find(t=>t.id===id)||null;if(target==='libitem')return HB.find(s,id);if(target==='handout')return HO.find(s,id);if(target==='scene')return (s.sessionFlow||[]).find(x=>x.id===id)||null;return null;}
+ function libraryBytes(s){const lib=s.gmLibrary||{};return [...(lib.templates||[]),...(lib.items||[]),...(s.handouts||[]),...(s.sessionFlow||[])].reduce((t,x)=>t+(x.image?.bytes||0),0);}
  function copyLibraryImage(s,img){if(!img||!LIB_FILE.test(img.filename||''))return null;const from=path.join(mediaDir,img.filename);if(!fs.existsSync(from))return null;
   if(M.list(s).reduce((t,m)=>t+(m.bytes||0),0)+libraryBytes(s)+(img.bytes||0)>M.MAX_TOTAL)return null;
   const filename=random(24)+'.'+(img.mime==='image/png'?'png':'webp');fs.copyFileSync(from,path.join(mediaDir,filename));return {mime:img.mime,width:img.width,height:img.height,bytes:img.bytes,filename};}
@@ -314,6 +315,12 @@ function createServer(opts={}){
  const SPECTATOR={id:'__spectator__',name:'Spectateur',role:'player',characterId:'__table__',lang:'fr'};
  function spectator(req){const q=new URL(req.url,'http://x').searchParams.get('t')||'';const t=q||cookie(req,'chroniques_spectateur');if(!t||!/^[A-Za-z0-9_-]{20,80}$/.test(t))return null;const h=sha(t);
   const c=(db.campaigns||[]).find(x=>x.spectator&&x.spectator.hash===h);return c?{c,u:{...SPECTATOR},token:t}:null;}
+ // 5.9 : l’administrateur du serveur est le compte créé à l’installation (premier compte).
+ // 5.9 : rencontre posée sur une carte (jetons en formation autour du point touché) : carte vérifiée avant tout ajout.
+ function deployMap(s,b,encId){if(!b.mapId)return null;const map=CM.read(s,String(b.mapId));if(!map)badRequest('Carte introuvable.');const enc=E.encounters(s).find(x=>x.id===encId);const n=enc?E.count(enc):0;
+  if((map.tokens||[]).length+n>CM.MAX_TOKENS)badRequest('Pas assez de place sur la carte : '+CM.MAX_TOKENS+' jetons au maximum.');return map;}
+ function adminId(){return db.adminId||db.users[0]?.id||null;}
+ function isAdmin(u){return !!u&&!!u.id&&u.id===adminId();}
  function viewerOrSpectator(req){const u=who(req);if(u)return {u,c:currentCampaign(u)};const sp=spectator(req);if(sp)return sp;throw Object.assign(new Error('Connexion nécessaire.'),{status:401});}
  function currentCampaign(u){const c=db.campaigns.find(x=>x.id===u.activeCampaignId);if(!c||!memberOf(c,u.id))throw sleepBlock('Vous ne participez pas à cette campagne.');return c;}
  function requireGm(u){if(u.assistantElevated)return;const c=currentCampaign(u);if(u.role!=='gm'||memberOf(c,u.id)?.role!=='gm')throw sleepBlock('Accès réservé au MJ.');}
@@ -359,6 +366,7 @@ function createServer(opts={}){
  full.media=M.projected(c.state,u);
  if(c.state.votes){const nameOf=uid=>{const m=c.members.find(x=>x.userId===uid);const pc=m&&m.characterId&&c.state.characters.find(p=>p.id===m.characterId);return pc?pc.name:(db.users.find(x=>x.id===uid)?.name||'?');};full.votes=TV.projected(c.state,u.id,nameOf);} // Votes anonymes : qui a voté quoi n’est jamais envoyé.
  if(c.state.feedback){const nameOf=uid=>{const m=c.members.find(x=>x.userId===uid);const pc=m&&m.characterId&&c.state.characters.find(p=>p.id===m.characterId);return pc?pc.name:(db.users.find(x=>x.id===uid)?.name||'?');};full.feedback=FB.projected(c.state,u,nameOf);} // Anonymat : aucun nom envoyé.
+ {const ts=c.state.tableScene&&(c.state.sessionFlow||[]).find(x=>x.id===c.state.tableScene.id);full.tableScene=ts?{id:ts.id,title:ts.title,readAloud:ts.readAloud||'',hasImage:!!ts.image,imageKey:ts.image?ts.image.filename.slice(0,8):'',at:c.state.tableScene.at}:null;} // Scène mise en avant : seulement son titre, son texte à lire et son image.
  if(u.role!=='gm'){full.clocks=CLK.projected(c.state);full.clues=CLU.projected(c.state,u.id);} // Horloges secrètes, notes et indices non révélés : MJ seulement.
  full.ambience=AMB.projected(c.state); // Jamais les noms de fichiers sur disque.
  if(u.role!=='gm')full.randomTables=RT.projected(c.state); // Tables privées du MJ : jamais envoyées.
@@ -377,7 +385,7 @@ function createServer(opts={}){
  full.claimedCharacterIds=c.members.filter(m=>m.characterId).map(m=>m.characterId);
   // V5 — co-MJ restreint (« assistant ») : vue de joueur + combat complet + monstres et rencontres de la bibliothèque.
   if(u.role==='assistant'&&full.combat){full.combat={...L.clone(c.state.combat),log:full.combat.log};const lib=c.state.gmLibrary||{};full.gmLibrary={templates:L.clone(lib.templates||[]),encounters:L.clone(lib.encounters||[])};}
-  return {version:c.version,viewer:{name:u.name,role:u.role,accessRole:u.accessRole,characterId:u.characterId||null,isOwner:c.ownerId===u.id,campaignId:c.id,canUndo:u.role==='gm'&&canUndo(c),...(c.ownerId===u.id?{lastBackupDays:lastBackupDays()}:{})},state:full};
+  return {version:c.version,viewer:{name:u.name,role:u.role,accessRole:u.accessRole,characterId:u.characterId||null,isOwner:c.ownerId===u.id,isAdmin:isAdmin(u),...(isAdmin(u)?{newSuggestions:SUG.list(db).filter(x=>x.status==='nouvelle').length}:{}),campaignId:c.id,canUndo:u.role==='gm'&&canUndo(c),...(c.ownerId===u.id?{lastBackupDays:lastBackupDays()}:{})},state:full};
  }
  function publish(c){for(const x of [...listeners]){if(x.campaignId!==c.id)continue;try{const user=db.users.find(u=>u.id===x.userId),session=sessions.get(x.sessionHash),member=user&&memberOf(c,user.id);const role=member?.role==='gm'&&session?.mode==='player'?'player':member?.role||'player';x.res.write(`event: update\ndata: ${JSON.stringify({version:c.version,campaignId:c.id,role})}\n\n`);}catch{listeners.delete(x);}}}
  function badRequest(msg){throw Object.assign(new Error(msg),{status:400});}
@@ -520,7 +528,11 @@ function createServer(opts={}){
   case 'storyDelete':{requireGm(u);SP.remove(s,id);break;}
   case 'sceneAdd':{requireGm(u);const sc=F.add(s,'sc-'+random(10),b.values);if(sc.status==='active'&&sc.trackId)AMB.play(s,sc.trackId,s.ambience?.playing?.volume);break;}
   case 'sceneUpdate':{requireGm(u);const before=(s.sessionFlow||[]).find(x=>x.id===id)?.status;const sc=F.update(s,id,b.values);if(sc.status==='active'&&before!=='active'&&sc.trackId){AMB.play(s,sc.trackId,s.ambience?.playing?.volume);const t=AMB.projected(s).tracks?.find(x=>x.id===sc.trackId);logGm(s,'♫ Ambiance de la scène « '+sc.title+' » : '+(t?.name||'piste')+'.');}break;}
-  case 'sceneDelete':{requireGm(u);F.remove(s,id);break;}
+  case 'sceneDelete':{requireGm(u);const old=(s.sessionFlow||[]).find(x=>x.id===id)?.image;F.remove(s,id);if(s.tableScene?.id===id)delete s.tableScene;dropLibraryFile(old);break;}
+  // 5.9 : mise en scène sur l’écran de table, chez les joueurs et le spectateur (image, texte à lire, ambiance).
+  case 'sceneStage':{requireGm(u);const sc=(s.sessionFlow||[]).find(x=>x.id===id);if(!sc)badRequest('Scène introuvable.');sc.status='active';s.tableScene={id:sc.id,at:new Date().toISOString()};
+   if(sc.trackId&&(s.ambience?.tracks||[]).some(t=>t.id===sc.trackId))AMB.play(s,sc.trackId,s.ambience?.playing?.volume);logPublic(s,'🎭 Scène : '+sc.title);break;}
+  case 'sceneUnstage':{requireGm(u);delete s.tableScene;break;}
   case 'plannerAdd':{requireGm(u);C.add(s,String(b.section||''),'cp-'+random(10),b.values);break;}
   case 'plannerUpdate':{requireGm(u);C.update(s,String(b.section||''),id,b.values);break;}
   case 'plannerDelete':{requireGm(u);C.remove(s,String(b.section||''),id);break;}
@@ -539,8 +551,13 @@ function createServer(opts={}){
   case 'encounterGroupAdd':{requireGm(u);E.addGroup(s,id,'grp-'+random(9),b.templateId,b.quantity);break;}
   case 'encounterGroupRemove':{requireGm(u);E.removeGroup(s,id,b.groupId);break;}
   case 'encounterDeploy':{
-   requireGm(u);
+   requireGm(u);const dmap=deployMap(s,b,id); // 5.9 : carte où poser les jetons (facultative).
    const launched=E.deploy(s,id,()=> 'npc-'+random(9));
+   if(dmap){const list=launched.created,n=list.length,cols=Math.ceil(Math.sqrt(n)),rows=Math.ceil(n/cols);const step=dmap.grid?.cells?Math.max(10,Math.round(1000/dmap.grid.cells)):40;const stepY=Math.max(10,Math.round(step*(Number(dmap.aspect)||1)));
+    const cx=Number.isInteger(b.x)&&b.x>=0&&b.x<=1000?b.x:500,cy=Number.isInteger(b.y)&&b.y>=0&&b.y<=1000?b.y:500;const clamp=v=>Math.max(0,Math.min(1000,Math.round(v)));
+    list.forEach((cr,i)=>{const col=i%cols,row=Math.floor(i/cols);const npc=N.find(s,cr.id);
+     CM.tokenAdd(s,dmap.id,'tok-'+random(10),{kind:'npc',refId:cr.id,label:String(npc?.name||cr.name).slice(0,40),x:clamp(cx+(col-(cols-1)/2)*step),y:clamp(cy+(row-(rows-1)/2)*stepY),visible:cr.visibility==='public'});});
+    ensureAspect(dmap);}
    for(const creature of launched.created){
     const tpl=E.templates(s).find(t=>t.id===creature.templateId);
     attachArt(s,{kind:'npc',entityId:creature.id,visibility:creature.visibility==='public'?'public':'private',image:tpl?.image,icon:creature.icon});
@@ -1079,6 +1096,12 @@ function createServer(opts={}){
     const u=requireUser(req),c=currentCampaign(u);if(c.ownerId!==u.id)throw sleepBlock('Réservé au MJ propriétaire de la campagne.');
     send(res,200,{backups:BK.list(backupRoot,dataFile).slice(0,40),mirror:db.backupMirror||'',daily:dailyBackup});return;
    }
+   if(req.method==='GET'&&pathname.startsWith('/api/scene-image/')){
+    const {u,c}=viewerOrSpectator(req);const id=decodeURIComponent(pathname.slice('/api/scene-image/'.length));const sc=(c.state.sessionFlow||[]).find(x=>x.id===id);
+    if(!sc||!sc.image||!LIB_FILE.test(sc.image.filename||'')||(u.role!=='gm'&&c.state.tableScene?.id!==id))throw Object.assign(new Error('Image non disponible.'),{status:404});
+    const file=path.join(mediaDir,sc.image.filename);if(!fs.existsSync(file))throw Object.assign(new Error('Image absente.'),{status:404});
+    res.writeHead(200,{'content-type':sc.image.mime,'cache-control':'private, no-store','content-disposition':'inline','content-length':fs.statSync(file).size});fs.createReadStream(file).pipe(res);return;
+   }
    if(req.method==='GET'&&pathname.startsWith('/api/handout-image/')){
     const u=requireUser(req),c=currentCampaign(u),h=HO.find(c.state,decodeURIComponent(pathname.slice('/api/handout-image/'.length)));
     if(!h||!h.image||!LIB_FILE.test(h.image.filename||'')||(u.role!=='gm'&&!HO.addressedTo(h,u.characterId)))throw Object.assign(new Error('Document non disponible.'),{status:404});
@@ -1145,6 +1168,7 @@ function createServer(opts={}){
    if(req.method==='GET'&&pathname==='/api/state'){const u=requireUser(req),c=currentCampaign(u);send(res,200,syncOut(req,c,projected(c,u),new URL(req.url,'http://localhost').searchParams.get('since')||''));return;}
    if(req.method==='GET'&&pathname==='/api/ai/status'){const u=requireUser(req);currentCampaign(u);requireGm(u);send(res,200,{enabled:aiEnabled,model:aiModel,localAvailable:true});return;}
    if(req.method==='GET'&&pathname==='/api/management'){const u=requireUser(req),c=currentCampaign(u);requireGm(u);send(res,200,gmOverview(c));return;}
+   if(req.method==='GET'&&pathname==='/api/suggestions'){const u=requireUser(req);const admin=isAdmin(u);send(res,200,admin?{admin:true,suggestions:SUG.forAdmin(db),counts:SUG.counts(db)}:{admin:false,suggestions:SUG.forUser(db,u.id)});return;}
    if(req.method==='GET'&&pathname==='/api/reports'){const u=requireUser(req),c=currentCampaign(u);if(c.ownerId!==u.id)throw Object.assign(new Error('Réservé au MJ propriétaire.'),{status:403});
      const file=path.join(path.dirname(dataFile),'signalements.jsonl');let list=[];try{list=fs.readFileSync(file,'utf8').split('\n').filter(Boolean).map(l=>{try{return JSON.parse(l);}catch{return null;}}).filter(Boolean);}catch{}
      send(res,200,{reports:list.slice(-200).reverse(),file:'data/signalements.jsonl'});return;}
@@ -1234,7 +1258,7 @@ function createServer(opts={}){
      limit(req,'setup');if(db.users.length)throw sleepBlock('Le MJ existe déjà.');
      if(typeof b.setupKey!=='string'||b.setupKey!==setupKey)throw sleepBlock('Clé de première configuration incorrecte.');
      const name=normalizeName(b.name);validPassword(b.password);const {salt,hash}=passwordHash(b.password),id=random(12);
-     const u={id,name,slug:name.toLocaleLowerCase('fr'),role:'gm',salt,passHash:hash};db.users.push(u);
+     const u={id,name,slug:name.toLocaleLowerCase('fr'),role:'gm',salt,passHash:hash};db.users.push(u);db.adminId=id;
      db.campaigns.push({id:'camp-'+random(9),ownerId:id,version:1,members:[{userId:id,role:'gm'}],state:L.initialState()});persist();login(res,u);send(res,200,{ok:true});return;
     }
     // 5.1 — clés d'accès (WebAuthn). L'origine attendue est celle que le serveur accepte déjà (sameOrigin).
@@ -1338,7 +1362,7 @@ function createServer(opts={}){
     if(pathname==='/api/library/image'){
      requireGm(u);limit(req,'media');
      if(!Number.isSafeInteger(b.baseVersion)||b.baseVersion!==c.version)throw Object.assign(new Error('Bibliothèque modifiée entre-temps.'),{status:409});
-     const target=['template','libitem','handout'].includes(b.target)?b.target:badRequest('Type de fiche inconnu.');const entry=libraryEntry(c.state,target,String(b.id||''));if(!entry)badRequest('Fiche introuvable.');
+     const target=['template','libitem','handout','scene'].includes(b.target)?b.target:badRequest('Type de fiche inconnu.');const entry=libraryEntry(c.state,target,String(b.id||''));if(!entry)badRequest('Fiche introuvable.');
      const old=entry.image||null;
      if(b.remove===true){delete entry.image;c.version++;persist();publish(c);dropLibraryFile(old);send(res,200,projected(c,u));return;}
      if(!['image/webp','image/png'].includes(b.mime)||typeof b.imageBase64!=='string'||!b.imageBase64||b.imageBase64.length>2_700_000||!/^[A-Za-z0-9+/]+={0,2}$/.test(b.imageBase64))badRequest('Image invalide.');
@@ -1427,6 +1451,10 @@ function createServer(opts={}){
       db.campaigns.push(c);persist();const session=sessionFor(req);session.campaignId=c.id;session.mode='gm';endSessionStreams(sha(cookie(req,'chroniques_sid')));
       send(res,200,{ok:true,id:c.id});return;
      }
+     // 5.9 : suggestions d’amélioration (tous les comptes) et suivi par l’administrateur du serveur.
+     if(pathname==='/api/suggestion'){limit(req,'suggest');const sg=SUG.add(db,'sug-'+random(10),u,b,{campaign:c.state.title,version:APP_VERSION});persist();send(res,200,{ok:true,id:sg.id,suggestions:SUG.forUser(db,u.id)});return;}
+     if(pathname==='/api/suggestion/status'){if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');SUG.setStatus(db,String(b.id||''),String(b.status||''),b.reply===undefined?undefined:String(b.reply));persist();send(res,200,{ok:true,suggestions:SUG.forAdmin(db),counts:SUG.counts(db)});return;}
+     if(pathname==='/api/suggestion/delete'){if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');SUG.remove(db,String(b.id||''));persist();send(res,200,{ok:true,suggestions:SUG.forAdmin(db),counts:SUG.counts(db)});return;}
      if(pathname==='/api/report'){
       limit(req,'report');
       const clip=(v,n)=>String(v??'').replace(/[\u0000-\u0008\u000b-\u001f]/g,' ').slice(0,n);

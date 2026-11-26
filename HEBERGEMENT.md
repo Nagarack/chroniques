@@ -71,6 +71,8 @@ Au démarrage, le message indique l’intermédiaire reconnu, par exemple : `HTT
 
 ## Entretien
 
+- **Administration** : le compte créé à l’installation est l’administrateur du serveur. Il lit les suggestions d’amélioration de tous les comptes dans « Administration » (menu Bibliothèque & réglages). Le transfert des données le conserve.
+
 - **Sauvegarde** : Chroniques fait seul une sauvegarde complète par jour (base et images) dans `backups/`, et garde les 10 dernières copies de la base dans `data/auto-backups/`. `node scripts/backup.js` en fait une à la demande. Copiez régulièrement `backups/` sur une autre machine (ou réglez la copie miroir dans Paramètres).
 - **Mot de passe MJ oublié** : arrêtez le service, puis `node scripts/reset-password.js "Nom du compte"`.
 - **Revenir en mode local** : `node scripts/set-remote-origin.js --off` (et coupez la route publique).
