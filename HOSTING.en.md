@@ -53,7 +53,7 @@ Always start **`node scripts/launcher.js`** (not `server.js`): the launcher inst
 - Accounts and passwords are kept. **Passkeys** are tied to the domain name: if it changes, everyone signs in with their password and creates a new passkey.
 
 ## Maintenance
-- **Administration:** the account created at installation is the server administrator. It reads everyone’s improvement suggestions in “Administration” (Library & settings menu). Moving the data keeps it.
+- **Administration:** the account created at installation is the server administrator. It reads everyone’s improvement suggestions in “Administration” (Library & settings menu). Moving the data keeps it. In the Server tab it can also create a new password link for an account, sign it out everywhere or suspend it.
 - **Backups:** Chroniques makes a full daily backup (database and images) in `backups/` and keeps the last 10 database copies in `data/auto-backups/`. `node scripts/backup.js` makes one on demand. Copy `backups/` to another machine regularly (or set up the mirror copy in Settings).
 - **Forgotten GM password:** stop the service, then `node scripts/reset-password.js "Account name"`.
 - **Back to local mode:** `node scripts/set-remote-origin.js --off` (and turn off the public route).

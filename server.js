@@ -133,6 +133,7 @@ const allowedStatic=new Map([
  ['/src/clues.js',['src/clues.js','text/javascript; charset=utf-8']],
  ['/src/personality.js',['src/personality.js','text/javascript; charset=utf-8']],
  ['/src/travel-journal.js',['src/travel-journal.js','text/javascript; charset=utf-8']],
+ ['/src/jumps.js',['src/jumps.js','text/javascript; charset=utf-8']],
  ['/src/spells.js',['src/spells.js','text/javascript; charset=utf-8']],
  ['/src/spell-guide.js',['src/spell-guide.js','text/javascript; charset=utf-8']],
  ['/src/creatures.js',['src/creatures.js','text/javascript; charset=utf-8']],
@@ -298,6 +299,7 @@ function createServer(opts={}){
  function memberOf(c,uid){return c?.members?.find(m=>m.userId===uid)||null;}
  function memberCampaigns(uid){return db.campaigns.filter(c=>memberOf(c,uid));}
  function login(res,u,campaignId=null){
+  if(u.suspended)throw Object.assign(new Error('Ce compte est suspendu par l’administrateur du serveur.'),{status:403});
   const sid=random(32),first=memberCampaigns(u.id)[0];
   sessions.set(sha(sid),{uid:u.id,campaignId:campaignId||first?.id||null,mode:null,expires:Date.now()+7*864e5});
   res.setHeader('Set-Cookie',`chroniques_sid=${sid}; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800${secureCookies?'; Secure':''}`);
@@ -306,7 +308,7 @@ function createServer(opts={}){
  // Les rôles stockés dans users sont historiques : l'autorisation dépend UNIQUEMENT de la campagne active.
  function who(req){
   const session=sessionFor(req);if(!session)return null;
-  const original=db.users.find(u=>u.id===session.uid);if(!original)return null;
+  const original=db.users.find(u=>u.id===session.uid);if(!original||original.suspended)return null;
   const available=memberCampaigns(original.id);
   let c=available.find(x=>x.id===session.campaignId);
   if(!c){c=available[0];session.campaignId=c?.id||null;session.mode=null;}
@@ -328,7 +330,7 @@ function createServer(opts={}){
  function deployMap(s,b,encId){if(!b.mapId)return null;const map=CM.read(s,String(b.mapId));if(!map)badRequest('Carte introuvable.');const enc=E.encounters(s).find(x=>x.id===encId);const n=enc?E.count(enc):0;
   if((map.tokens||[]).length+n>CM.MAX_TOKENS)badRequest('Pas assez de place sur la carte : '+CM.MAX_TOKENS+' jetons au maximum.');return map;}
  // 5.10 : en mode table unique, seules les routes utiles aux joueurs restent ouvertes (pas de compte, d’invitations ni d’administration).
- const TABLE_OK=/^(GET \/api\/(state|events|me|status|notify\/poll|push\/status|media\/|map-image\/|map-pin-image\/|handout-image\/|scene-image\/|audio\/)|POST \/api\/(action|table-mode|logout|presence|lang|notify\/poll|media\/change)$)/;
+ const TABLE_OK=/^(GET \/api\/(state|events|me|status|notify\/poll|push\/status|media\/|map-image\/|map-pin-image\/|handout-image\/|scene-image\/|audio\/)|POST \/api\/(action|map-ping|table-mode|logout|presence|lang|notify\/poll|media\/change)$)/;
  // Date du monde lisible (après `extra` minutes), si le calendrier du monde est actif.
  function wtLabel(s){return s.worldTime?.enabled?WT.format(s.worldTime,s.worldTime.minutes):'';}
  function adminId(){return db.adminId||db.users[0]?.id||null;}
@@ -400,6 +402,8 @@ function createServer(opts={}){
   if(u.role==='assistant'&&full.combat){full.combat={...L.clone(c.state.combat),log:full.combat.log};const lib=c.state.gmLibrary||{};full.gmLibrary={templates:L.clone(lib.templates||[]),encounters:L.clone(lib.encounters||[])};}
   return {version:c.version,viewer:{name:u.name,role:u.role,accessRole:u.accessRole,characterId:u.characterId||null,isOwner:!u.tableMode&&c.ownerId===u.id,tableMode:!!u.tableMode,isAdmin:isAdmin(u),...(isAdmin(u)?{newSuggestions:SUG.list(db).filter(x=>x.status==='nouvelle').length}:{}),campaignId:c.id,canUndo:u.role==='gm'&&canUndo(c),...(c.ownerId===u.id?{lastBackupDays:lastBackupDays()}:{})},state:full};
  }
+ const pingTimes=new Map();
+ function pingAll(c,payload,shared){const data=JSON.stringify(payload);for(const x of [...listeners]){if(x.campaignId!==c.id)continue;try{const session=sessions.get(x.sessionHash),member=memberOf(c,x.userId);const role=member?.role==='gm'&&(session?.mode==='player'||session?.table)?'player':member?.role||'player';if(!shared&&role!=='gm')continue;x.res.write(`event: ping\ndata: ${data}\n\n`);}catch{listeners.delete(x);}}}
  function publish(c){for(const x of [...listeners]){if(x.campaignId!==c.id)continue;try{const user=db.users.find(u=>u.id===x.userId),session=sessions.get(x.sessionHash),member=user&&memberOf(c,user.id);const role=member?.role==='gm'&&(session?.mode==='player'||session?.table)?'player':member?.role||'player';x.res.write(`event: update\ndata: ${JSON.stringify({version:c.version,campaignId:c.id,role})}\n\n`);}catch{listeners.delete(x);}}}
  function badRequest(msg){throw Object.assign(new Error(msg),{status:400});}
  function cleanText(value,label,max=70,min=1){if(typeof value!=='string'){badRequest(label+' invalide.');}const v=value.trim();if(v.length<min||v.length>max)badRequest(label+' : '+min+' à '+max+' caractères.');return v;}
@@ -452,7 +456,7 @@ function createServer(opts={}){
  function lightsChanged(s){CM.syncPcLights(s,TR.bestByPc(s));for(const m of s.maps||[])try{CM.visionReveal(s,m.id,darkvisionOf(s));}catch{}}
  // Le temps du monde passe : événements, lumières qui s’éteignent, éclairage des cartes.
  function timePassed(s,minutes,{lights=true}={}){if(!s.worldTime?.enabled)return;const reached=WT.advance(s,minutes);logEvents(s,reached);if(lights&&s.travel)for(const m of TR.tickLights(s,minutes))logPublic(s,m.text);lightsChanged(s);}
- function logEvents(s,reached){for(const e of reached||[]){const msg='📅 Événement : '+e.title+(e.note&&e.shared?' — '+e.note:'');if(e.shared)logPublic(s,msg);else s.combat.log.unshift({id:random(5),msg,audience:'gm',when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});}}
+ function logEvents(s,reached){for(const m of reached?.fullMoons||[])logPublic(s,'🌕 Pleine lune : '+m.name+(m.count>1?' (×'+m.count+')':'')+'.');for(const e of reached||[]){const msg='📅 Événement : '+e.title+(e.note&&e.shared?' — '+e.note:'');if(e.shared)logPublic(s,msg);else s.combat.log.unshift({id:random(5),msg,audience:'gm',when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});}}
  // Import d'un personnage exporté : chaque partie passe par les validations habituelles ; les éléments invalides sont ignorés et signalés.
  function importCharacter(s,a,data){const c=CT.check(data);const skipped=[];
   const pc=L.addPc(s,'mj',{name:cleanText(c.name,'Nom'),role:String(c.role||''),job:String(c.job||''),level:Number(c.level)||1,hp:Number(c.hpMax)||10,ac:Number(c.ac)||10});
@@ -699,6 +703,7 @@ function createServer(opts={}){
   case 'worldTimeAdvance':{requireGm(u);if(!s.worldTime?.enabled)badRequest('Activez d’abord le calendrier du monde.');const minutes=Number(b.minutes);const reached=WT.advance(s,minutes);const why=String(b.reason||'').replace(/[\u0000-\u001f]/g,' ').trim().slice(0,60);
    logPublic(s,'⏳ '+WT.duration(minutes)+(why?' ('+why+')':'')+' · '+WT.format(s.worldTime,s.worldTime.minutes));logEvents(s,reached);if(s.travel)for(const m of TR.tickLights(s,minutes))logPublic(s,m.text);lightsChanged(s);break;}
   case 'worldCalendar':{requireGm(u);WT.setCalendar(s,b.values||{});break;}
+  case 'worldMoons':{requireGm(u);if(!s.worldTime?.enabled)badRequest('Activez d’abord le calendrier du monde.');const ms=WT.setMoons(s,b.moons);logGm(s,ms.length?'🌙 Lunes : '+ms.map(m=>m.name).join(', ')+'.':'🌙 Lunes retirées du calendrier.');break;}
   case 'worldEventAdd':{requireGm(u);WT.eventAdd(s,'wev-'+random(8),b.values);break;}
   case 'worldEventRemove':{requireGm(u);WT.eventRemove(s,id);break;}
   case 'worldEventDone':{requireGm(u);WT.eventDone(s,id,b.done);break;}
@@ -1121,7 +1126,7 @@ function createServer(opts={}){
     const sizeOf=(dir,depth=0)=>{let bytes=0,count=0;try{for(const f of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,f.name);if(f.isDirectory()){if(depth<4){const r=sizeOf(p,depth+1);bytes+=r.bytes;count+=r.count;}}else if(f.isFile()){bytes+=fs.statSync(p).size;count++;}}}catch{}return {bytes,count};};
     const fileSize=f=>{try{return fs.statSync(f).size;}catch{return 0;}};const now=Date.now();
     const active=uid=>[...sessions.values()].filter(x=>x.uid===uid&&x.expires>=now).length;
-    const users=db.users.map(x=>({name:x.name,admin:x.id===adminId(),passkeys:(x.passkeys||[]).length,sessions:active(x.id),campaigns:memberCampaigns(x.id).map(c=>({title:c.state.title,role:memberOf(c,x.id)?.role||'player'}))}));
+    const users=db.users.map(x=>({id:x.id,name:x.name,admin:x.id===adminId(),suspended:!!x.suspended,passkeys:(x.passkeys||[]).length,sessions:active(x.id),campaigns:memberCampaigns(x.id).map(c=>({title:c.state.title,role:memberOf(c,x.id)?.role||'player'}))}));
     const campaigns=db.campaigns.map(c=>({title:c.state.title,owner:db.users.find(x=>x.id===c.ownerId)?.name||'?',members:c.members.length,characters:(c.state.characters||[]).length,maps:(c.state.maps||[]).length,lastActivity:c.state.lastEdited||null,bytes:Buffer.byteLength(JSON.stringify(c))}));
     const backups=BK.list(backupRoot,dataFile);let disk=null;try{const st=fs.statfsSync(path.dirname(dataFile));disk={free:st.bavail*st.bsize,total:st.blocks*st.bsize};}catch{}
     let reports=[];try{reports=fs.readFileSync(path.join(path.dirname(dataFile),'signalements.jsonl'),'utf8').split('\n').filter(Boolean).map(l=>{try{return JSON.parse(l);}catch{return null;}}).filter(Boolean).slice(-100).reverse();}catch{}
@@ -1265,6 +1270,24 @@ function createServer(opts={}){
      st.subs.push({id:random(9),userId:u.id,...sub,createdAt:new Date().toISOString()});persist();send(res,200,{ok:true,devices:st.subs.filter(x=>x.userId===u.id).length});return;}
     if(pathname==='/api/push/unsubscribe'){const u=requireUser(req);const st=pushStore();const n=st.subs.length;st.subs=st.subs.filter(x=>!(x.userId===u.id&&(b.all===true||x.endpoint===String(b.endpoint||''))));if(st.subs.length!==n)persist();send(res,200,{ok:true,devices:st.subs.filter(x=>x.userId===u.id).length});return;}
     if(pathname==='/api/lang'){const u=requireUser(req);const rec=db.users.find(x=>x.id===u.id);const l=b.lang==='en'?'en':'fr';if(rec.lang!==l){rec.lang=l;persist();}send(res,200,{lang:l});return;}
+    // 5.11 : gestion des comptes par l’administrateur du serveur (lien de nouveau mot de passe, déconnexion partout, suspension).
+    if(pathname==='/api/admin/account'){const u=requireUser(req);if(!isAdmin(u))throw sleepBlock('Réservé à l’administrateur de ce serveur.');
+     const tu=db.users.find(x=>x.id===String(b.userId||''));if(!tu)badRequest('Compte introuvable.');const self=tu.id===u.id,mine=sha(cookie(req,'chroniques_sid')||'');
+     const closeSessions=keep=>{let n=0;for(const [token,session] of [...sessions]){if(session.uid===tu.id&&token!==keep){sessions.delete(token);endSessionStreams(token);n++;}}return n;};
+     if(b.op==='reset'){if(self)badRequest('Pour votre propre compte, changez le mot de passe dans Mon compte (ou utilisez reset-password.js sur le serveur).');if(!Array.isArray(db.resets))db.resets=[];
+      db.resets=db.resets.filter(x=>x.userId!==tu.id&&!x.used&&x.expires>Date.now());const code=random(15);db.resets.push({codeHash:sha(code),userId:tu.id,used:false,expires:Date.now()+2*3600_000});persist();
+      send(res,200,{code,name:tu.name,expiresHours:2});return;}
+     if(b.op==='logout'){const n=closeSessions(self?mine:null);send(res,200,{closed:n});return;}
+     if(b.op==='suspend'||b.op==='restore'){if(self)badRequest('L’administrateur ne peut pas suspendre son propre compte.');
+      if(b.op==='suspend'){tu.suspended=new Date().toISOString();const n=closeSessions(null);persist();send(res,200,{suspended:true,closed:n});return;}
+      delete tu.suspended;persist();send(res,200,{suspended:false});return;}
+     badRequest('Opération inconnue.');}
+    // 5.11 : signal éphémère sur une carte (onde visible quelques secondes par toute la table) ; rien n’est enregistré.
+    if(pathname==='/api/map-ping'){const u=requireUser(req),c=currentCampaign(u);const m=CM.read(c.state,String(b.mapId||''));if(!m||!CM.canRead(u,m))badRequest('Carte introuvable.');
+     const x=Math.round(Number(b.x)),y=Math.round(Number(b.y));if(!Number.isFinite(x)||!Number.isFinite(y)||x<0||x>1000||y<0||y>1000)badRequest('Position invalide.');
+     const now=Date.now(),hist=(pingTimes.get(u.id)||[]).filter(t=>now-t<60_000);if(hist.length&&now-hist[hist.length-1]<600||hist.length>=20)throw Object.assign(new Error('Doucement : un signal à la fois.'),{status:429});hist.push(now);pingTimes.set(u.id,hist);
+     const pc=(c.state.characters||[]).find(p=>p.id===u.characterId);const name=u.role==='gm'?'MJ':(pc?.name||u.name);
+     pingAll(c,{mapId:m.id,x,y,name:String(name).slice(0,40),by:u.role==='gm'?'gm':'player',id:random(6)},m.visibility==='shared');send(res,200,{ok:true});return;}
     if(pathname==='/api/presence'){const u=requireUser(req);const h=sha(cookie(req,'chroniques_sid')||'');for(const x of listeners)if(x.sessionHash===h)x.visible=b.visible!==false;send(res,200,{ok:true});return;}
     if(pathname==='/api/push/prefs'){const u=requireUser(req);const st=pushStore();st.prefs??={};st.prefs[u.id]={...(st.prefs[u.id]||{}),turn:b.turn!==false};persist();send(res,200,{prefs:st.prefs[u.id]});return;}
     if(pathname==='/api/push/test'){const u=requireUser(req);limit(req,'media');const r=await pushTo([u.id],{title:'Chroniques',body:'Les rappels de séance fonctionnent sur cet appareil.',url:'/',tag:'test'});send(res,200,r);return;}
@@ -1331,7 +1354,7 @@ function createServer(opts={}){
     if(pathname==='/api/password-reset/use'){
       limit(req,'join');validPassword(b.newPassword);const h=sha(String(b.code||'').trim());if(!Array.isArray(db.resets))db.resets=[];
       const r=db.resets.find(x=>x.codeHash===h&&!x.used&&x.expires>Date.now());if(!r)throw sleepBlock('Lien de réinitialisation expiré ou incorrect. Demandez-en un nouveau à votre MJ.');
-      const user=db.users.find(x=>x.id===r.userId);if(!user)throw sleepBlock('Compte introuvable.');
+      const user=db.users.find(x=>x.id===r.userId);if(!user)throw sleepBlock('Compte introuvable.');if(user.suspended)throw sleepBlock('Ce compte est suspendu par l’administrateur du serveur.');
       const nh=passwordHash(b.newPassword);user.salt=nh.salt;user.passHash=nh.hash;r.used=true;
       for(const [token,session] of [...sessions]){if(session.uid===user.id){sessions.delete(token);endSessionStreams(token);}}
       db.resets=db.resets.filter(x=>!x.used&&x.expires>Date.now()).slice(-100);persist();login(res,user);send(res,200,{ok:true});return;

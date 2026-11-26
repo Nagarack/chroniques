@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 5.11.0 — Lunes, signal sur la carte, gestion des comptes, sauts et chutes
+- **Lunes du calendrier** (Chronique → Calendrier → « 🌙 Lunes », MJ) : jusqu’à trois lunes avec leur cycle (décimales permises) et le nombre de jours avant la prochaine pleine lune. Les huit phases s’affichent sous la date pour toute la table ; chaque pleine lune franchie quand le temps passe (repos, voyage, « Faire passer ») est annoncée dans le journal. Changer de calendrier garde la phase.
+- **Signal sur la carte** : Alt+clic, appui long ou bouton « 📍 Signaler » ; une onde (bleue pour le MJ) s’affiche quelques secondes chez toute la table avec le nom de son auteur, y compris sur l’écran de table (pas sur le lien spectateur, mis à jour toutes les 4 secondes). Rien n’est enregistré ; un signal par personne et par demi-seconde ; sur une carte privée, seul le MJ le reçoit. Animation réduite si le système le demande.
+- **Gestion des comptes** (Administration → Serveur → Comptes) : lien de nouveau mot de passe pour n’importe quel compte (2 h, usage unique), fermeture de toutes ses connexions (ou de vos autres connexions), suspension et réactivation. Un compte suspendu ne se connecte plus (mot de passe, clé d’accès, lien de réinitialisation) ; ses données restent en place. L’administrateur ne peut pas se suspendre.
+- **Sauts et chutes** (fiche → Actions & ressources) : sauts en longueur et en hauteur, avec et sans élan, depuis la Force (SRD 5.1 et 5.2), option sort Saut (× 3) ; hauteur de chute → nombre de d6 contondants à lancer (20d6 au plus) et rappel « À terre ». En mètres ou en pieds selon la langue.
+
 ## 5.10.0 — Mode table unique, personnalité, journal de voyage, accessibilité, administration du serveur
 **Autour de la table**
 - **Mode table unique** (Mon compte, MJ) : une seule tablette posée sur la table. Elle affiche « Qui joue ? » ; chaque joueur touche son personnage et voit sa fiche comme sur son propre appareil, puis la rend avec « Changer de joueur ». Le serveur traite la tablette comme un joueur (aucun secret du MJ envoyé, seules les actions du personnage choisi) ; réglages du compte, invitations, export et administration y sont fermés. Seul le code du MJ (4 à 8 chiffres) en fait sortir, et le mode survit à un redémarrage du serveur.

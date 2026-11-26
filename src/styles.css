@@ -1860,3 +1860,30 @@ html.cvd .map-token.tok-or::before{content:'●'}html.cvd .map-token.tok-rouge::
 .table-wrap{overflow-x:auto}.admin-table{width:100%;border-collapse:collapse;font-size:.92rem}.admin-table th,.admin-table td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}.admin-table thead th{color:var(--soft);font-weight:700}
 .sug-tabs{margin:4px 0 10px}.sug-board-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.sug-vote{min-width:72px}.sug-head{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}.sug-sort{display:inline-flex;align-items:center;gap:6px;font-size:.9rem}
 .table-mode-bar{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;background:var(--card2);border-bottom:2px solid var(--gold)}
+/* 5.11 : lunes du calendrier */
+.world-clock .wc-moons{display:flex;flex-wrap:wrap;gap:4px 14px}
+.world-clock .wc-moon{white-space:normal}
+.moon-row{border:1px solid var(--border);border-radius:6px;padding:6px 10px 2px;margin:0 0 8px}
+.moon-row legend{font-size:13px;color:var(--soft);padding:0 4px}
+@media(max-width:590px){.moon-row .three-fields{grid-template-columns:minmax(0,1fr)}}
+/* 5.11 : signal sur la carte */
+.campaign-map-stage{-webkit-touch-callout:none}
+.campaign-map-stage.tool-ping{cursor:crosshair}
+.map-ping{position:absolute;z-index:60;width:0;height:0;pointer-events:none}
+.map-ping-wave{position:absolute;left:-28px;top:-28px;width:56px;height:56px;border-radius:50%;border:3px solid #f2c14e;box-shadow:0 0 0 2px #1b130cbb,inset 0 0 0 2px #1b130cbb;animation:map-ping 1.3s ease-out 3 both}
+.map-ping-wave2{animation-delay:.45s}
+.map-ping-gm .map-ping-wave{border-color:#6fd3ff}
+.map-ping-name{position:absolute;left:50%;top:22px;transform:translateX(-50%);white-space:nowrap;background:#1b130ce6;color:#fff3d6;border:1px solid #f2c14e;border-radius:4px;padding:1px 7px;font-size:12.5px;font-weight:700}
+.map-ping-gm .map-ping-name{border-color:#6fd3ff}
+@keyframes map-ping{0%{transform:scale(.25);opacity:1}100%{transform:scale(1.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.map-ping-wave{animation:none;opacity:1}.map-ping-wave2{display:none}}
+/* 5.11 : gestion des comptes */
+.admin-acts{display:flex;flex-wrap:wrap;gap:2px 8px}
+.admin-acts .text-button{white-space:nowrap}
+/* 5.11 : sauts et chutes */
+.jump-table{width:100%;border-collapse:collapse;margin-bottom:10px}
+.jump-table th,.jump-table td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border)}
+.jump-table thead th{font-size:13px;color:var(--soft);font-weight:600}
+.fall-calc{border-top:1px solid var(--border);margin-top:10px;padding-top:10px}
+.fall-calc input{width:9em;display:block;margin-top:4px}
+.fall-result{margin:8px 0 0}

@@ -1,6 +1,6 @@
 {
   "name": "chroniques",
-  "version": "5.10.0",
+  "version": "5.11.0",
   "private": true,
   "license": "SEE LICENSE IN LICENSE.md",
   "description": "Chroniques : assistant de table D&D 5e (dés physiques), serveur Node.js sans dépendance.",
