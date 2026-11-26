@@ -10,6 +10,6 @@ test('sauvegarde horodatée autonome vérifie format et conserve les données',t
  assert.throws(()=>backup(root),/Format de base inattendu/);
  const expected={format:5,users:[{id:'mj',name:'MJ'}],campaigns:[{id:'c',state:{title:'Test'}}],invites:[]};
  fs.writeFileSync(path.join(root,'data','chroniques-db.json'),JSON.stringify(expected));
- const target=backup(root);assert.match(target,/backups\/chroniques-backup-/);assert.deepEqual(JSON.parse(fs.readFileSync(target,'utf8')),expected);
+ const target=backup(root);assert.match(target,/backups[\\/]chroniques-backup-/);assert.deepEqual(JSON.parse(fs.readFileSync(target,'utf8')),expected);
  assert.ok(target.startsWith(root));
 });
