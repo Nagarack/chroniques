@@ -1334,9 +1334,8 @@ img.library-photo{object-fit:cover;border-radius:6px}
 .page-tabs button[aria-selected="true"]{color:var(--c-text);border-bottom-color:var(--c-accent)}
 .page-tabs button:hover{color:var(--c-text)}
 .tab-host[data-active] [data-tab]{display:none}
-.tab-host[data-active="monstres"] [data-tab="monstres"],.tab-host[data-active="objets"] [data-tab="objets"],.tab-host[data-active="marchands"] [data-tab="marchands"],.tab-host[data-active="rencontres"] [data-tab="rencontres"],
-.tab-host[data-active="seances"] [data-tab="seances"],.tab-host[data-active="documents"] [data-tab="documents"],.tab-host[data-active="resumes"] [data-tab="resumes"],.tab-host[data-active="memoire"] [data-tab="memoire"],.tab-host[data-active="carnet"] [data-tab="carnet"],.tab-host[data-active="calendrier"] [data-tab="calendrier"],.tab-host[data-active="frise"] [data-tab="frise"],.tab-host[data-active="enquete"] [data-tab="enquete"],.tab-host[data-active="voyages"] [data-tab="voyages"]{display:block}
-.tab-host[data-active="carnet"] .planner-summary[data-tab="carnet"]{display:flex}
+.tab-host[data-active] [data-tab][data-tab-on]{display:block}
+.tab-host[data-active] .planner-summary[data-tab][data-tab-on]{display:flex}
 .toast-action{margin-left:.8rem;border:1px solid currentColor;background:transparent;color:inherit;border-radius:99px;padding:.15rem .8rem;font:inherit;font-weight:700;cursor:pointer}
 body{zoom:var(--ui-zoom,1)}
 
@@ -1908,3 +1907,37 @@ html.cvd .map-token.tok-or::before{content:'●'}html.cvd .map-token.tok-rouge::
 .campaign-tile-icon[style]{border:2px solid var(--camp);border-radius:8px;width:42px;height:42px;display:grid;place-items:center;font-size:22px}
 .look-form{margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
 .look-form h4{margin:0 0 4px}
+/* 5.13 : page Cet appareil */
+.device-panel h2{font-size:18px;margin:0 0 6px}
+.device-row{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;padding:12px 0;border-top:1px solid var(--border)}
+.device-panel h2+.device-row{border-top:0}
+.device-text{min-width:0;flex:1 1 260px}
+.device-text p{margin:2px 0 0}
+.device-control{flex:0 1 auto;display:flex;justify-content:flex-end}
+.device-seg{flex-wrap:wrap}
+.device-toggle{min-width:7.5em}
+.device-toggle[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.kbd-list{display:grid;gap:6px;margin:0}
+.kbd-list div{display:grid;grid-template-columns:minmax(9em,auto) 1fr;gap:12px;align-items:baseline}
+.kbd-list dt{white-space:nowrap}.kbd-list dd{margin:0}
+@media(max-width:590px){.device-row{flex-direction:column;align-items:stretch}.device-control{justify-content:flex-start}}
+.device-seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.device-seg button{border:0;border-left:1px solid var(--border);background:transparent;color:inherit;font:inherit;font-size:.9rem;padding:.4rem .85rem;min-height:38px;cursor:pointer}
+.device-seg button:first-child{border-left:0}
+.device-seg button[aria-pressed="true"]{background:#9a3a26;color:#fff8f2;font-weight:700}
+/* 5.13 : panneau repliable (sauts et chutes) */
+details.jump-panel>summary{list-style:none;cursor:pointer;margin:0}
+details.jump-panel>summary::-webkit-details-marker{display:none}
+details.jump-panel>summary h3::after{content:" ⌄";color:var(--soft);font-size:.85em}
+details.jump-panel[open]>summary{margin-bottom:10px}
+details.jump-panel[open]>summary h3::after{content:" ⌃"}
+/* 5.13 : relecture visuelle — petits écrans */
+.panel-top>.mini-pill,.panel-top>div>.mini-pill:last-child{white-space:nowrap;flex:0 0 auto}
+.panel-top>div:first-child,.panel-top>h3,.panel-top>h2{min-width:0}
+.member{flex-wrap:wrap;row-gap:6px}
+.member>div:nth-child(2){flex:1 1 150px;min-width:0}
+.onboard-banner .btn{white-space:nowrap}
+.onboard-banner>.btn{flex:1 1 auto}
+.map-tools .seg{flex-wrap:wrap;border-radius:12px}
+.map-tools .seg button{white-space:nowrap}
+@media(max-width:590px){.device-text{flex:0 1 auto}.device-row{gap:8px}}

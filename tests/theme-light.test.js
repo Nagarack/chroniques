@@ -29,5 +29,5 @@ test('Thème : automatique par défaut, feuille claire servie, mise en cache et 
  assert.ok(index.indexOf('theme.js')<index.indexOf('online-app.js'),'le thème est appliqué avant le reste de l’application');
  for(const f of ['/src/styles-light.css','/src/theme.js']){assert.ok(read('server.js').includes("['"+f+"'"),f+' servi');assert.ok(read('sw.js').includes("'"+f+"'"),f+' en cache PWA');}
  const theme=read('src/theme.js');assert.ok(theme.includes("'dark'")&&theme.includes("return 'auto'")&&theme.includes('prefers-color-scheme: light')&&theme.includes('localStorage'));
- assert.ok(read('src/online-app.js').includes('data-task="theme-cycle"'));
+ assert.ok(read('src/online-app.js').includes("deviceChoice('theme'"),'choix de l’apparence sur la page Cet appareil (5.13)');
 });

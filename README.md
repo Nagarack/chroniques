@@ -31,7 +31,7 @@ Historique : voir `CHANGELOG.md`. Recette de test : `GUIDE_TESTEURS.md`.
 - **Historique de chaque personnage** (fiche → Historique) : niveaux, XP, objets, combats, quêtes et documents notés automatiquement ; notes du MJ secrètes ou visibles. **Coffre du groupe** commun dans l’Inventaire.
 - **Pour le MJ** : **Séance du jour** (tout ce qui est prévu sur une page, imprimable), **Vue du groupe** (sauvegardes, scores passifs, DD des sorts), **PNJ express** (idées écrites, aucun tirage), **lieux du carnet reliés aux repères de carte**, **modèles de campagne** (exporter / importer la préparation), **poste co-MJ** pour les créatures (`/#poste-comj`), durées d’états précises, concentration des créatures et minuteur de tour.
 - **Rappel de séance** par notification la veille (Paramètres → Rappel de séance ; adresse HTTPS nécessaire, iOS 16.4+ avec Chroniques sur l’écran d’accueil).
-- **Apparence** : automatique par défaut ; Mon compte → Apparence (Sombre, Clair, Automatique).
+- **Apparence** : automatique par défaut ; Cet appareil → Apparence (Sombre, Clair, Automatique).
 - **Aide** : visite guidée, aide-mémoire imprimables (`/aide-joueur.html`, `/aide-mj.html`) et campagne d'entraînement dans Aide & tutoriel.
 - **Recherche globale** : Ctrl+K (ou la loupe) pour tout retrouver et lancer des commandes.
 - **Écran de table** : carte, brouillard, jetons et initiative en plein écran sur une TV, sans aucun secret.
