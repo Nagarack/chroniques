@@ -93,6 +93,9 @@ function sendStatic(req,res,root,file,type,cacheControl='no-cache'){const e=stat
 const allowedStatic=new Map([
  ['/', ['index.html','text/html; charset=utf-8']],
  ['/guide.html',['GUIDE_UTILISATION.html','text/html; charset=utf-8']],
+ // 5.16 : aventure d’initiation (modèle de campagne prêt à importer).
+ ['/aventures/lanterne-noyee.fr.json',['aventures/lanterne-noyee.fr.json','application/json; charset=utf-8']],
+ ['/aventures/lanterne-noyee.en.json',['aventures/lanterne-noyee.en.json','application/json; charset=utf-8']],
  ['/tutos.html',['TUTOS_EXPRESS.html','text/html; charset=utf-8']],
  ['/sw.js',['sw.js','text/javascript; charset=utf-8']],
  ['/src/pwa-register.js',['src/pwa-register.js','text/javascript; charset=utf-8']],

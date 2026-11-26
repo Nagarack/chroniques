@@ -14,6 +14,7 @@ const CM=require('./campaign-maps.js');
 const I=require('./inventory.js');
 const RT=require('./random-tables.js');
 const TCH=require('./table-charter.js');
+const CLU=require('./clues.js');
 const FORMAT='chroniques-modele-campagne',VERSION=1;
 const MAX_IMAGE=2_800_000;
 function fail(m){const e=new Error(m);e.status=400;throw e;}
@@ -32,26 +33,29 @@ function exportTemplate(state,{withMaps=true,readImage=()=>null,title}={}){
   planner,scenes:(state.sessionFlow||[]).map(x=>({...x})),
   templates:(lib.templates||[]).map(t=>({...t})),encounters:(lib.encounters||[]).map(e=>({...e,groups:(e.groups||[]).map(g=>({...g}))})),items:(lib.items||[]).map(x=>({...x})),
   handouts:(state.handouts||[]).map(h=>({id:h.id,title:h.title,text:h.text})),
+  // 5.16 : tableau d’enquête (indices non révélés à l’import).
+  clues:(state.clues||[]).map(c=>({id:c.id,title:c.title,text:c.text||'',gmNote:c.gmNote||'',tag:c.tag})),
   shops:(state.shops||[]).map(s=>({...strip(s,'open'),items:(s.items||[]).map(i=>({...i}))})),
   loot:(state.lootStash||[]).map(x=>({...x})),tables:(state.randomTables||[]).map(t=>({id:t.id,name:t.name,die:t.die,category:t.category||'',visibility:t.visibility,notes:t.notes||'',rows:(t.rows||[]).map(r=>({...r}))})),houseRules:((state.tableCharter||{}).rules||[]).map(r=>({title:r.title,text:r.text,category:r.category,visibility:r.visibility,screen:!!r.screen})),maps};}
 // ---------- Import ----------
 // Nouvel identifiant pour chaque ancien, en gardant le préfixe (cp-, sc-, hb-, map-, pin-…).
 function remapIds(data,random){const ids=new Set();const add=x=>{if(typeof x==='string'&&x.length>=4&&x.length<=110)ids.add(x);};
  for(const list of Object.values(data.planner||{}))for(const e of list||[]){add(e.id);for(const o of e.objectives||[])add(o.id);}
- for(const k of ['scenes','templates','encounters','items','handouts','shops','loot','tables','maps'])for(const e of data[k]||[]){add(e.id);for(const g of e.groups||[])add(g.id);for(const i of k==='shops'?e.items||[]:[])add(i.id);for(const p of e.markers||[])add(p.id);}
+ for(const k of ['scenes','templates','encounters','items','handouts','clues','shops','loot','tables','maps'])for(const e of data[k]||[]){add(e.id);for(const g of e.groups||[])add(g.id);for(const i of k==='shops'?e.items||[]:[])add(i.id);for(const p of e.markers||[])add(p.id);}
  const map=new Map();for(const id of ids){const pre=(id.match(/^[a-z]{2,4}-/)||['x-'])[0];map.set(id,pre+random(12));}
  const walk=v=>Array.isArray(v)?v.map(walk):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,k==='base64'?x:walk(x)])):typeof v==='string'&&map.has(v)?map.get(v):v;
  return walk(data);}
 function check(data){if(!data||typeof data!=='object'||data.format!==FORMAT)fail('Ce fichier n’est pas un modèle de campagne Chroniques.');if(data.version!==VERSION)fail('Version de modèle non prise en charge.');return data;}
-function summary(data){const n=k=>(data[k]||[]).length;return {title:String(data.title||''),planner:Object.values(data.planner||{}).reduce((t,l)=>t+(l||[]).length,0),scenes:n('scenes'),templates:n('templates'),encounters:n('encounters'),items:n('items'),handouts:n('handouts'),shops:n('shops'),loot:n('loot'),tables:n('tables'),houseRules:n('houseRules'),maps:n('maps'),images:(data.maps||[]).filter(m=>m.image).length};}
+function summary(data){const n=k=>(data[k]||[]).length;return {title:String(data.title||''),planner:Object.values(data.planner||{}).reduce((t,l)=>t+(l||[]).length,0),scenes:n('scenes'),templates:n('templates'),encounters:n('encounters'),items:n('items'),handouts:n('handouts'),clues:n('clues'),shops:n('shops'),loot:n('loot'),tables:n('tables'),houseRules:n('houseRules'),maps:n('maps'),images:(data.maps||[]).filter(m=>m.image).length};}
 function importTemplate(state,raw,{random,writeImage}){const data=remapIds(check(raw),random);const skipped=[];const count={};
  const tryIt=(label,fn)=>{try{fn();count[label]=(count[label]||0)+1;return true;}catch(e){skipped.push(label+' : '+e.message);return false;}};
  for(const t of data.templates||[])tryIt('Modèles de monstres',()=>E.addTemplate(state,t.id,strip(t,'id','icon'),t.icon));
  for(const x of data.items||[])tryIt('Objets maison',()=>HB.add(state,x.id,strip(x,'id')));
  for(const e of data.encounters||[])tryIt('Rencontres',()=>{E.addEncounter(state,e.id,e.name,e.notes||'');for(const g of e.groups||[])try{E.addGroup(state,e.id,g.id,g.templateId,g.quantity);}catch(err){skipped.push('Groupe de « '+e.name+' » : '+err.message);}});
  for(const [type,list] of Object.entries(data.planner||{})){if(!Object.hasOwn(C.TYPES,type))continue;for(const e of list||[])tryIt('Carnet',()=>{C.add(state,type,e.id,strip(e,'id','objectives'));for(const o of e.objectives||[])C.objectiveAdd(state,e.id,o.id,{text:o.text,secret:o.secret===true});});}
- for(const sc of data.scenes||[])tryIt('Scènes',()=>F.add(state,sc.id,{title:sc.title,summary:sc.summary||'',gmNotes:sc.gmNotes||'',status:sc.status||'planned',visibility:sc.visibility||'private',links:sc.links||[]}));
+ for(const sc of data.scenes||[])tryIt('Scènes',()=>F.add(state,sc.id,{title:sc.title,summary:sc.summary||'',readAloud:sc.readAloud||'',gmNotes:sc.gmNotes||'',status:sc.status||'planned',visibility:sc.visibility||'private',links:sc.links||[]}));
  for(const h of data.handouts||[])tryIt('Documents',()=>HO.add(state,h.id,{title:h.title,text:h.text||''}));
+ for(const c of data.clues||[])tryIt('Indices',()=>CLU.add(state,c.id,{title:c.title,text:c.text||'',gmNote:c.gmNote||'',tag:c.tag,revealed:false}));
  for(const s of data.shops||[])tryIt('Marchands',()=>{SH.add(state,s.id,strip(s,'id','items','open'));for(const i of s.items||[])try{SH.itemAdd(state,s.id,i.id,strip(i,'id'));}catch(err){skipped.push('Article de « '+s.name+' » : '+err.message);}});
  for(const x of data.loot||[])tryIt('Trésor du MJ',()=>I.lootAdd(state,x.id,strip(x,'id')));
  for(const t of data.tables||[])tryIt('Tables aléatoires',()=>RT.add(state,t.id,{name:t.name,die:t.die,category:t.category,notes:t.notes,visibility:t.visibility,rows:RT.rowsText(t)}));

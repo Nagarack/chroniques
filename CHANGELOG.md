@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 5.16.0 — Aventure d’initiation « La Lanterne noyée »
+- **Aventure prête à jouer** pour 3 à 5 personnages de niveau 1 (2 à 3 heures), texte original écrit pour Chroniques, en français et en anglais : 6 scènes avec texte à lire et notes du MJ, 5 rencontres (crabes géants, bandits, nuée de rats, squelettes du SRD, et Corbin le Gris, chef des naufrageurs), 3 documents à remettre, 3 indices, une quête à objectifs, des lieux et PNJ, une table de rumeurs, un trésor et une carte dessinée (« Grotte des naufrageurs », grille, 6 repères). La carte et les secrets restent privés jusqu’à ce que le MJ les révèle.
+- **En un clic** : Mes campagnes → « Créer une campagne avec cette aventure » (nouvelle campagne avec trois personnages d’exemple), ou Paramètres → Modèles → « Importer l’aventure d’initiation » dans la campagne en cours.
+- **Modèles de campagne** : le texte à lire des scènes et le tableau d’enquête (indices, cachés à l’import) sont désormais exportés et réimportés ; le texte à lire était perdu jusqu’ici.
+- Fichiers sources : `scripts/dev/build-adventure.js` (contenu) et `scripts/dev/dessiner-carte-grotte.py` (carte).
+
 ## 5.15.0 — Plus rapide sur téléphone
 - **Fichiers compressés** : le serveur envoie le code, les styles et les pages en brotli (ou gzip), soit environ 3,7 Mo ramenés à moins de 1 Mo pour l’installation complète. Mesuré en 3G simulée (1,6 Mbit/s, 150 ms) : premier affichage en 5,0 s au lieu de 11,9 s, 0,6 Mo transférés au lieu de 2,05 Mo. Les polices et images, déjà compressées, sont envoyées telles quelles.
 - **Revalidation au lieu de re-téléchargement** : chaque fichier porte une empreinte (ETag) ; un appareil qui a déjà la bonne version reçoit une réponse vide (304). Les mises à jour restent vues aussitôt (« no-cache » au lieu de « no-store »).

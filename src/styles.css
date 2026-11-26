@@ -1944,3 +1944,8 @@ details.jump-panel[open]>summary h3::after{content:" ⌃"}
 /* 5.15 : longues listes — le navigateur ne met en page que les lignes visibles (téléphones modestes). */
 .bestiary-row,.catalog-row,.spell-row,.art-choice,.tl-item,.memory-card,.planner-record{content-visibility:auto;contain-intrinsic-size:auto 72px}
 .art-choice{contain-intrinsic-size:auto 140px}
+/* 5.16 : aventure d’initiation */
+.adventure-card{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;margin-top:12px;padding:12px 14px;border:1px dashed var(--gold);border-radius:8px}
+.adventure-card>div{flex:1 1 260px;min-width:0}.adventure-card p{margin:4px 0 0}
+.tpl-adventure{margin:6px 0 0}
+.tpl-parts{display:flex;flex-wrap:wrap;gap:4px 14px;margin:6px 0;padding:0;list-style:none}

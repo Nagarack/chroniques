@@ -1085,6 +1085,7 @@ html.cvd .map-token::before{background:#efebe7;color:#181510}
 .device-seg button:first-child{border-left:0}
 .device-seg button[aria-pressed="true"]{background:#d8816f;color:#331801}
 details.jump-panel>summary h3::after{color:var(--soft)}
+.adventure-card{border:1px dashed var(--gold)}
 :root{color-scheme:light;--grain:none;--c-bg:#f4efe4;--c-bg-2:#ede5d6;--c-surface:#fbf8f1;--c-surface-2:#f0e9dc;--c-line:#dcd1be;--c-line-soft:#e7dfcf;--c-text:#2b2118;--c-muted:#5c4b37;--c-accent:#9a3a26;--c-accent-strong:#8c2f1f;--c-on-accent:#fffaf3;--c-ok:#3d6a4c;--c-warn:#a8741a;--c-danger:#b3402c;--c-focus:#8c2f1f}
 .workspace-parchment :is(p,span,small,li,strong,em,h1,h2,h3,h4,label,div){color:#3d2f1d}
 .workspace-parchment .muted,.workspace-parchment .muted *{color:#6b5a42}
