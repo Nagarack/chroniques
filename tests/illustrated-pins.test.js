@@ -105,7 +105,7 @@ test('V2.5.1 : rendu réel du tableau de cartes, formulaires MJ masqués pour le
  }
  const gm=await paint('gm'),player=await paint('player');
  for(const s of ['map-marker-form','map-pin-upload-form','imageChoice','linkChoice','map-pin-art','Coffre','Piège secret'])assert(gm.includes(s),s);
- for(const s of ['map-pin-art','Coffre','Cartes de campagne'])assert(player.includes(s),s);
+ for(const s of ['map-pin-art','Coffre','<h1>Cartes</h1>'])assert(player.includes(s),s);
  assert(!player.includes('Piège secret'));assert(!player.includes('Secret absolu'));
  assert(!player.includes('map-marker-form'));assert(!player.includes('map-pin-upload-form'));
 });

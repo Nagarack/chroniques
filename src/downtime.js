@@ -52,16 +52,16 @@ function item(h,a,{edit,editing,pcBank}){const {esc,attr}=h;const k=KINDS[a.kind
 // Panneau de la fiche (Progression & règles).
 function sheetPanel({state,pc,edit,h,editId=''}){const {esc}=h;const d=state.downtime||{};const list=(d.activities||[]).filter(a=>a.pcId===pc.id);const b=Math.max(0,Number((d.bank||{})[pc.id])||0);
  const active=list.filter(a=>!a.done),done=list.filter(a=>a.done);
- return `<section class="panel dt-panel"><div class="panel-top"><h3>⏳ Intermèdes</h3><span class="mini-pill">${b} jour${b>1?'s':''} disponible${b>1?'s':''}</span></div>
+ return `<section class="panel dt-panel"><div class="panel-top"><h3>Intermèdes</h3><span class="mini-pill">${b} jour${b>1?'s':''} disponible${b>1?'s':''}</span></div>
  <p class="muted small">Entre deux aventures, le MJ accorde des jours d’intermède. Consacrez-les à vos activités : les journées n’ont pas besoin d’être consécutives.</p>
  ${active.length?`<div class="dt-list">${active.map(a=>item(h,a,{edit,editing:editId===a.id,pcBank:b})).join('')}</div>`:'<p class="muted small">Aucune activité en cours.</p>'}
  ${done.length?`<details class="dt-done"><summary>Terminées (${done.length})</summary><div class="dt-list">${done.map(a=>item(h,a,{edit,editing:editId===a.id,pcBank:0})).join('')}</div></details>`:''}
  ${edit?`<details class="dt-add" ${list.length?'':'open'}><summary>＋ Nouvelle activité</summary>${editId?'':form(h,pc.id,null)}</details>`:''}</section>`;}
 // Panneau du MJ (Séance du jour) : accorder des jours, voir l’avancement de tout le groupe.
 function gmPanel({state,h}){const {esc,attr}=h;const d=state.downtime||{};const pcs=state.characters||[];
- return `<section class="panel dt-gm" id="dt-gm"><div class="panel-top"><h3>⏳ Intermèdes du groupe</h3></div>
+ return `<section class="panel dt-gm" id="dt-gm"><div class="panel-top"><h3>Intermèdes du groupe</h3></div>
  <form class="dt-grant"><label>Jours d’intermède à accorder<input name="days" type="number" min="1" max="365" value="7" required></label>${state.worldTime?.enabled?'<label class="check"><input type="checkbox" name="world" checked> Avancer aussi la date du monde</label>':''}<button class="btn btn-secondary" type="submit">Accorder à tout le groupe</button></form>
  ${pcs.length?`<div class="dt-gm-list">${pcs.map(p=>{const acts=(d.activities||[]).filter(a=>a.pcId===p.id&&!a.done);const b=Math.max(0,Number((d.bank||{})[p.id])||0);
-  return `<div class="dt-gm-row"><strong>${esc(p.name)}</strong> <span class="mini-pill">${b} j disponibles</span>${acts.length?`<ul>${acts.map(a=>`<li>${esc(a.title)} · ${a.daysDone}/${a.daysTotal} j</li>`).join('')}</ul>`:'<span class="muted small"> · aucune activité</span>'} <button type="button" class="text-button" data-char="${attr(p.id)}" data-dt-open="1">Fiche →</button></div>`;}).join('')}</div>`:''}</section>`;}
+  return `<div class="dt-gm-row"><strong>${esc(p.name)}</strong> <span class="mini-pill">${b} j disponibles</span>${acts.length?`<ul>${acts.map(a=>`<li>${esc(a.title)} · ${a.daysDone}/${a.daysTotal} j</li>`).join('')}</ul>`:'<span class="muted small"> · aucune activité</span>'} <button type="button" class="text-button" data-char="${attr(p.id)}" data-dt-open="1">Fiche</button></div>`;}).join('')}</div>`:''}</section>`;}
 return {KINDS,MAX_DAYS,get,add,update,remove,grant,spend,bank,suggest,crafting,projected,cleanup,sheetPanel,gmPanel};
 });

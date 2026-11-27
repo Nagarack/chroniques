@@ -17,7 +17,7 @@ async function app(role='gm'){
 test('MJ : galerie d’icônes, import et changement de catégorie visibles',async()=>{
  const ui=await app('gm');
  ui.listeners.click({target:{closest:()=>({dataset:{nav:'illustrations'}})}});
- let html=ui.html();assert.match(html,/Médiathèque/);assert.match(html,/Ajouter à l’inventaire|Associer une illustration/);assert.match(html,/Importer cette image/);assert.match(html,/data-art-id/);assert.match(html,/Lorc|Delapouite/);
+ let html=ui.html();assert.match(html,/<h1>Illustrations &amp; objets<\/h1>/);assert.match(html,/Ajouter à l’inventaire|Associer une illustration/);assert.match(html,/Importer cette image/);assert.match(html,/data-art-id/);assert.match(html,/Lorc|Delapouite/);
  ui.listeners.change({target:{id:'media-kind',value:'npc',dataset:{},closest:()=>null}});
  html=ui.html();assert.match(html,/Monstre \/ PNJ/);assert.match(html,/goblin-head|dragon-head/);
 });

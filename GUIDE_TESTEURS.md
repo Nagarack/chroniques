@@ -67,7 +67,7 @@ La **visite guidée** (Aide & tutoriel, ou le bandeau d'accueil) montre les vrai
 - [ ] **Actions de monstres :** cliquer « Cimeterre » sur un gobelin : le journal MJ note l'action et le message rappelle « d20+4 ». Sur un dragon adulte, dépenser une action légendaire coûtant 2 ; le compteur se recharge à son tour.
 - [ ] **Écran du MJ :** l'ouvrir depuis le combat, chercher « abri ».
 - [ ] **Objets SRD :** dans l'inventaire, chercher « potion de soins » ou « longsword » et ajouter l'objet.
-- [ ] **Résumé de séance :** après un combat, ouvrir Journal & quêtes ; vérifier les dégâts, créatures vaincues et XP ; le partager et contrôler côté joueur qu'aucune créature masquée n'y figure.
+- [ ] **Résumé de séance :** après un combat, ouvrir la Chronique ; vérifier les dégâts, créatures vaincues et XP ; le partager et contrôler côté joueur qu'aucune créature masquée n'y figure.
 - [ ] **Création guidée :** créer un personnage en trois étapes (répartition standard, PV et CA proposés) ; passer un niveau avec un vrai dé de vie.
 - [ ] **Cartes vivantes :** ajouter une grille et les jetons des aventuriers ; un joueur déplace son jeton (pas celui des autres) au doigt sur téléphone ; activer le brouillard et révéler une salle.
 - [ ] **Mot de passe oublié :** créer un lien de réinitialisation pour un joueur, l'ouvrir dans un autre navigateur, choisir un nouveau mot de passe.

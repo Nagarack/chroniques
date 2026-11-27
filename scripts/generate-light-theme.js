@@ -24,7 +24,7 @@ function invert({r,g,b,a},keepShadow,text){
   if(text&&l>=.45&&a>.5)l2=Math.min(l2,.33);
   const warm=h<70||h>340;
   let h2=h,s2;
-  if(s<.12||(warm&&s<.35)){h2=32;s2=Math.min(Math.max(s,.2),.34);}   // neutres chauds -> papier et encre brune
+  if(s<.12||(warm&&s<.35)){h2=36;s2=Math.min(Math.max(s*.5,.06),.14);}   // neutres chauds -> pierre claire peu saturée et encre sépia (5.18 : plus de crème)
   else s2=Math.min(1,s*(s<.35?1.25:.95));                            // teintes froides et vives conservées
   const [R,G,B]=hslToRgb(h2,s2,l2);return {r:R,g:G,b:B,a};
 }
@@ -80,13 +80,14 @@ function emit(nodes){
   return out;
 }
 const EXTRA=[
-  ':root{color-scheme:light;--grain:none;--c-bg:#f4efe4;--c-bg-2:#ede5d6;--c-surface:#fbf8f1;--c-surface-2:#f0e9dc;--c-line:#dcd1be;--c-line-soft:#e7dfcf;--c-text:#2b2118;--c-muted:#5c4b37;--c-accent:#9a3a26;--c-accent-strong:#8c2f1f;--c-on-accent:#fffaf3;--c-ok:#3d6a4c;--c-warn:#a8741a;--c-danger:#b3402c;--c-focus:#8c2f1f}',
+  // 5.18 : « calcaire et encre » : pierre claire peu saturée (pas de crème), encre sépia, vert-de-gris pour agir, laiton foncé, rouge cire.
+  ':root{color-scheme:light;--grain:none;--c-bg:#e9e6e0;--c-bg-2:#e0dcd4;--c-surface:#f6f4ef;--c-surface-2:#ebe7df;--c-line:#cdc6b9;--c-line-soft:#dcd6cb;--c-text:#241d16;--c-muted:#594b3b;--c-accent:#1f6b5e;--c-accent-strong:#1a5a4f;--c-on-accent:#f7f3ea;--c-brass:#7f5c1c;--c-ok:#36654a;--c-warn:#875c12;--c-danger:#a3322a;--c-focus:#1f6b5e;--c-shadow:0 16px 40px -18px rgba(60,45,30,.35)}',
   '.workspace-parchment :is(p,span,small,li,strong,em,h1,h2,h3,h4,label,div){color:#3d2f1d}',
   '.workspace-parchment .muted,.workspace-parchment .muted *{color:#6b5a42}'
 ].join('\n')+'\n';
 function build(){
   const body=emit(parse(fs.readFileSync(SRC,'utf8')));
-  return '/* GÉNÉRÉ par scripts/generate-light-theme.js à partir de styles.css — ne pas modifier à la main.\n   Thème « vélin clair » : luminosité inversée, teintes conservées. */\n'+body+EXTRA;
+  return '/* GÉNÉRÉ par scripts/generate-light-theme.js à partir de styles.css — ne pas modifier à la main.\n   Thème « calcaire et encre » : luminosité inversée, teintes conservées. */\n'+body+EXTRA;
 }
 if(require.main===module){
   const out=build();

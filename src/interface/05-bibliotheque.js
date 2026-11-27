@@ -80,12 +80,12 @@ function uxContext(){
  const gm=actor==='mj';
  if(page==='combat'&&gm&&gmCombatView==='desk')return '';
  if(page==='combat'&&!gm)return '';
- const choices=page==='combat'?gm?[["actions","✧ Actions"],["creatures","♟ Créatures"]]:[["initiative","⚔ Initiatives"],["actions","✧ Actions"]]:
- page==='maps'?(gm?[["map","⌖ Carte"],["marker","＋ Repère"],["map-create","＋ Nouvelle carte"],["loot","🎁 Coffres"]]:[["map","⌖ Voir la carte"]]):
- page==='session'?(gm?[["active","▶ Scène en cours"],["new-scene","＋ Nouvelle scène"],["scenes","☷ Toutes les scènes"]]:[["active","▶ En cours"],["scenes","☷ Toutes les scènes"]]):
- page==='stories'&&gm?[["new-story","＋ Nouvelle aventure"],["story-list","📖 Préparations"]]:[];
+ const choices=page==='combat'?gm?[["actions","Actions"],["creatures","Créatures"]]:[["initiative","Initiatives"],["actions","Actions"]]:
+ page==='maps'?(gm?[["map","Carte"],["marker","＋ Repère"],["map-create","＋ Nouvelle carte"],["loot","Coffres"]]:[["map","Voir la carte"]]):
+ page==='session'?(gm?[["active","▶ Scène en cours"],["new-scene","＋ Nouvelle scène"],["scenes","Toutes les scènes"]]:[["active","▶ En cours"],["scenes","Toutes les scènes"]]):
+ page==='stories'&&gm?[["new-story","＋ Nouvelle aventure"],["story-list","Préparations"]]:[];
  if(!choices.length)return '';
- return `<nav class="ux-toolbar" aria-label="Accès rapide : ${esc(page==='combat'?'Combat':page==='maps'?'Cartes':page==='session'?'Séance':'Scénarios')}"><div class="ux-shortcuts">${choices.map(([k,label])=>`<button class="ux-shortcut" type="button" data-ux-go="${k}">${label}</button>`).join('')}</div><button type="button" class="ux-mode" data-ux-mode aria-pressed="${uxSimple}" title="Replier ou déplier les panneaux secondaires">${uxSimple?'☷ Voir les détails':'◈ Vue essentielle'}</button></nav>`;
+ return `<nav class="ux-toolbar" aria-label="Accès rapide : ${esc(page==='combat'?'Combat':page==='maps'?'Cartes':page==='session'?'Séance':'Scénarios')}"><div class="ux-shortcuts">${choices.map(([k,label])=>`<button class="ux-shortcut" type="button" data-ux-go="${k}">${label}</button>`).join('')}</div><button type="button" class="ux-mode" data-ux-mode aria-pressed="${uxSimple}" title="Replier ou déplier les panneaux secondaires">${uxSimple?'Voir les détails':'Vue essentielle'}</button></nav>`;
 }
 function uxScroll(selector){let node=document.querySelector(selector);if(!node){toast('Aucun élément disponible pour ce raccourci.',true);return;}for(let parent=node;parent;parent=parent.parentElement){if(parent.tagName==='DETAILS')parent.open=true;}if(node.tagName==='DETAILS')node.open=true;const target=node.querySelector('h3,h2,summary,label')||node;try{target.setAttribute('tabindex','-1');target.focus({preventScroll:true});node.scrollIntoView({block:'start',behavior:'smooth'});}catch{node.scrollIntoView?.();}}
 function uxGo(where){

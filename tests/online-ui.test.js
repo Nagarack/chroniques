@@ -22,5 +22,5 @@ test('affiche écran de première configuration en absence de session',async()=>
  const ui=makeUi(false);await wait();await wait();assert.match(ui.elems['#app'].innerHTML,/Première installation/);assert.match(ui.elems['#app'].innerHTML,/Clé initiale du serveur/);
 });
 test('vue MJ connectée remplace le commutateur de rôles simulés',async()=>{
- const ui=makeUi(true);await wait();await wait();assert.match(ui.elems['#app'].innerHTML,/Vue du Maître du Jeu/);assert.match(ui.elems['#app'].innerHTML,/Déconnexion/);assert.doesNotMatch(ui.elems['#app'].innerHTML,/Mode démo/);
+ const ui=makeUi(true);await wait();await wait();assert.match(ui.elems['#app'].innerHTML,/<h1>Tableau de bord<\/h1>[\s\S]*Mon bureau/);assert.match(ui.elems['#app'].innerHTML,/Déconnexion/);assert.doesNotMatch(ui.elems['#app'].innerHTML,/Mode démo/);
 });

@@ -70,7 +70,7 @@ test('API : données de campagne persistantes après redémarrage',async t=>{
  const login=(await f.call('login',{name:'Maitre Jeu',password:'longpassword1234'})).cookie;const result=(await f.state(login)).data;assert.equal(result.state.campaignPlanner.sessions[0].date,'2026-10-28');assert.equal(result.state.campaignPlanner.sessions[0].privateNotes,values.privateNotes);
 });
 test('interface : page partagée, formulaire MJ, aucune simulation de dés, contenu échappé',()=>{
- const html=fs.readFileSync(path.join(__dirname,'../src/online-app.js'),'utf8');assert.match(html,/Journal & quêtes/);assert.match(html,/planner-create/);assert.match(html,/planner-update/);assert.match(html,/privateNotes/);assert.doesNotMatch(html,/Math\.random\(|function rollDice\(/);
+ const html=fs.readFileSync(path.join(__dirname,'../src/online-app.js'),'utf8');assert.match(html,/Chronique/);assert.match(html,/planner-create/);assert.match(html,/planner-update/);assert.match(html,/privateNotes/);assert.doesNotMatch(html,/Math\.random\(|function rollDice\(/);
 });
 
 test('rendu simulé : le MJ voit ses secrets, le joueur uniquement les entrées publiées',async()=>{

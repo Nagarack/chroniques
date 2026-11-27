@@ -24,12 +24,12 @@ function recapDraft(state,{now=Date.now()}={}){const list=sessions(state).filter
  const wt=state.worldTime;if(wt&&wt.enabled&&WT)out.push('','Nous sommes le '+WT.format(wt,wt.minutes)+'.');
  return out.join('\n').slice(0,4000);}
 function recapPanel({state,isGM,h}){const {esc}=h;const r=state.recap||{};
- if(!isGM){if(!r.published||!r.text)return '';return `<section class="panel recap-card" aria-labelledby="recap-title"><div class="panel-top"><h3 id="recap-title">📜 Précédemment…</h3>${r.updatedAt?`<span class="mini-pill">${esc(dayLabel(r.updatedAt))}</span>`:''}</div><div class="recap-text">${paragraphs(r.text,esc)}</div></section>`;}
- return `<section class="panel recap-card" aria-labelledby="recap-title"><div class="panel-top"><h3 id="recap-title">📜 Précédemment dans…</h3><span class="mini-pill">${r.published?'Publié':'Brouillon'}${r.table?' · sur l’écran de table':''}</span></div>
+ if(!isGM){if(!r.published||!r.text)return '';return `<section class="panel recap-card" aria-labelledby="recap-title"><div class="panel-top"><h3 id="recap-title">Précédemment…</h3>${r.updatedAt?`<span class="mini-pill">${esc(dayLabel(r.updatedAt))}</span>`:''}</div><div class="recap-text">${paragraphs(r.text,esc)}</div></section>`;}
+ return `<section class="panel recap-card" aria-labelledby="recap-title"><div class="panel-top"><h3 id="recap-title">Précédemment dans…</h3><span class="mini-pill">${r.published?'Publié':'Brouillon'}${r.table?' · sur l’écran de table':''}</span></div>
  <p class="muted small">À lire à voix haute en début de séance. « Composer » propose un texte à partir de la dernière séance (faits notés automatiquement, quêtes en cours) : relisez-le, racontez-le à votre façon, puis publiez.</p>
  <form class="recap-form"><label for="recap-text">Texte</label><textarea id="recap-text" name="text" rows="9" maxlength="4000">${esc(r.text||'')}</textarea>
  <div class="recap-row"><label class="check"><input type="checkbox" name="published" ${r.published?'checked':''}> Publier pour les joueurs</label><label class="check"><input type="checkbox" name="table" ${r.table?'checked':''}> Afficher sur l’écran de table</label></div>
- <div class="btn-group"><button type="button" class="btn btn-secondary" data-task="recap-compose">✎ Composer à partir de la dernière séance</button><button class="btn btn-primary" type="submit">Enregistrer</button></div></form></section>`;}
+ <div class="btn-group"><button type="button" class="btn btn-secondary" data-task="recap-compose">Composer à partir de la dernière séance</button><button class="btn btn-primary" type="submit">Enregistrer</button></div></form></section>`;}
 function paragraphs(text,esc){return String(text||'').split(/\n{2,}/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('');}
 // ---------- Frise ----------
 const TL_KINDS=[['all','Tout'],['session','Séances'],['pc','Personnages'],['story','Quêtes & mémoire'],['world','Monde']];
@@ -62,7 +62,7 @@ function arcStats(state,{from='',to='',isGM=true}={}){const inRange=at=>(!from||
 function arcHtml({state,isGM,from='',h}){const {esc,attr}=h;const st=arcStats(state,{from,isGM});const list=sessions(state,{isGM}).filter(meaningful);
  const top=(k)=>{const p=st.pcs.filter(x=>x[k]>0).sort((a,b)=>b[k]-a[k])[0];return p?p.name+' ('+p[k].toLocaleString('fr-FR')+')':'—';};
  const foes=Object.entries(st.total.byName).sort((a,b)=>b[1]-a[1]).slice(0,6);
- return `<section class="panel arc-panel" aria-labelledby="arc-title"><div class="panel-top"><h3 id="arc-title">⚑ Bilan</h3></div>
+ return `<section class="panel arc-panel" aria-labelledby="arc-title"><div class="panel-top"><h3 id="arc-title">Bilan</h3></div>
  <label>Période<select data-arc-from><option value="">Toute la campagne</option>${list.map(s=>`<option value="${attr(s.startedAt)}" ${from===s.startedAt?'selected':''}>Depuis la séance du ${esc(dayLabel(s.startedAt))}</option>`).join('')}</select></label>
  <div class="arc-tiles"><div><strong>${st.total.sessions}</strong><span>séance${st.total.sessions>1?'s':''}</span></div><div><strong>${st.total.combats}</strong><span>combat${st.total.combats>1?'s':''}</span></div><div><strong>${st.total.rounds}</strong><span>rounds</span></div><div><strong>${st.total.defeated}</strong><span>adversaires vaincus</span></div></div>
  ${foes.length?`<p class="small"><b>Adversaires les plus fréquents :</b> ${foes.map(([n,c])=>esc(n)+(c>1?' ×'+c:'')).join(', ')}.</p>`:''}

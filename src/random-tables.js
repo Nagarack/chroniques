@@ -53,7 +53,7 @@ function panel({state,isGM,h,openId=''}){const {esc,attr}=h;const tables=state.r
  if(!isGM&&!tables.length)return '';
  const cats=[...new Set(tables.map(t=>t.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fr'));
  const card=t=>{const r=range(t.die);const last=(t.history||[])[0];
-  return `<article class="rt-card" id="rt-${attr(t.id)}"><div class="panel-top"><h4>🎲 ${esc(t.name)} <small class="muted">${esc(t.die)}${t.category?' · '+esc(t.category):''}</small></h4>${isGM?`<span class="mini-pill">${t.visibility==='shared'?'Visible des joueurs':'Privée'}</span>`:''}</div>
+  return `<article class="rt-card" id="rt-${attr(t.id)}"><div class="panel-top"><h4>${esc(t.name)} <small class="muted">${esc(t.die)}${t.category?' · '+esc(t.category):''}</small></h4>${isGM?`<span class="mini-pill">${t.visibility==='shared'?'Visible des joueurs':'Privée'}</span>`:''}</div>
   ${isGM?`<form class="rt-roll" data-table="${attr(t.id)}"><label>Total de votre ${esc(t.die)}<input name="total" type="number" inputmode="numeric" min="${r.min}" max="${r.max}" required></label><label class="check"><input type="checkbox" name="shared"> Annoncer aux joueurs</label><button class="btn btn-primary" type="submit">Lire le résultat</button></form>`:''}
   ${last?`<p class="rt-result" role="status"><b>${last.total}</b> → ${last.text?esc(last.text):'<i>aucune ligne pour ce total</i>'}</p>`:''}
   <details class="ux-fold" ${openId===t.id?'open':''}><summary>Voir la table (${t.rows.length} ligne${t.rows.length>1?'s':''}) <span aria-hidden="true">⌄</span></summary>
@@ -62,7 +62,7 @@ function panel({state,isGM,h,openId=''}){const {esc,attr}=h;const tables=state.r
    ${isGM?`${t.notes?`<p class="muted small">${esc(t.notes)}</p>`:''}<details class="ux-fold"><summary>Modifier <span aria-hidden="true">⌄</span></summary>${form(t,h)}</details><button type="button" class="text-button danger" data-table-remove="${attr(t.id)}">Supprimer la table</button>`:''}
   </details></article>`;};
  const groups=cats.length?[...cats.map(c=>[c,tables.filter(t=>t.category===c)]),['',tables.filter(t=>!t.category)]].filter(([,l])=>l.length):[['',tables]];
- return `<section class="panel rt-panel" aria-labelledby="rt-title"><div class="panel-top"><h3 id="rt-title">🎲 Tables aléatoires</h3><span class="mini-pill">${tables.length}</span></div>
+ return `<section class="panel rt-panel" aria-labelledby="rt-title"><div class="panel-top"><h3 id="rt-title">Tables aléatoires</h3><span class="mini-pill">${tables.length}</span></div>
  <p class="muted small">${isGM?'Lancez votre vrai dé, saisissez le total : Chroniques lit la ligne. Aucun tirage n’est fait par l’outil.':'Tables partagées par le MJ et résultats annoncés.'}</p>
  ${tables.length?groups.map(([c,l])=>`${c?`<h4 class="rt-cat">${esc(c)}</h4>`:''}<div class="rt-grid">${l.map(card).join('')}</div>`).join(''):'<p class="muted">Aucune table pour le moment.</p>'}
  ${isGM?`<details class="ux-fold" ${tables.length?'':'open'}><summary>＋ Nouvelle table <span aria-hidden="true">⌄</span></summary>${form(null,h)}</details>`:''}</section>`;}

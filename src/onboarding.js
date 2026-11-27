@@ -7,7 +7,7 @@ const gm=[
  {id:'stories',title:'Préparer le fil de l’aventure',description:'Dans l’assistant de scénario, posez une accroche, les enjeux et trois temps forts. Reliez ensuite vos lieux et vos scènes.',page:'stories',action:'Ouvrir l’assistant'},
  {id:'maps',title:'Préparer une carte ou une rencontre',description:'Ajoutez une carte ou une rencontre, puis décidez de ce que les joueurs peuvent découvrir.',page:'maps',action:'Ouvrir les cartes'},
  {id:'combat',title:'Vérifier le tableau MJ',description:'Essayez la saisie des initiatives (après de vrais jets) et le suivi des ressources avant la séance.',page:'combat',action:'Ouvrir le combat'},
- {id:'memory',title:'Retrouver les décisions importantes',description:'Dans Journal & quêtes, consignez les décisions, les indices et leurs conséquences. Ne partagez que les souvenirs utiles aux joueurs.',page:'chronicle',action:'Ouvrir la mémoire'},
+ {id:'memory',title:'Retrouver les décisions importantes',description:'Dans la Chronique, consignez les décisions, les indices et leurs conséquences. Ne partagez que les souvenirs utiles aux joueurs.',page:'chronicle',action:'Ouvrir la mémoire'},
  {id:'inventory',title:'Préparer et distribuer le butin',description:'Préparez un coffre sur une carte, déplacez-y un objet de votre réserve, révélez-le au bon moment et attribuez son contenu.',page:'maps',action:'Préparer un coffre'}
 ];
 const player=[

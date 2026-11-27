@@ -33,7 +33,7 @@ function previewHtml(rows,h){const {esc}=h;if(!rows.length)return '<p class="mut
 // Fenêtre : `preset` = clés « pc:… / npc:… » déjà cochées (zone de la carte), `label` = nom de la zone.
 function modalHtml({state,h,preset=[],label='',types}){const {esc,attr}=h;const list=combatants(state);const pre=new Set(preset);
  const sorted=[...list.filter(c=>pre.has(c.key)),...list.filter(c=>!pre.has(c.key))];
- return `<div class="modal-backdrop"><div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="ad-title"><div class="panel-top"><h2 id="ad-title">💥 Dégâts de zone</h2><button class="icon-close" data-task="close-modal" aria-label="Fermer">✕</button></div>
+ return `<div class="modal-backdrop"><div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="ad-title"><div class="panel-top"><h2 id="ad-title">Dégâts de zone</h2><button class="icon-close" data-task="close-modal" aria-label="Fermer">✕</button></div>
  <form id="area-dmg-form" class="ad-form"><div class="ad-head"><label>Sort ou effet (facultatif)<input name="label" maxlength="60" value="${attr(label)}" placeholder="Ex. Boule de feu"></label>
  <label>Total des dés<input name="amount" type="number" inputmode="numeric" min="0" max="10000" required></label>
  <label>Type<select name="type"><option value="">Sans type</option>${types.map(t=>`<option value="${attr(t)}">${esc(t)}</option>`).join('')}</select></label>

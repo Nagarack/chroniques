@@ -9,7 +9,7 @@
   var link=document.getElementById('theme-light');
   if(link)link.media=mode==='light'?'all':mode==='auto'?'(prefers-color-scheme: light)':'not all';
   var dark=mode==='dark'||(mode==='auto'&&!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
-  var meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',dark?'#161519':'#f4efe4');
+  var meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',dark?'#16120e':'#e9e6e0');
   document.documentElement.setAttribute('data-theme',mode);
  }
  var api={

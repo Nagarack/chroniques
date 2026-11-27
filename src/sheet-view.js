@@ -20,7 +20,7 @@ function build(p,s,progression,slotRows){
  const remaining=resources.reduce((v,r)=>v+Math.max(0,num(r.left)),0),total=resources.reduce((v,r)=>v+Math.max(0,num(r.max)),0);
  const rows=Array.isArray(slotRows)?slotRows:[];
  const tracked=progression?.tracked===true;
- let spells='';if(rows.length){const max=rows.reduce((a,x)=>a+num(x.max),0);const left=rows.reduce((a,x)=>a+num(x.left),0);spells=tracked?`Emplacements ${left}/${max}`:`${max} emplacements théoriques (suivi inactif)`;}
+ let spells='';if(rows.length){const max=rows.reduce((a,x)=>a+num(x.max),0);const left=rows.reduce((a,x)=>a+num(x.left),0);spells=tracked?`Emplacements ${left}/${max}`:`${max} emplacements (non suivis)`;}
  return {hp,hpMax,hpPercent:Math.max(0,Math.min(100,100*hp/hpMax)),tempHp:Math.max(0,num(p?.tempHp)),hpMessage:hp===0?'À 0 PV · sauvegardes de mort':hp*2<=hpMax?'PV à 50 % ou moins':'PV suivis manuellement',statuses,concentration:p?.concentration||'Pas de concentration',resources:resources.length?`Ressources ${remaining}/${total}`:'Pas de ressource suivie',spells};
 }
 return {build,section,SECTIONS};

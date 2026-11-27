@@ -11,7 +11,7 @@ async function refresh(){setTimeout(wakeSync,0);if(tableMode)return refreshTable
 async function changeTable(endpoint,body){try{await api(endpoint,'POST',body);if(events){events.close();events=null;}management=null;inviteResult=null;page='overview';selected='';modal='';mobileMore=false;await refresh();connectEvents();returnToTop();}catch(err){toast(err.message,true);}}
 
 async function fetchManagement(draw=true){if(actor!=='mj')return;try{management=await api('management');if(draw&&page==='campaign')render();}catch(err){toast(err.message,true);}}
-function undoBtn(){return viewer?.canUndo?'<button type="button" class="btn btn-secondary" data-task="undo" title="Annuler la dernière action de combat">↩ Annuler</button>':'';}
+function undoBtn(){return viewer?.canUndo?'<button type="button" class="btn btn-secondary" data-task="undo" title="Annuler la dernière action de combat">Annuler</button>':'';}
 function setConnectionLabel(label){connectionState=label;document.body?.classList?.toggle('is-offline',/Reconnexion/.test(label));document.body?.classList?.toggle('is-live',/En direct/.test(label));const badge=document.querySelector('#realtime-state');if(badge)badge.textContent=label;}
 // Plusieurs mises à jour rapprochées (combat rapide) : une seule actualisation à la fois, la dernière gagne.
 let refreshing=null,refreshAgain=false;
@@ -49,7 +49,7 @@ const SNAP_KEY='chroniques-instantane';
 function offlineSnapshotSave(){if(!viewer||!state||tableMode)return;try{localStorage.setItem(SNAP_KEY,JSON.stringify({at:new Date().toISOString(),viewer,version,state,network}));}catch{}}
 function offlineSnapshotLoad(){try{const v=JSON.parse(localStorage.getItem(SNAP_KEY)||'null');return v&&v.viewer&&v.state?v:null;}catch{return null;}}
 function offlineSnapshotClear(){syncTag='';serverCopy=null;try{localStorage.removeItem(SNAP_KEY);}catch{}}
-function offlineBanner(){return offlineMode?`<div class="offline-banner" role="status">📴 Hors connexion — affichage des données du ${esc(new Date(offlineAt).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}))}. Points de vie, ressources, carnet et chuchotements restent notés ici et partiront au retour du réseau. <button type="button" class="btn btn-secondary" data-task="retry-online">Réessayer</button></div>`:'';}
+function offlineBanner(){return offlineMode?`<div class="offline-banner" role="status">Hors connexion — affichage des données du ${esc(new Date(offlineAt).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}))}. Points de vie, ressources, carnet et chuchotements restent notés ici et partiront au retour du réseau. <button type="button" class="btn btn-secondary" data-task="retry-online">Réessayer</button></div>`:'';}
 async function tryReconnect(){if(!offlineMode)return;try{await api('me');offlineMode=false;await refresh();connectEvents();await flushOutbox();toast('Connexion rétablie.');}catch{}}
 
 function outboxKey(){return 'chroniques-attente:'+String(viewer?.name||'')+':'+String(viewer?.campaignId||'');}

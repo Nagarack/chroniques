@@ -36,7 +36,7 @@ Historique : voir `CHANGELOG.md`. Recette de test : `GUIDE_TESTEURS.md`.
 - **Recherche globale** : Ctrl+K (ou la loupe) pour tout retrouver et lancer des commandes.
 - **Écran de table** : carte, brouillard, jetons et initiative en plein écran sur une TV, sans aucun secret.
 - **Repos guidé, XP et jalons, cartes de sorts, livre de campagne en PDF, factions et attitudes.**
-- **Documents pour les joueurs** : lettres, indices et images envoyés à un joueur ou à toute la table (Journal & quêtes).
+- **Documents pour les joueurs** : lettres, indices et images envoyés à un joueur ou à toute la table (Chronique).
 - **Organisation des séances** : dates proposées, disponibilités des joueurs, prochaine séance affichée à l’accueil.
 - **Fiche imprimable** : aperçu puis impression ou PDF depuis la fiche.
 - **Monstres lanceurs de sorts** : emplacements et sorts suivis en combat ; les lanceurs du SRD arrivent tout prêts.
@@ -46,7 +46,7 @@ Historique : voir `CHANGELOG.md`. Recette de test : `GUIDE_TESTEURS.md`.
 - **Monstres et objets maison** : « Créer un monstre » et « Créer un objet » depuis l’accueil, le combat ou la Bibliothèque MJ, avec une icône du catalogue ou votre propre image ; les objets se donnent aux joueurs en un clic, sans vos notes secrètes.
 - **Bestiaire SRD (334 créatures, fiches officielles en français) et objets SRD (598, objets magiques en français officiel)** : dans Combat, la Bibliothèque MJ et l’inventaire. Plusieurs exemplaires d’une créature partagent une initiative ; leurs actions et actions légendaires sont des boutons qui rappellent les dés.
 - **Écran du MJ** : aide-mémoire des règles, depuis le combat.
-- **Résumé de séance** : dans Journal & quêtes, construit automatiquement (sans IA), à partager ou non.
+- **Résumé de séance** : dans la Chronique, construit automatiquement (sans IA), à partager ou non.
 - **Personnages** : création guidée en trois étapes ; montée de niveau qui explique ce qui change.
 - **Cartes** : grille, jetons à faire glisser, brouillard de guerre révélé par le MJ.
 - **Mot de passe oublié** : le MJ crée un lien de réinitialisation (Campagne → Invitations) ; pour son propre compte, `REINITIALISER_MOT_DE_PASSE.bat`.
