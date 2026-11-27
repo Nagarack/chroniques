@@ -148,6 +148,10 @@ function delegateClick(event){
   if(ds.tourStart!==undefined){modal='';render();startTour();return;}
   if(ds.catalogAdd&&IC){const e=IC.get(ds.catalogAdd);if(e)act('itemAdd',{id:ds.character,values:IC.toItemValues(e)}).then(ok=>{if(ok)toast(e.name+' ajouté à l’inventaire.');});return;}
   if(ds.surprise){act('surpriseToggle',{id:ds.surprise});return;}
+ if(ds.bestOp){const op=ds.bestOp;if(op==='remove'&&!confirm('Retirer cette créature du bestiaire du groupe ?'))return;act('bestiaryEntry',{id:ds.best,op});return;}
+ if(ds.bestFactDel){act('bestiaryFact',{id:ds.bestFactDel,factId:ds.fact});return;}
+ if(ds.npcScale){act('npcScale',{id:ds.npcScale,step:Number(ds.step)});return;}
+ if(ds.npcScaleAll){act('npcScale',{all:true,step:Number(ds.npcScaleAll)}).then(ok=>{if(ok)toast(Number(ds.npcScaleAll)>0?'Créatures renforcées d’un palier.':'Créatures affaiblies d’un palier.');});return;}
  if(ds.device){const [g,v]=ds.device.split(':');if(g==='pause'){pauseEvery=[0,60,90,120].includes(Number(v))?Number(v):0;try{localStorage.setItem('chroniques-pause',String(pauseEvery));}catch{}render();return;}if(g==='lang'){if(v!==uiLang())window.ChroniquesI18n?.set(v);}else if(g==='units'){window.ChroniquesI18n?.setUnits?.(v);render();}else if(g==='theme'){window.ChroniquesTheme?.set(v);render();}else if(g==='size'){textSize=Math.max(0,Math.min(2,Number(v)||0));try{localStorage.setItem('chroniques-taille',String(textSize));}catch{}applyTextSize();render();}return;}
  if(ds.speak!==undefined){speakToggle(ds.speak);return;}
  if(ds.adminAccount){const op=ds.adminAccount,name=(adminOverview?.users||[]).find(x=>x.id===ds.user)?.name||'';

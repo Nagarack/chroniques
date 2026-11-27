@@ -32,7 +32,7 @@ function exportTemplate(state,{withMaps=true,readImage=()=>null,title}={}){
  return {format:FORMAT,version:VERSION,exportedAt:new Date().toISOString(),title:String(title||state.title||'Campagne').slice(0,90),edition:state.edition||'',
   planner,scenes:(state.sessionFlow||[]).map(x=>({...x})),
   templates:(lib.templates||[]).map(t=>({...t})),encounters:(lib.encounters||[]).map(e=>({...e,groups:(e.groups||[]).map(g=>({...g}))})),items:(lib.items||[]).map(x=>({...x})),
-  handouts:(state.handouts||[]).map(h=>({id:h.id,title:h.title,text:h.text})),
+  handouts:(state.handouts||[]).map(h=>({id:h.id,title:h.title,text:h.text,...(h.lock?{lock:{question:h.lock.question||'',answers:h.lock.answers}}:{})})),
   // 5.16 : tableau d’enquête (indices non révélés à l’import).
   clues:(state.clues||[]).map(c=>({id:c.id,title:c.title,text:c.text||'',gmNote:c.gmNote||'',tag:c.tag})),
   shops:(state.shops||[]).map(s=>({...strip(s,'open'),items:(s.items||[]).map(i=>({...i}))})),
@@ -54,7 +54,7 @@ function importTemplate(state,raw,{random,writeImage}){const data=remapIds(check
  for(const e of data.encounters||[])tryIt('Rencontres',()=>{E.addEncounter(state,e.id,e.name,e.notes||'');for(const g of e.groups||[])try{E.addGroup(state,e.id,g.id,g.templateId,g.quantity);}catch(err){skipped.push('Groupe de « '+e.name+' » : '+err.message);}});
  for(const [type,list] of Object.entries(data.planner||{})){if(!Object.hasOwn(C.TYPES,type))continue;for(const e of list||[])tryIt('Carnet',()=>{C.add(state,type,e.id,strip(e,'id','objectives'));for(const o of e.objectives||[])C.objectiveAdd(state,e.id,o.id,{text:o.text,secret:o.secret===true});});}
  for(const sc of data.scenes||[])tryIt('Scènes',()=>F.add(state,sc.id,{title:sc.title,summary:sc.summary||'',readAloud:sc.readAloud||'',gmNotes:sc.gmNotes||'',status:sc.status||'planned',visibility:sc.visibility||'private',links:sc.links||[]}));
- for(const h of data.handouts||[])tryIt('Documents',()=>HO.add(state,h.id,{title:h.title,text:h.text||''}));
+ for(const h of data.handouts||[])tryIt('Documents',()=>HO.add(state,h.id,{title:h.title,text:h.text||'',lock:h.lock||null}));
  for(const c of data.clues||[])tryIt('Indices',()=>CLU.add(state,c.id,{title:c.title,text:c.text||'',gmNote:c.gmNote||'',tag:c.tag,revealed:false}));
  for(const s of data.shops||[])tryIt('Marchands',()=>{SH.add(state,s.id,strip(s,'id','items','open'));for(const i of s.items||[])try{SH.itemAdd(state,s.id,i.id,strip(i,'id'));}catch(err){skipped.push('Article de « '+s.name+' » : '+err.message);}});
  for(const x of data.loot||[])tryIt('Trésor du MJ',()=>I.lootAdd(state,x.id,strip(x,'id')));

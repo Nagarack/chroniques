@@ -1,5 +1,6 @@
 // ——— 14 · Nouveautés et accueil ———
 const WHATS_NEW=[
+ ['5.20',[['Bestiaire du groupe','Les créatures affrontées et ce que vous avez appris sur elles (Chronique → Carnet & enquête).',''],['Documents-énigmes','Trouvez la réponse pour ouvrir le document.',''],['Bilan en graphiques','PV round par round, dégâts et soins, XP par séance (Chronique → Histoire).',''],['Monstres ajustables','Renforcer ou affaiblir une créature ou toute la rencontre.','gm']]],
  ['5.19',[['Textes mis en forme','Gras, italique, listes et intertitres dans les documents, scènes, carnet et indices.',''],['Durée de séance','Sur le tableau de bord, avec un rappel de pause en option (Cet appareil).','gm'],['Partage des pièces','Le reste va dans le coffre du groupe ; option « Faire la monnaie ».','gm']]],
  ['5.18',[['Nouvelle palette','Encre, vélin et vert-de-gris ; en thème clair, pierre pâle et encre sépia.',''],['Un nom par page','« Journal & quêtes » s’appelle désormais Chronique ; menu, titres et messages emploient le même nom.',''],['Écrans épurés','Titres sans surtitre, boutons sans emoji, rappels de l’accueil réunis en un bloc.','']]],
  ['5.16',[['Aventure d’initiation','« La Lanterne noyée » : 6 scènes, rencontres, documents et carte, en un clic (Mes campagnes).','gm']]],

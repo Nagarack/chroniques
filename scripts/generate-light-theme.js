@@ -81,7 +81,7 @@ function emit(nodes){
 }
 const EXTRA=[
   // 5.18 : « calcaire et encre » : pierre claire peu saturée (pas de crème), encre sépia, vert-de-gris pour agir, laiton foncé, rouge cire.
-  ':root{color-scheme:light;--grain:none;--c-bg:#e9e6e0;--c-bg-2:#e0dcd4;--c-surface:#f6f4ef;--c-surface-2:#ebe7df;--c-line:#cdc6b9;--c-line-soft:#dcd6cb;--c-text:#241d16;--c-muted:#594b3b;--c-accent:#1f6b5e;--c-accent-strong:#1a5a4f;--c-on-accent:#f7f3ea;--c-brass:#7f5c1c;--c-ok:#36654a;--c-warn:#875c12;--c-danger:#a3322a;--c-focus:#1f6b5e;--c-shadow:0 16px 40px -18px rgba(60,45,30,.35)}',
+  ':root{color-scheme:light;--grain:none;--c-bg:#e9e6e0;--c-bg-2:#e0dcd4;--c-surface:#f6f4ef;--c-surface-2:#ebe7df;--c-line:#cdc6b9;--c-line-soft:#dcd6cb;--c-text:#241d16;--c-muted:#594b3b;--c-accent:#1f6b5e;--c-accent-strong:#1a5a4f;--c-on-accent:#f7f3ea;--c-brass:#7f5c1c;--c-ok:#36654a;--c-warn:#875c12;--c-danger:#a3322a;--c-focus:#1f6b5e;--c-shadow:0 16px 40px -18px rgba(60,45,30,.35);--viz-1:#257de0;--viz-2:#f47230;--viz-3:#00b894;--viz-4:#f2a600;--viz-5:#ee7fac;--viz-6:#008a17}',
   '.workspace-parchment :is(p,span,small,li,strong,em,h1,h2,h3,h4,label,div){color:#3d2f1d}',
   '.workspace-parchment .muted,.workspace-parchment .muted *{color:#6b5a42}'
 ].join('\n')+'\n';

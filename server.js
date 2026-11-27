@@ -31,6 +31,9 @@ const HB=require('./src/homebrew-items');
 const GEAR=require('./src/gear');
 const SH=require('./src/shops');
 const HO=require('./src/handouts');
+const PB=require('./src/party-bestiary.js');
+const CCH=require('./src/combat-chart.js');
+const riddleTries=new Map(); // 5.20 : essais récents par joueur et par énigme (au plus 6 par minute), en mémoire seulement.
 const SC=require('./src/schedule');
 const ICS=require('./src/calendar-ics.js');
 const CG=require('./src/class-guide');
@@ -368,7 +371,7 @@ function createServer(opts={}){
  // la dernière réponse reçue, on ne lui envoie que les différences.
  const syncCache=new Map();
  // Actions permises au co-MJ restreint : tout ce qui concerne les créatures pendant le combat, rien d'autre.
- const ASSISTANT_KINDS=new Set(['npcAdd','npcUpdate','npcRemove','npcHp','npcCondition','conditionTimer','npcConcentration','npcConcentrationResult','npcLegendary','npcActionLog','npcSlot','npcRecharge','npcDefense','lairDone','next','turnTimer','turnTimerRestart','templateDeploy','encounterDeploy','readyAction','readyResolve','delayTurn','actNow']);
+ const ASSISTANT_KINDS=new Set(['bestiaryFact','bestiaryEntry','npcScale','npcAdd','npcUpdate','npcRemove','npcHp','npcCondition','conditionTimer','npcConcentration','npcConcentrationResult','npcLegendary','npcActionLog','npcSlot','npcRecharge','npcDefense','lairDone','next','turnTimer','turnTimerRestart','templateDeploy','encounterDeploy','readyAction','readyResolve','delayTurn','actNow']);
  function syncOut(req,c,full,since){const key=sha(cookie(req,'chroniques_sid')||'')+'|'+c.id;const prev=syncCache.get(key);const tag=random(9);const text=JSON.stringify(full.state);let out=full;
   if(since&&prev&&prev.tag===since){try{const ops=SD.diff(JSON.parse(prev.text),full.state);if(ops){out={...full,patch:ops,base:since};delete out.state;}}catch{}}
   syncCache.delete(key);syncCache.set(key,{tag,text});while(syncCache.size>300)syncCache.delete(syncCache.keys().next().value);
@@ -380,6 +383,7 @@ function createServer(opts={}){
   {const sp=SS.projected(c.state);full.sessionStats=sp.sessionStats;full.sessionHistory=sp.sessionHistory;} // Résumés : seulement ceux publiés par le MJ.
   if(full.combat){delete full.combat.lairPending;delete full.combat.lairRound;} // Peut nommer des créatures masquées.
   full.handouts=HO.projected(c.state,u); // Seulement les documents envoyés à ce joueur.
+  {const pb=PB.projected(c.state);if(pb)full.partyBestiary=pb;else delete full.partyBestiary;} // 5.20 : fiches visibles seulement.
   full.shops=SH.projected(c.state,u); // Joueurs : boutiques ouvertes uniquement.
   full.whispers=WH.projected(c.state,u); // Chuchotements : uniquement le fil de ce personnage.
   full.worldTime=WT.projected(c.state); // Date du monde et événements partagés seulement.
@@ -672,6 +676,10 @@ function createServer(opts={}){
   case 'handoutAdd':{requireGm(u);HO.add(s,'doc-'+random(9),b.values);break;}
   case 'handoutUpdate':{requireGm(u);HO.update(s,id,b.values);break;}
   case 'handoutDelete':{requireGm(u);const old=HO.find(s,id)?.image;HO.remove(s,id);dropLibraryFile(old);break;}
+  case 'handoutAnswer':{const cid=u.role==='gm'?null:u.characterId;if(!cid)badRequest('Seuls les joueurs destinataires peuvent répondre.');
+   const now=Date.now(),key=u.id+'|'+id,list=(riddleTries.get(key)||[]).filter(t=>now-t<60000);if(list.length>=6)throw Object.assign(new Error('Trop d’essais : attendez une minute avant de proposer une autre réponse.'),{status:429});list.push(now);riddleTries.set(key,list);
+   const r=HO.answer(s,id,cid,b.answer);if(r.ok&&!r.already){const pc=L.findPc(s,cid);logPublic(s,`${pc?.name||'Un joueur'} a résolu l’énigme « ${r.h.title} ».`);}
+   break;}
   case 'handoutSend':{requireGm(u);const h=HO.send(s,id,b.recipients);logPublic(s,'Le MJ envoie un document : « '+h.title+' »'+(h.recipients==='all'?' à toute la table':' à '+h.recipients.map(x=>L.findPc(s,x)?.name).filter(Boolean).join(', '))+'.');break;}
   case 'handoutRetract':{requireGm(u);HO.retract(s,id);break;}
   case 'handoutRead':{if(u.role==='gm')break;HO.markRead(s,id,u.characterId);break;}
@@ -796,6 +804,11 @@ function createServer(opts={}){
   case 'historyNote':{requireGm(u);CH.note(s,id,b.text,b.secret===true);break;}
   case 'historyRemove':{requireGm(u);CH.remove(s,id,String(b.entryId||''));break;}
   case 'importPc':{requireGm(u);if(s.characters.length>=30)badRequest('Maximum 30 personnages.');importCharacter(s,a,b.data);break;}
+  case 'npcScale':{requireGm(u);const step=Number(b.step);if(b.all===true){const targets=N.list(s).filter(n=>!n.ownerPc&&(b.visibleOnly!==true||n.visibility==='public'));if(!targets.length)badRequest('Aucune créature à ajuster.');
+    try{for(const n of targets)N.scale(s,n.id,Math.max(-2,Math.min(2,(n.scale||0)+step)));}catch(e){badRequest(e.message);}}
+   else{try{N.scale(s,id,step);}catch(e){badRequest(e.message);}}break;}
+  case 'bestiaryFact':{requireGm(u);try{if(b.factId)PB.factRemove(s,id,String(b.factId));else{const fct=PB.factAdd(s,id,b.text);const e=PB.get(s).entries.find(x=>x.id===id);if(!e.hidden)logPublic(s,`Bestiaire : ${e.name}, ${fct.text}`);}}catch(e){badRequest(e.message);}break;}
+  case 'bestiaryEntry':{requireGm(u);try{const op=String(b.op||'');if(op==='hide'||op==='show')PB.setHidden(s,id,op==='hide');else if(op==='rename')PB.rename(s,id,b.name);else if(op==='remove')PB.remove(s,id);else if(op==='add')PB.addManual(s,b.name);else badRequest('Opération inconnue.');}catch(e){badRequest(e.message);}break;}
   case 'npcCondition':{requireGm(u);try{N.condition(s,id,b.condition);}catch(e){badRequest(e.message);}break;}
   case 'conditionTimer':requireGm(u);try{L.setConditionTimer(s,a,id,String(b.condition||''),b.rounds,{when:b.when,anchor:b.anchor,save:b.save});}catch(e){badRequest(e.message);}break;
   case 'npcConcentration':requireGm(u);N.concentration(s,id,b.text);break;
@@ -1034,7 +1047,7 @@ function createServer(opts={}){
   default:badRequest('Opération inconnue.');
   }
   s.schemaVersion=4;s.changeCount=(s.changeCount||0)+1;s.lastEdited=new Date().toISOString();
-  const previous=c.state;try{SS.observe(previous,s,b.kind,b);}catch(e){console.error('Résumé de séance :',e.message);}try{CH.observe(previous,s,b.kind,b);}catch(e){console.error('Historique :',e.message);}c.state=s;c.version++;
+  const previous=c.state;try{SS.observe(previous,s,b.kind,b);}catch(e){console.error('Résumé de séance :',e.message);}try{CH.observe(previous,s,b.kind,b);}catch(e){console.error('Historique :',e.message);}try{PB.observe(previous,s);}catch(e){console.error('Bestiaire du groupe :',e.message);}try{CCH.observe(previous,s);}catch(e){console.error('Graphique de combat :',e.message);}c.state=s;c.version++;
   if(UNDOABLE[b.kind]){const st=undoStacks.get(c.id)||[];st.push({state:previous,version:c.version,label:UNDOABLE[b.kind]});while(st.length>10)st.shift();undoStacks.set(c.id,st);}else undoStacks.delete(c.id);
   persist();for(const filename of deletedMapFiles){try{fs.unlinkSync(path.join(mediaDir,filename));}catch{}}publish(c);return projected(c,u);
  }
@@ -1180,7 +1193,7 @@ function createServer(opts={}){
    }
    if(req.method==='GET'&&pathname.startsWith('/api/handout-image/')){
     const u=requireUser(req),c=currentCampaign(u),h=HO.find(c.state,decodeURIComponent(pathname.slice('/api/handout-image/'.length)));
-    if(!h||!h.image||!LIB_FILE.test(h.image.filename||'')||(u.role!=='gm'&&!HO.addressedTo(h,u.characterId)))throw Object.assign(new Error('Document non disponible.'),{status:404});
+    if(!h||!h.image||!LIB_FILE.test(h.image.filename||'')||(u.role!=='gm'&&(!HO.addressedTo(h,u.characterId)||HO.locked(h))))throw Object.assign(new Error('Document non disponible.'),{status:404});
     const file=path.join(mediaDir,h.image.filename);if(!fs.existsSync(file))throw Object.assign(new Error('Image absente.'),{status:404});
     res.writeHead(200,{'content-type':h.image.mime,'cache-control':'private, no-store','content-disposition':'inline','content-length':fs.statSync(file).size});fs.createReadStream(file).pipe(res);return;
    }

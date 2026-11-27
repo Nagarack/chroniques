@@ -2721,3 +2721,37 @@ details.jump-panel[open]>summary h3::after{content:" ⌃"}
 .pause-reminder{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.55rem .9rem;box-shadow:inset 3px 0 0 var(--c-brass)}
 .pause-reminder span{flex:1 1 240px;font-weight:600}
 .session-clock{font-variant-numeric:tabular-nums}
+/* 5.20 : bilan en graphiques. Palette catégorielle validée (daltonismes, contraste) sur le fond sombre ; le thème clair a ses propres teintes. */
+:root{--viz-1:#338ced;--viz-2:#e76624;--viz-3:#00a888;--viz-4:#d28e05;--viz-5:#e24d8b;--viz-6:#0aac23}
+.viz-grid-cards{display:grid;gap:18px}
+.viz-card{margin:0}.viz-card figcaption{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;margin-bottom:6px}
+.viz{display:block;width:100%;max-width:760px;height:auto;overflow:visible}
+.viz text{font-family:var(--f-ui);font-size:12px}
+.viz-grid{stroke:var(--c-line-soft);stroke-width:1}
+.viz-axis{fill:var(--c-muted)}
+.viz-label,.viz-value{fill:var(--c-text);font-weight:600}
+.viz-line{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.viz-s1{--viz:var(--viz-1)}.viz-s2{--viz:var(--viz-2)}.viz-s3{--viz:var(--viz-3)}.viz-s4{--viz:var(--viz-4)}.viz-s5{--viz:var(--viz-5)}.viz-s6{--viz:var(--viz-6)}
+.viz-line{stroke:var(--viz)}.viz-dot{fill:var(--viz);stroke:var(--c-surface);stroke-width:2}.viz-bar rect{fill:var(--viz)}
+.viz-hit,.viz .viz-hitbar{fill:transparent;stroke:none}
+.viz-pt:hover .viz-dot{r:6}.viz-bar:hover rect:not(.viz-hitbar){opacity:.85}
+.viz-legend{display:flex;flex-wrap:wrap;gap:4px 14px;list-style:none;margin:0 0 6px;padding:0;font-size:.85rem;color:var(--c-text)}
+.viz-legend li{display:flex;align-items:center;gap:6px}
+.viz-swatch{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--viz)}
+.viz-table{margin-top:6px}.viz-table summary{cursor:pointer;color:var(--c-accent);font-size:.9rem}
+@media (forced-colors:active){.viz-line{stroke:CanvasText}.viz-bar rect,.viz-dot,.viz-swatch{fill:CanvasText;background:CanvasText}}
+/* 5.20 : énigmes, bestiaire, ajustement des créatures. */
+.riddle-form{display:grid;gap:8px;padding:12px;border:1px dashed var(--c-brass);border-radius:var(--c-radius)}
+.riddle-question,.riddle-text{margin:0}.riddle-text{font-family:var(--f-display);font-size:1.1rem}
+.riddle-gm{margin:6px 0}.riddle-tries{margin:4px 0 0;padding-left:1.2em}
+.bestiary-list{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.bestiary-card{padding:10px 0;border-top:1px solid var(--c-line-soft)}.bestiary-card.is-hidden{opacity:.7}
+.bestiary-card h4{margin:0}.bestiary-facts{margin:6px 0;padding-left:1.2em}
+.bestiary-fact-form,.bestiary-add{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}.bestiary-fact-form label,.bestiary-add label{flex:1 1 200px}
+.npc-scale{display:inline-flex;align-items:center;gap:4px}.npc-scale .btn{min-width:36px;padding-inline:8px}.npc-scale-level{min-width:7.5em;text-align:center;font-size:.85rem}
+.npc-scale-note{margin:4px 0 0;color:var(--c-brass)}
+.npc-scale-all{margin:8px 0;align-items:center}
+.bestiary-list{grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr))}
+.bestiary-card .panel-top{flex-wrap:wrap;gap:6px 12px}
+.bestiary-fact-form label,.bestiary-add label{display:grid;gap:4px}.bestiary-fact-form input,.bestiary-add input{width:100%}
+.bestiary-add{margin:4px 0 12px;max-width:560px}
