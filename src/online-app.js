@@ -1,4 +1,5 @@
-/* Chroniques — interface web (la version affichée vient de package.json via /api/status). */
+/* Chroniques — interface web (la version affichée vient de package.json via /api/status).
+   FICHIER GÉNÉRÉ : modifiez les morceaux de src/interface/, puis lancez « node scripts/dev/build-app.js » (vérification : --check). */
 (function () {
 'use strict';
 const L=window.ChroniquesLogic;
@@ -46,6 +47,7 @@ let areaShape='circle',areaSize=6,areaPending=null,measureDrag=null;
 let mapTool='marker',fogRadius=120,mapActiveToken='',tokenDrag=null,renderPending=false,suppressTokenClick=false;const mapAspect={};
 let memoryFilter={search:'',category:'all',status:'all'};
 let aiStatus=null,aiPreview=null,aiResult='',aiChoice={storyId:'',task:'twist',notes:'',fields:[]},aiBusy=false;
+// ——— 02 · Appels au serveur, clés d’accès, connexion ———
 async function api(route,method='GET',body){
  const res=await fetch('/api/'+route,{method,credentials:'same-origin',headers:method==='POST'?{'Content-Type':'application/json'}:{},body:method==='POST'?JSON.stringify({...body,...(viewer?.campaignId&&!['campaigns/select','campaigns/create','campaigns/join'].includes(route)?{campaignId:viewer.campaignId}:{})}):undefined});
  const data=await res.json().catch(()=>({}));
@@ -118,6 +120,7 @@ document.addEventListener('input',e=>{const el=e.target;if(!el||!el.dataset||el.
  document.addEventListener('focusout',e=>{if(!e.target||!e.target.dataset||e.target.dataset.noteField===undefined)return;notesEditing=false;setTimeout(()=>{if(!notesEditing&&notesPending){notesPending=false;refresh();}},700);});
 }
 let inviteResults=[],pendingInvite='',pendingReset='',resetResult=null,reportList=null;
+// ——— 03 · Invitations, réinitialisation, notes partagées ———
 function inviteBase(){return String(network.remoteUrl||(typeof location!=='undefined'?location.origin:'')).replace(/\/+$/,'');}
 function inviteLink(code){return inviteBase()+'/#invitation='+encodeURIComponent(code);}
 function inviteLocalOnly(){return !network.remoteUrl&&typeof location!=='undefined'&&/^(localhost|127\.|\[::1\])/.test(location.hostname||'');}
@@ -144,6 +147,7 @@ function turnBanner(){if(actor==='mj'||page==='combat'||page==='overview'||!view
 function defenseTags(p){const d=p.defenses||{};const short={resist:'Rés.',vuln:'Vuln.',immune:'Imm.'};return Object.entries(d).map(([t,v])=>`<span class="tag def-${v}" title="${esc(L.DEFENSE_STATES[v])} : ${esc(t)}">${short[v]} ${esc(t)}</span>`).join('');}
 function defensePanel(p,edit,mode){const d=p.defenses||{},key='def-'+mode+'-'+p.id,n=Object.keys(d).length;
  return `<details class="ux-fold def-fold" data-fold="${attr(key)}" ${openFolds.has(key)?'open':''}><summary>Résistances et vulnérabilités${n?' · '+n:''} <span aria-hidden="true">⌄</span></summary><div class="ux-fold-content"><div class="def-grid">${L.DAMAGE_TYPES.map(t=>`<label class="def-cell def-${d[t]||'none'}"><span>${esc(t)}</span><select data-defense="${mode}|${attr(p.id)}|${attr(t)}" ${edit?'':'disabled'} aria-label="${esc(t)} : défense">${option('','Normal',d[t]||'')}${option('resist','Résistance',d[t]||'')}${option('vuln','Vulnérabilité',d[t]||'')}${option('immune','Immunité',d[t]||'')}</select></label>`).join('')}</div><p class="muted small">Appliquées quand un type de dégâts est choisi avant d’enregistrer les dégâts : résistance ÷ 2 (arrondi inférieur), vulnérabilité × 2, immunité 0.</p></div></details>`;}
+// ——— 04 · Blocs de créatures, co-MJ, séance du jour, raccourcis ———
 const ABILITY_LABELS=[['str','FOR'],['dex','DEX'],['con','CON'],['int','INT'],['wis','SAG'],['cha','CHA']];
 function npcStatBlock(n){const ab=n.abilities,mod=v=>{const m=Math.floor((v-10)/2);return (m>=0?'+':'−')+Math.abs(m);};
  const abil=ab?`<div class="npc-abilities" role="list" aria-label="Caractéristiques">${ABILITY_LABELS.map(([k,l])=>`<div role="listitem"><small>${l}</small><strong>${ab[k]}</strong><span>${mod(ab[k])}</span></div>`).join('')}</div>`:'';
@@ -210,6 +214,7 @@ if(typeof document!=='undefined'&&typeof document.addEventListener==='function')
  });
 }
 function shortcutsHint(){return `<p class="muted small kbd-hint" aria-label="Raccourcis clavier"><kbd>?</kbd> aide · <kbd>/</kbd> recherche · <kbd>Échap</kbd> fermer${actor==='mj'?' · en combat : <kbd>N</kbd> tour suivant · <kbd>U</kbd> annuler':''}</p>`;}
+// ——— 05 · Bestiaire SRD, objets, bibliothèque du MJ, replis ———
 const B=(typeof window!=='undefined'&&window.ChroniquesBestiary)||(typeof require==='function'?(()=>{try{return require('./bestiary.js');}catch{return null;}})():null);
 const IC=(typeof window!=='undefined'&&window.ChroniquesItemCatalog)||(typeof require==='function'?(()=>{try{return require('./item-catalog.js');}catch{return null;}})():null);
 let srdLoading=false;
@@ -325,6 +330,7 @@ function uxGo(where){
 // Les panneaux ne contiennent que des données autorisées par la projection serveur MJ.
 // Leur disposition est stockée localement, jamais dans la base de campagne.
 // Disposition de combat isolée pour chaque compte et campagne, sans toucher à l'état du jeu.
+// ——— 06 · Bureaux de combat et du MJ, découverte ———
 function fightKey(){return CW?.key(viewer?.name,viewer?.campaignId,onboardRole())||'';}
 function fightLoad(){try{fightLayout=CW.normalize(JSON.parse(localStorage.getItem(fightKey())||'null'));}catch{fightLayout=CW?.blank();}}
 function fightSave(){try{localStorage.setItem(fightKey(),JSON.stringify(CW.normalize(fightLayout)));}catch{toast('La disposition du combat ne peut pas être mémorisée ici.',true);}}
@@ -373,6 +379,7 @@ function onboardingLoad(){try{onboardDone=OB.decode(JSON.parse(localStorage.getI
 function onboardingSave(){try{localStorage.setItem(OB.key(viewer?.name,onboardRole())+':'+String(viewer?.campaignId||''),JSON.stringify({done:onboardDone}));}catch{}}
 // V5 — synchronisation légère : on garde une copie intacte du dernier état reçu, et le serveur n'envoie que
 // les différences depuis cette copie (étiquette syncTag). En cas de doute, on redemande l'état complet.
+// ——— 07 · Synchronisation, flux en direct, démarrage, hors ligne, actions ———
 const SDF=(typeof window!=='undefined'&&window.ChroniquesDiff)||null;let syncTag='',serverCopy=null;
 const cloneState=o=>typeof structuredClone==='function'?structuredClone(o):JSON.parse(JSON.stringify(o));
 function acceptState(r){if(r.patch){if(!SDF||!serverCopy||r.base!==syncTag){syncTag='';serverCopy=null;const e=new Error('resync');e.resync=true;throw e;}SDF.apply(serverCopy,r.patch);}else serverCopy=r.state;
@@ -453,6 +460,7 @@ async function act(kind,payload={},retried=false){
  try{const out=await api('action','POST',{baseVersion:version,kind,...payload,since:syncTag});await acceptAction(out);render();return true;}
  catch(e){if(isNetworkError(e)&&QUEUEABLE.has(kind))return queueOffline(kind,payload,'Connexion perdue : action notée sur cet appareil, elle sera envoyée au retour du réseau.');
   if(e.status===409){await refresh();if(!retried&&(kind==='hp'||kind==='npcHp'||kind==='sharedNoteSave'))return act(kind,payload,true);}toast(isNetworkError(e)?'Connexion perdue : cette action n’a pas été enregistrée. Réessayez au retour du réseau.':e.message,true);return false;}}
+// ——— 08 · Navigation, icônes, recherche ———
 function option(value, label, chosen){return `<option value="${attr(value)}"${value===chosen?' selected':''}>${esc(label)}</option>`;}
 function conditionHelp(c){const h=CONDITION_HELP[c];return h?h+' (Résumé : vérifiez la règle exacte de votre édition.)':'';}
 function conditionChip(c,ownerId){const t=ownerId&&typeof ownerId==='string'?(state?.combat?.timers||[]).find(x=>x.id===ownerId&&x.condition===c&&x.rounds):null;return `<span class="condition-chip" tabindex="0" role="button" data-cond-help="${attr(c)}" title="${attr(conditionHelp(c))}${t?' — se termine '+(t.when==='start'?'au début':'à la fin')+' du '+(t.rounds>1?t.rounds+'e ':'prochain ')+'tour concerné':''} — cliquer pour la règle complète">${esc(c)}${t?` <small aria-label="${t.rounds} tour(s) restant(s)">⏳${t.rounds}</small>`:''}</span>`;}
@@ -514,6 +522,7 @@ function mobileExtraNav(isGM){
 function returnToTop(){if(typeof window.scrollTo==='function')window.scrollTo({top:0,behavior:'instant'});}
 const MORPH=(typeof window!=='undefined'&&window.ChroniquesMorph)||null;
 function patchApp(html){const app=$('#app');if(!app)return;if(MORPH&&app.firstChild)MORPH.patch(app,html);else app.innerHTML=html;}
+// ——— 09 · Cadre de l’application ———
 function renderShell(){
  if(viewer?.tableMode&&!viewer.characterId){patchApp(tablePickerHtml());return;}
  const activePc=L.actorPc(state,actor);const isGM=actor==='mj';
@@ -588,6 +597,7 @@ function itemValues(v){return {name:v.name,description:v.description||'',categor
 // --- V4.3 : utiliser, équiper, donner ; alertes de charge et d'harmonisation ; CA d'équipement ---
 function fullItemValues(it,patch={}){return {name:it.name,description:it.description||'',category:it.category||'other',quantity:it.quantity??1,weight:Number(it.weight)||0,chargesMax:it.chargesMax||0,charges:it.charges||0,equipped:!!it.equipped,attuned:!!it.attuned,recharge:it.recharge||'',rechargeDice:it.rechargeDice||'',capacity:Number(it.capacity)||0,holdMagic:!!it.holdMagic,...patch};}
 // 5.4 : pièges sur la carte (exemples du SRD 5.1, état, DD).
+// ——— 10 · Pièges, objets mystérieux, sauts, formes, langues, votes, tests de groupe ———
 const TRAP_REFS={'Aiguille empoisonnée':'Poison Needle','Effondrement de plafond':'Collapsing Roof','Filet suspendu':'Falling Net','Fléchettes empoisonnées':'Poison Darts','Fosses':'Pits','Sphère d’annihilation':'Sphere of Annihilation','Sphère roulante':'Rolling Sphere','Statue au souffle de feu':'Fire-Breathing Statue'};
 const TRAP_STATE={hidden:['🫥','Caché'],spotted:['👁','Repéré'],disarmed:['✔','Désamorcé'],triggered:['💥','Déclenché']};
 let trapRulesWanted=false;
@@ -729,6 +739,7 @@ function containerBlock(pc,it,objects){if(!I.isContainer)return '';const can=act
   return `<div class="container-box"><div class="gear-meter-top"><span><span>🎒 Contenu</span>${it.holdMagic?' <span>· ne pèse rien</span>':''}</span><strong>${number(w)} / ${number(it.capacity)} kg</strong></div><div class="gear-bar" role="meter" aria-valuemin="0" aria-valuemax="${it.capacity}" aria-valuenow="${w}" aria-label="Contenu de ${attr(it.name)}"><i style="width:${pct}%"></i></div>${inside.length?`<div class="inventory-list container-contents">${inside.map(x=>inventoryCard(pc,x,objects)).join('')}</div>`:'<p class="muted small">Vide. Rangez-y un objet avec « Ranger dans ».</p>'}</div>`;}
  const boxes=objects.filter(c=>I.isContainer(c)&&c.id!==it.id);if(!can||!boxes.length||it.equipped||it.attuned)return '';
  return `<label class="item-into">Ranger dans<select data-item-into="${attr(it.id)}" data-inventory-for="${attr(pc.id)}">${option('','— Sur soi',it.in||'')}${boxes.map(c=>option(c.id,c.name,it.in||'')).join('')}</select></label>`;}
+// ——— 11 · Inventaire, marchands, illustrations ———
 function inventoryPage(){const isGM=actor==='mj',pcs=state.characters.filter(p=>isGM||p.id===actor);if(!pcs.length)return `${heading('Sac d’aventurier','Inventaire','Aucun personnage disponible.')}`;
  const pc=pcs.find(p=>p.id===inventoryCharacterId)||pcs[0];inventoryCharacterId=pc.id;const objects=I.list(pc),totalWeight=GEAR?GEAR.carried(pc):objects.reduce((n,it)=>n+(Number(it.weight)||0)*(Number(it.quantity)||1),0);const stash=isGM?state.lootStash||[]:[];
  return `${heading('Équipement & trésors','Inventaire et butin','Compteurs et équipement manuels, sans dés virtuels ni bonus de combat automatiques.')}
@@ -869,6 +880,7 @@ function mediaSelection(){const target=mediaTargets(mediaKind).find(x=>x.charact
 async function mediaChange(mode,more={}){try{const body={...mediaSelection(),mode,addToGallery:document.querySelector('#media-add-gallery')?.checked===true,caption:document.querySelector('#media-caption')?.value||'',...more};const out=await api('media/change','POST',body);version=out.version;viewer=out.viewer;state=out.state;clearCrop();render();toast(mode==='delete'?'Illustration retirée.':'Illustration enregistrée.');}catch(e){if(e.status===409)await refresh();toast(e.message,true);}}
 function chooseMedia(kind,characterId,entityId){clearCrop();page='illustrations';mediaKind=kind;mediaTarget=(characterId||'')+'|'+entityId;artSearch='';render();}
 
+// ——— 12 · Cartes ———
 const MAP_SYMBOLS={point:['⌖','Point'],monster:['🐉','Monstre / groupe'],chest:['🧰','Coffre'],npc:['♟','PNJ'],item:['💎','Objet / trésor'],trap:['⚠','Piège'],quest:['✦','Quête'],camp:['⛺','Campement'],portal:['🌀','Portail'],place:['🏰','Lieu / donjon']};
 const TOKEN_COLOR_NAMES={or:'Or',rouge:'Rouge',bleu:'Bleu',vert:'Vert',violet:'Violet',gris:'Gris'};
 function canMoveToken(t){return actor==='mj'||(t.kind==='pc'&&L.canEdit(state,actor,t.refId));}
@@ -1037,6 +1049,7 @@ async function uploadMapPinImage(file,mapId,markerId){
 }
 // --- V4.5 : onglets des pages chargées (Bibliothèque MJ, Journal & quêtes) ---
 // 5.13 : un onglet peut regrouper plusieurs rubriques (troisième élément : les data-tab affichés ensemble).
+// ——— 13 · Onglets, écran allumé, lecture à voix haute, affichage ———
 const TAB_SETS={encounters:[['monstres','Monstres'],['objets','Objets'],['marchands','Marchands'],['rencontres','Rencontres']],
  chronicle:[['seances','Séances',['seances','resumes']],['monde','Monde',['calendrier','voyages']],['carnet','Carnet & enquête',['carnet','enquete']],['histoire','Histoire',['frise','memoire']],['documents','Documents',['documents']]]};
 const tabMembers=t=>t[2]||[t[0]];
@@ -1108,6 +1121,7 @@ function playerTurnPanel(){if(actor==='mj'||!state.combat?.started)return '';con
  ${usable.length?`<div class="pt-items">${usable.map(it=>`<button type="button" class="act-chip" data-pt-item="${attr(it.id)}">${esc(it.name)}${(it.quantity??1)>1?' ×'+it.quantity:''}</button>`).join('')}</div>`:''}
  ${(p.conditions||[]).length?`<div class="pt-conds">${p.conditions.map(c=>conditionChip(c,p.id)).join('')}</div>`:''}</section>`;}
 // --- V4.5 : « Quoi de neuf ? » après une mise à jour ---
+// ——— 14 · Nouveautés et accueil ———
 const WHATS_NEW=[
  ['5.16',[['📖 Aventure d’initiation','« La Lanterne noyée » : 6 scènes, rencontres, documents et carte, en un clic (Mes campagnes).','gm']]],
  ['5.15',[['⚡ Plus rapide','Fichiers compressés et longues listes allégées : chargement deux fois plus rapide en 3G.','']]],
@@ -1164,6 +1178,7 @@ function characterCard(p){let sum=L.summary(state,p.id),owned=L.canViewDetail(st
  <div class="card-cond">${p.conditions.length?p.conditions.slice(0,2).map(conditionChip).join(''):'<span class="soft-label">Aucune condition</span>'}${p.concentration?'<span class="condition-chip">Concentration</span>':''}</div>
  <button class="btn card-button" data-char="${attr(p.id)}">${owned?'Ouvrir la fiche détaillée':'Voir le résumé'} <span>→</span></button>
  </article>`;}
+// ——— 15 · Rencontres, combat, impression, repos ———
 function encountersPage(){
  const lib=state.gmLibrary||{templates:[],encounters:[]};const templates=lib.templates||[],encounters=lib.encounters||[];
  const values=(t)=>({name:t.name||'',kind:t.kind||'monstre',hpMax:t.hpMax??20,ac:t.ac??12,initiative:t.initiative??0,speed:t.speed??9,visibility:t.visibility||'hidden',showHp:!!t.showHp,actions:t.actions||'',notes:t.notes||'',icon:t.icon||'',cr:t.cr||''});
@@ -1401,6 +1416,7 @@ function combatConditions(p){if(!p||!L.canViewDetail(state,actor,p.id))return ''
 function quickEconomy(p){if(!p)return '<p>Aucun personnage.</p>';const s=L.summary(state,p.id), can=L.canEdit(state,actor,p.id);return `<div class="economy-grid">${econ('Action',s.action,'action','◈',p,can)}${econ('Action bonus',s.bonus,'bonus','✧',p,can)}${econ('Réaction',s.reaction,'reaction','↶',p,can)}<div class="economy-pill"><span>➝ Déplacement</span><strong>${s.movement} m</strong><small>restants sur ${p.speed} m</small></div></div><div class="small muted" style="margin:14px 0">${s.bonus?'Une capacité bonus est actuellement utilisable.':'Action bonus non disponible ou déjà utilisée.'} Les réactions demandent un déclencheur valide.</div>`;}
 function econ(name,available,type,icon,p,can){return `<div class="economy-pill ${available?'available':'spent'}"><span>${icon} ${name}</span><strong>${available?'Prête':'Non disponible'}</strong><button type="button" class="tiny-action" data-spend="${type}" data-for="${attr(p.id)}" ${!available||!can?'disabled':''}>Marquer utilisée</button></div>`;}
 // Champs partagés par le parcours « nouveau personnage » et la fiche existante.
+// ——— 16 · Création et progression des personnages ———
 const CG=(typeof window!=='undefined'&&window.ChroniquesClassGuide)||(typeof require==='function'?(()=>{try{return require('./class-guide.js');}catch{return null;}})():null);
 function wizardScores(form){const base=Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,Number(form.querySelector('[name="base_'+k+'"]')?.value)||null]));let final=base;try{const r=O.compute(originPayload(form),state.edition);if(r&&r.finalScores)final={...base,...r.finalScores};}catch{}return {base,final};}
 function wizardRefresh(form){if(!CG||!form)return;const cls=form.querySelector('[name="classId"]')?.value,c=CG.info(cls),box=form.querySelector('#wizard-class-info');
@@ -1513,6 +1529,7 @@ function heritagePanel(p,edit){
  ${edit?`<details class="origin-editor"><summary>＋ Enregistrer un don / une capacité spéciale</summary><form id="feat-form"><label>Nom du don<input name="name" maxlength="70" required placeholder="Ex. don choisi au niveau 4"></label><label>Niveau de déblocage<input name="level" type="number" min="1" max="20" value="${p.level}" required></label><label>Effet (manuel)<textarea name="description" rows="2" maxlength="280" placeholder="Conditions ou rappel de règles"></textarea></label><button class="btn btn-primary" type="submit">Ajouter à la fiche</button></form></details>`:''}
  </section>`;
 }
+// ——— 17 · Règles, charte, chuchotements, mode table, marche, personnalité ———
 function rulesResultsHtml(){if(!R||!R.loaded()||fold(rulesQuery).trim().length<2)return '';const res=R.search(rulesQuery,30);
  if(!res.length)return '<p class="muted">Aucun résultat dans les règles ni les sorts.</p>';
  return `<p class="muted small">${res.length} résultat(s)</p><ul class="rules-results">${res.map(r=>`<li><button type="button" class="rules-hit" ${r.kind==='spell'?`data-spell-desc="${attr(r.id)}"`:`data-rule="${attr(r.chapter+'|'+r.index)}"`}><span class="sr-kind">${r.kind==='spell'?(r.level===0?'Sort mineur':'Sort niv. '+r.level):esc(r.chapterTitle)}</span><strong>${esc(r.title)}</strong><small>${esc(r.snippet)}</small></button></li>`).join('')}</ul>`;}
@@ -1642,6 +1659,7 @@ function personalityPanel(p){if(!PERSM)return '';const edit=actor==='mj'||L.canE
  <h4 class="tie-title">🤝 Liens avec le groupe</h4>${tieList||(edit?'':'<p class="muted small">Aucun lien noté.</p>')}${toMe.length?`<p class="muted small"><span>Ce que les autres disent de ${esc(p.name)} :</span></p><ul class="tie-list tie-in">${toMe.map(t=>`<li><strong>${esc(t.from.name)}</strong> : ${esc(t.text)}</li>`).join('')}</ul>`:''}${tieForm}</section>`;}
 // 5.9 : suggestions d’amélioration (tous les comptes) et page d’administration (administrateur du serveur).
 let suggestData=null,adminFilter='nouvelle',pendingDeploy=null,sugTab='new',adminTab='suggestions',adminSort='date',adminOverview=null;
+// ——— 18 · Suggestions, administration, Cet appareil ———
 const SUG_STATUS={nouvelle:'Nouvelle',retenue:'Retenue',faite:'Faite',non_retenue:'Non retenue'};
 const SUG_CATS={combat:'Combat',cartes:'Cartes',fiches:'Fiches et inventaire',mj:'Outils du MJ',interface:'Interface et confort',autre:'Autre'};
 const SUG_ICON={nouvelle:'✦',retenue:'★',faite:'✓',non_retenue:'✕'};
@@ -1714,6 +1732,7 @@ function adminPage(){if(!viewer?.isAdmin)return `${heading('Administration','Adm
   <form class="sug-status-form" data-sug="${attr(x.id)}"><fieldset class="sug-choices"><legend>Décision</legend>${Object.entries(SUG_STATUS).map(([k,l])=>`<label class="sug-choice"><input type="radio" name="status" value="${k}" ${x.status===k?'checked':''}> <span aria-hidden="true">${SUG_ICON[k]}</span> ${esc(l)}</label>`).join('')}</fieldset>
   <label>Réponse à l’auteur (facultatif)<textarea name="reply" rows="2" maxlength="600">${esc(x.reply||'')}</textarea></label><div class="btn-group"><button class="btn btn-primary" type="submit">Enregistrer</button><button type="button" class="text-button danger-text" data-sug-delete="${attr(x.id)}">Supprimer</button></div></form></article>`).join('')||`<section class="panel"><p class="empty">${all.length?'Aucune suggestion dans ce filtre.':'Aucune suggestion pour l’instant. Chacun peut en proposer depuis Mon compte → « Proposer une amélioration ».'}</p></section>`}</div>`;}
 // 5.9 : mise en scène (image, texte à lire, ambiance) sur l’écran de table, chez les joueurs et le spectateur.
+// ——— 19 · Mise en scène, horloges, étoiles et souhaits, enquête ———
 function sceneImageUrl(ts){return ts&&ts.hasImage?'/api/scene-image/'+encodeURIComponent(ts.id)+'?v='+encodeURIComponent(ts.imageKey||''):'';}
 function stagedScene(){const ts=state.tableScene;if(!ts)return null;if(ts.title!==undefined)return ts;const sc=(state.sessionFlow||[]).find(x=>x.id===ts.id);return sc?{id:sc.id,title:sc.title,readAloud:sc.readAloud||'',hasImage:!!sc.image,imageKey:sc.image?sc.image.filename.slice(0,8):''}:null;}
 function stageView(cls){const ts=stagedScene();if(!ts)return '';const url=sceneImageUrl(ts);return `<div class="${cls}">${url?`<img class="stage-image" src="${attr(url)}" alt="">`:''}<div class="stage-text"><h2>${esc(ts.title)}</h2>${ts.readAloud?(CHR?CHR.paragraphs(ts.readAloud,esc):`<p>${esc(ts.readAloud)}</p>`):''}${ts.readAloud&&!tableMode?speakButton('stage'):''}</div></div>`;}
@@ -1759,6 +1778,7 @@ function cluesSection(){if(!CLUM)return '';const isGM=actor==='mj';const list=st
  ${isGM?`<details ${list.length?'':'open'}><summary>＋ Nouvel indice</summary>${clueForm(null)}</details>`:''}
  ${groups.map(([tag,l])=>`<h4 class="clue-group"><span aria-hidden="true">${CLUM.ICONS[tag]}</span> <span>${esc(CLUM.TAGS[tag])}</span> · ${l.length}</h4><div class="clue-grid">${l.map(card).join('')}</div>`).join('')||`<p class="empty">${isGM?'Aucun indice préparé.':'Aucun indice révélé pour l’instant.'}</p>`}</section>`;}
 // 5.8 : dessins et altitude sur les cartes.
+// ——— 20 · Dessins, signaux, météo, mises à jour, sauvegardes ———
 let drawColor='or',drawKind='pen',drawDrag=null;
 const DRAW_FILL={or:'#e8c46b',rouge:'#e05a4f',bleu:'#5fb3e8',vert:'#7bd389',blanc:'#f4f1ea'};
 const DRAW_NAMES={or:'Or',rouge:'Rouge',bleu:'Bleu',vert:'Vert',blanc:'Blanc'};
@@ -1805,6 +1825,7 @@ function waitRestart(target){const box=document.createElement('div');box.classNa
  const t0=Date.now();const tick=async()=>{try{const r=await fetch('/api/status',{cache:'no-store'});if(r.ok){const j=await r.json();if(j.version===target||Date.now()-t0>180000){location.reload();return;}}}catch{}setTimeout(tick,2500);};setTimeout(tick,4000);}
 async function loadBackups(){backupsInfo=false;try{backupsInfo=await api('backups');}catch(e){backupsInfo={backups:[],mirror:'',error:e.message};}if(page==='settings')render();}
 // Ambiance sonore : un seul élément audio conservé hors du rendu (écran de table, ou joueur qui a choisi d'écouter).
+// ——— 21 · Ambiance sonore, grimoire, fiche ———
 let audioEl=null,audioNonce='',audioBlocked=false;
 function syncAudio(){const am=state?.ambience;const want=am?.playing&&(tableMode||(ambListen&&am.players));
  if(!want){if(audioEl){audioEl.pause();audioEl.removeAttribute('src');audioEl.load?.();audioNonce='';}return;}
@@ -1895,6 +1916,7 @@ ${can?privateNotesPanel(p,edit):''}${X&&can?X.companionsSection({pc:p,state,edit
  </div>`}`;}
 
 /* V2.0 — journal de campagne : la projection serveur retire les notes MJ et les entrées secrètes. */
+// ——— 22 · Carnet, guide, scènes ———
 const PLANNER_TYPES=[
  ['sessions','Séances','Calendrier des parties, résumés et événements','✦'],
  ['quests','Quêtes','Objectifs, pistes et progression','⚑'],
@@ -1951,6 +1973,7 @@ function sceneForm(item){const it=item||{},links=Array.isArray(it.links)?it.link
  <label>Texte à lire ou à afficher quand la scène est mise en scène (facultatif)<textarea name="readAloud" maxlength="1200" rows="3" placeholder="Ex. La porte s’ouvre sur une salle froide où brûlent encore trois bougies…">${esc(it.readAloud||'')}</textarea></label>${item?sceneImageInput(it):''}
  <label>Notes secrètes, indices et rebondissements<textarea name="gmNotes" maxlength="2000" rows="3" placeholder="Uniquement pour le MJ">${esc(it.gmNotes||'')}</textarea></label>${(state.ambience?.tracks||[]).length?`<label>Ambiance sonore lancée quand la scène passe « en cours » (facultatif)<select name="trackId"><option value="">Aucune</option>${(state.ambience.tracks||[]).map(t=>option(t.id,(t.category==='musique'?'♫ ':t.category==='effet'?'✸ ':'≈ ')+t.name,it.trackId||'')).join('')}</select></label>`:''}
  <fieldset class="scene-linkset"><legend>Relier aux éléments existants (facultatif)</legend>${SCENE_LINK_TYPE.map(([type,label])=>{const all=ref[type]||[];return all.length?`<div class="scene-link-category"><strong>${label}</strong><div class="scene-link-choices">${all.map(x=>`<label class="scene-checkbox"><input type="checkbox" name="link" value="${attr(type+'|'+x.id)}" ${links.some(l=>l.type===type&&l.id===x.id)?'checked':''}>${esc(x.title||x.name)}</label>`).join('')}</div></div>`:'';}).join('')||'<p class="muted small">Commencez par créer un lieu, une quête ou une rencontre si vous souhaitez les associer.</p>'}</fieldset></div>`;}
+// ——— 23 · Assistant de scénario ———
 const STORY_STATUS=[['draft','Brouillon'],['ready','Prêt à jouer'],['running','En cours'],['archived','Archivé']];
 const STORY_ACTS=['Mise en place','Complication','Dénouement'];
 const STORY_LINKS=[['scenes','Scène de séance'],['places','Lieu'],['quests','Quête'],['npcs','PNJ'],['encounters','Rencontre']];
@@ -2023,6 +2046,7 @@ function sessionPage(){const isGM=actor==='mj',scenes=state.sessionFlow||[],inPr
  <p class="muted small">Les scènes sont des aides de préparation. Aucune récompense, aucun PV et aucun dé ne sont calculés automatiquement.</p>`;
 }
 
+// ——— 24 · Mémoire, résumés, documents, chronique ———
 const MEMORY_TYPES=[['event','Événement'],['decision','Décision'],['clue','Indice'],['consequence','Conséquence']];
 const MEMORY_STATUS=[['open','À suivre'],['resolved','Résolu']];
 function memoryForm(item={}){return `<div class="memory-fields"><div class="two-fields"><label>Titre<input name="title" maxlength="100" required value="${attr(item.title||'')}" placeholder="Ex. Le pacte avec la guilde"></label><label>Séance (facultatif)<input name="session" maxlength="70" value="${attr(item.session||'')}" placeholder="Ex. Séance 5"></label></div>
@@ -2123,6 +2147,7 @@ function campaignHub(){const items=campaignList.campaigns||[];
  ${viewer?.isOwner&&actor==='mj'?`<div class="campaign-self-character"><div><strong>Mon personnage de joueur</strong><p class="muted small">Vous pouvez rester MJ et posséder aussi un personnage. En affichage Joueur, vous pourrez modifier cette fiche.</p></div><label><span>Personnage associé à mon compte</span><select id="gm-own-character"><option value="">Aucun — aperçu joueur uniquement</option>${state.characters.filter(p=>!state.claimedCharacterIds?.includes(p.id)||p.id===viewer.characterId).map(p=>option(p.id,p.name,viewer.characterId||'')).join('')}</select></label><button type="button" class="btn btn-secondary" data-save-gm-character>Enregistrer</button></div>`:''}
  <div class="campaign-hub-forms"><details><summary>＋ Créer une campagne</summary><form id="campaign-create-form"><label>Nom de la nouvelle campagne<input name="title" minlength="3" maxlength="80" required placeholder="Ex. La Côte des Brumes"></label><p class="muted small">Vous en serez le propriétaire et le MJ. Une campagne indépendante avec ses propres fiches d'exemple sera créée.</p><button class="btn btn-primary" type="submit">Créer la campagne</button></form></details><div class="adventure-card"><div><strong>📖 La Lanterne noyée</strong><p class="muted small">Aventure d’initiation pour 3 à 5 personnages de niveau 1 (2 à 3 heures) : 6 scènes avec texte à lire, rencontres prêtes, documents, indices et une carte. Idéale pour débuter comme MJ ou faire découvrir Chroniques.</p></div><button type="button" class="btn btn-secondary" data-task="adventure-new">Créer une campagne avec cette aventure</button></div><details><summary>✉ Rejoindre avec une invitation</summary><form id="campaign-join-form"><label>Code transmis par le MJ<input name="code" required autocomplete="off" placeholder="Code d'invitation"></label><p class="muted small">Utilisez votre compte actuel, sans créer de deuxième identifiant.</p><button class="btn btn-primary" type="submit">Rejoindre la campagne</button></form></details></div>
  </section>`;}
+// ——— 25 · Campagnes, notifications, modèles, paramètres ———
 const ROLE_LABEL={gm:'Co-MJ complet',assistant:'Co-MJ créatures',player:'Joueur'};
 function campaign(){const isGM=actor==='mj',isOwner=viewer?.isOwner===true,members=management?.members||[],invites=management?.invites||[],roles=management?.roleAssignments||[];
  return `${heading('Organisation de la table','Vos campagnes','Retrouvez vos aventures et choisissez vos permissions par campagne.')}
@@ -2202,6 +2227,7 @@ function deployModal(encId){const enc=(state.gmLibrary?.encounters||[]).find(e=>
  <label>Poser aussi leurs jetons sur une carte<select name="mapId"><option value="">Non, seulement le combat</option>${maps.map(m=>option(m.id,m.title,state.tableMapId&&maps.some(x=>x.id===state.tableMapId)?state.tableMapId:maps[0].id)).join('')}</select></label>
  <p class="muted small">Avec une carte : touchez-la ensuite à l’endroit voulu, les jetons s’y placent en formation. Les créatures masquées restent invisibles des joueurs.</p><button class="btn btn-primary" type="submit">Lancer la rencontre</button></form></div></div>`;}
 function reportDevice(){try{const ua=navigator.userAgent||'';const os=/iPhone|iPad/.test(ua)?'iPhone/iPad':/Android/.test(ua)?'Android':/Windows/.test(ua)?'Windows':/Mac OS/.test(ua)?'Mac':/Linux/.test(ua)?'Linux':'Autre';const br=/Edg\//.test(ua)?'Edge':/Firefox\//.test(ua)?'Firefox':/Chrome\//.test(ua)?'Chrome':/Safari\//.test(ua)?'Safari':'Autre';return os+' · '+br+(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches?' · application installée':'');}catch{return 'inconnu';}}
+// ——— 26 · Fenêtres et rendu ———
 const PAGE_NAMES={device:'Cet appareil',rules:'Règles du jeu',overview:'Tableau de bord',combat:'Combat',character:'Personnages',maps:'Cartes',session:'Scènes',inventory:'Inventaire',grimoire:'Grimoire',notes:'Notes partagées',encounters:'Rencontres',stories:'Scénarios',chronicle:'Journal',illustrations:'Illustrations',campaign:'Campagnes',settings:'Paramètres',guide:'Aide'};
 function reportModal(){return `<div class="modal-backdrop"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="report-title"><div class="panel-top"><h2 id="report-title">Signaler un problème</h2><button class="icon-close" data-task="close-modal" aria-label="Fermer">✕</button></div>
  <form id="report-form"><label>Que s’est-il passé ? Qu’attendiez-vous ?<textarea name="message" rows="5" maxlength="2000" required placeholder="Ex. : j’ai cliqué sur « Tour suivant » et rien ne s’est passé."></textarea></label>
@@ -2238,6 +2264,7 @@ let lastGameState=null;function trackAndroidGame(){if(!ANDROID||!state)return;co
 function render(){if(tableMode)return renderTable();if(tokenDrag){renderPending=true;return;}renderPending=false;trackAndroidGame();trackDowned();trackHandouts();trackTurn();trackWhispers();syncAudio();if(!L.findPc(state,selected))selected=state.characters[0]?.id||'';renderShell();if(typeof window!=='undefined'&&window.ChroniquesTour&&window.ChroniquesTour.active())requestAnimationFrame(()=>window.ChroniquesTour.place());if(typeof document.querySelectorAll==='function')document.querySelectorAll('#origin-form,#add-form').forEach(updateOriginPreview);manageModalFocus();}
 function chooseChar(id){selected=id;sheetSection='play';page='character';render();}
 async function exportFile(){try{const data=await api(actor==='mj'?'export':'state');const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='chroniques_v25_'+(actor==='mj'?'campagne':'personnage')+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('Sauvegarde téléchargée.');}catch(err){toast(err.message,true);}}
+// ——— 27 · Tâches (boutons data-task) ———
 async function handleTask(task){const id=selected;const amount=()=>Math.floor(Math.max(0,+($('#hp-amount')?.value||0)));
  if(typeof task==='string'&&task.startsWith('timer-clear:')){const [tid,...cs]=task.slice(12).split('|');await act('conditionTimer',{id:tid,condition:cs.join('|'),rounds:0});return;}
  if(task==='timer-set'){const [tid,...cs]=String($('#timer-target')?.value||'').split('|');if(tid)await act('conditionTimer',{id:tid,condition:cs.join('|'),rounds:Number($('#timer-rounds')?.value||0),when:$('#timer-when')?.value||'end',anchor:$('#timer-anchor')?.value||tid,save:$('#timer-save')?.value||''});return;}
@@ -2350,6 +2377,7 @@ async function handleTask(task){const id=selected;const amount=()=>Math.floor(Ma
  case 'close-modal':modal='';render();break;
  }
 }
+// ——— 28 · Clics ———
 function delegateClick(event){
  const pick=event.target.closest?.('[data-search-pick]');if(pick&&pick.dataset?.searchPick!==undefined){pickSearch(Number(pick.dataset.searchPick));return;}
  if(event.target.classList?.contains('search-backdrop')){modal='';render();return;}
@@ -2654,6 +2682,7 @@ function delegateClick(event){
  if(ds.slot){act('slot',{id:selected,key:ds.slot,delta:Number(ds.delta)});return;}
  if(ds.resource){act('resource',{id:selected,resourceId:ds.resource,delta:Number(ds.delta)});return;}
 }
+// ——— 29 · Glisser-déposer, changements ———
 document.addEventListener('toggle',event=>{if(event.target.matches?.('.fight-customize'))fightCustomizeOpen=event.target.open;else if(event.target.matches?.('.workspace-customize'))deskCustomizeOpen=event.target.open;},true);
 document.addEventListener('dragstart',event=>{
  const fightHandle=event.target.closest?.('[data-fight-drag]');
@@ -2742,6 +2771,7 @@ document.addEventListener('change',event=>{const el=event.target;
  if(el.dataset.init){act('init',{id:el.dataset.init,value:Number(el.value)});return;}
 });
 document.addEventListener('input',event=>{if(['media-crop-zoom','media-crop-x','media-crop-y'].includes(event.target.id))drawCrop();});
+// ——— 30 · Formulaires ———
 document.addEventListener('submit',async event=>{const fid=(event.target&&event.target.getAttribute&&event.target.getAttribute('id'))||(event.target&&event.target.id);
  if(event.target.classList?.contains('npc-conc-form')){event.preventDefault();const f=event.target;await act('npcConcentration',{id:f.dataset.npc,text:String(new FormData(f).get('text')||'')});return;}
  if(event.target.classList?.contains('faction-members')){event.preventDefault();const f=event.target;if(await act('factionMembers',{id:f.dataset.faction,members:new FormData(f).getAll('members').map(String)}))toast('Membres enregistrés.');return;}
@@ -2972,6 +3002,7 @@ document.addEventListener('submit',async event=>{const fid=(event.target&&event.
  }
 });
 // Accessibilité : fermer le tiroir mobile au clavier, et garder le focus dans son dialogue.
+// ——— 31 · Clavier, outils de carte, démarrage ———
 document.addEventListener('keydown',event=>{if(event.key!=='Tab'||!modal)return;const box=document.querySelector('#modal-root .modal');if(!box)return;const f=[...box.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(x=>x.offsetParent!==null);if(!f.length)return;const first=f[0],last=f[f.length-1];if(!box.contains(document.activeElement)){event.preventDefault();first.focus();}else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}});
 document.addEventListener('keydown',event=>{const t=event.target;if((event.key==='Enter'||event.key===' ')&&t&&t.getAttribute&&t.getAttribute('role')==='button'&&t.tagName!=='BUTTON'){event.preventDefault();t.click();}});
 document.addEventListener('keydown',event=>{

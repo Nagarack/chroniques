@@ -1,5 +1,9 @@
 # Journal des modifications
 
+## 5.17.0 — Interface rangée en 31 morceaux
+- **`src/online-app.js` découpé en 31 morceaux thématiques** dans `src/interface/` (connexion, synchronisation, cartes, combat, création de personnage, administration, tâches, clics, formulaires…). Le navigateur reçoit toujours un seul fichier, assemblé par `node scripts/dev/build-app.js` : le code exécuté est **identique** à celui de la 5.16 (seuls un en-tête et un bandeau de commentaire par morceau s’ajoutent). Vérifié : chaque coupure tombe entre deux instructions (jamais au milieu d’un texte), et un test refuse un fichier assemblé pas à jour.
+- Rien ne change pour les joueurs : cette version prépare des évolutions plus sûres et plus rapides.
+
 ## 5.16.0 — Aventure d’initiation « La Lanterne noyée »
 - **Aventure prête à jouer** pour 3 à 5 personnages de niveau 1 (2 à 3 heures), texte original écrit pour Chroniques, en français et en anglais : 6 scènes avec texte à lire et notes du MJ, 5 rencontres (crabes géants, bandits, nuée de rats, squelettes du SRD, et Corbin le Gris, chef des naufrageurs), 3 documents à remettre, 3 indices, une quête à objectifs, des lieux et PNJ, une table de rumeurs, un trésor et une carte dessinée (« Grotte des naufrageurs », grille, 6 repères). La carte et les secrets restent privés jusqu’à ce que le MJ les révèle.
 - **En un clic** : Mes campagnes → « Créer une campagne avec cette aventure » (nouvelle campagne avec trois personnages d’exemple), ou Paramètres → Modèles → « Importer l’aventure d’initiation » dans la campagne en cours.
