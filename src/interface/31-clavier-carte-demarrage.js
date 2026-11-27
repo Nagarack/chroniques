@@ -57,5 +57,10 @@ if(typeof document!=='undefined'&&typeof document.addEventListener==='function')
   act('mapTokenMove',{id:d.mapId,tokenId:d.id,x,y});};
  document.addEventListener('pointerup',endDrag);document.addEventListener('pointercancel',endDrag);
 }
+// 5.19 : chaque demi-minute, met à jour la durée de séance affichée et fait apparaître le rappel de pause quand il est dû.
+// (Un nouveau rendu plutôt qu’une simple modification du texte : la traduction anglaise s’applique au rendu.)
+let clockMinute=null;
+if(typeof window!=='undefined'&&typeof setInterval==='function'){const tick=setInterval(()=>{if(!state||actor!=='mj'||typeof document==='undefined')return;const m=sessionMinutes();
+ const chipStale=!!document.querySelector('[data-session-clock]')&&m!==clockMinute;clockMinute=m;if(chipStale||!!document.querySelector('.pause-reminder')!==pauseDue())render();},30000);tick?.unref?.();}
 bootstrap();
 })();

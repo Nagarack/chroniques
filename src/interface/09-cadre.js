@@ -64,8 +64,17 @@ function renderShell(){
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="modal-root">${modalHtml()}</div>${spotlightHtml()}${previewMediaHtml()}`);
 }
+// 5.19 : durée de la séance (depuis state.sessionStats.startedAt) et rappel de pause, pour le MJ seul. Rien n’est envoyé au serveur.
+let pauseEvery=(()=>{try{const v=Number(localStorage.getItem('chroniques-pause'));return [60,90,120].includes(v)?v:0;}catch{return 0;}})();
+const pauseKey=()=>'chroniques-pause-faite:'+(state?.sessionStats?.id||'');
+function sessionMinutes(now=Date.now()){const ss=state?.sessionStats;if(!ss||!ss.startedAt)return null;const a=Date.parse(ss.startedAt),last=Date.parse(ss.lastAt||ss.startedAt);if(!Number.isFinite(a)||now-last>6*3600e3||now<a)return null;return Math.floor((now-a)/60000);}
+function fmtSessionLength(min){const h=Math.floor(min/60),m=min%60;return h?(m?`${h} h ${String(m).padStart(2,'0')}`:`${h} h`):`${m} min`;}
+function sessionClockChip(){if(actor!=='mj')return '';const m=sessionMinutes();if(m==null)return '';return `<span class="tag session-clock" data-session-clock title="Depuis la première action de la séance. « Nouvelle séance » (Séance du jour) remet le compteur à zéro.">Séance en cours depuis ${fmtSessionLength(m)}</span>`;}
+function pauseDue(now=Date.now()){if(actor!=='mj'||!pauseEvery)return false;const m=sessionMinutes(now);if(m==null)return false;let ref=Date.parse(state.sessionStats.startedAt);try{const v=Number(localStorage.getItem(pauseKey()));if(v>ref)ref=v;}catch{}return now-ref>=pauseEvery*60000;}
+function pauseBanner(){if(!pauseDue())return '';const m=Math.floor((Date.now()-Math.max(Date.parse(state.sessionStats.startedAt),(()=>{try{return Number(localStorage.getItem(pauseKey()))||0;}catch{return 0;}})()))/60000);
+ return `<div class="pause-reminder" role="status"><span>${fmtSessionLength(m)} de jeu sans pause : c’est peut-être le moment d’en proposer une.</span><button type="button" class="btn btn-secondary" data-task="pause-done">Pause faite</button><button type="button" class="text-button" data-task="pause-later">Dans 15 min</button></div>`;}
 // 5.18 : les rappels (hors ligne, sauvegarde, découverte, nouveautés) sont regroupés dans un seul bloc ; « à vous de jouer » reste à part.
-function noticeStack(){const turn=turnBanner();const parts=[offlineBanner(),backupReminder(),turn?'':onboardingBanner(),page==='overview'?whatsNewBanner():''].filter(Boolean);return (turn||'')+(parts.length?`<div class="notice-stack">${parts.join('')}</div>`:'');}
+function noticeStack(){const turn=turnBanner();const parts=[pauseBanner(),offlineBanner(),backupReminder(),turn?'':onboardingBanner(),page==='overview'?whatsNewBanner():''].filter(Boolean);return (turn||'')+(parts.length?`<div class="notice-stack">${parts.join('')}</div>`:'');}
 function onboardingBanner(){if(!viewer||page!=='overview'||onboardHidden)return '';const role=onboardRole(),progress=OB.progress(role,onboardDone);if(!progress.next)return '';
 return `<section class="onboard-banner" aria-label="Parcours de découverte"><div><strong>${icon('guide')} Vos premiers pas (${progress.done} sur ${progress.total})</strong><p>Prochaine étape : ${esc(progress.next.title)}. ${esc(progress.next.description)}</p></div><button class="btn btn-primary" data-tour-start>Visite guidée (2 min)</button><button class="btn btn-secondary" data-onboard-open>Étapes</button><button class="text-button" data-onboard-hide aria-label="Masquer le rappel">Masquer</button></section>`;}
 function onboardingPage(){const role=onboardRole(),steps=OB.steps(role),count=onboardDone.length,progress=OB.progress(role,onboardDone),next=progress.next;

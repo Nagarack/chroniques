@@ -16,7 +16,7 @@ test('V2.2 : action bonus reste conditionnelle, un blocage supprime la disponibi
 });
 test('V2.2 : indication de sorts selon le suivi réel ; aucune consommation simulée',()=>{
  const st=L.initialState(),pc=st.characters[2];const before=JSON.stringify(st);
- let m=view(pc,st);assert.match(m.spells,/emplacements \(non suivis\)/);
+ let m=view(pc,st);assert.match(m.spells,/emplacements? \(non suivis?\)/);
  P.initTracking(pc,st.edition);P.spendSlot(pc,st.edition,'1',1);m=view(pc,st);
  assert.match(m.spells,/Emplacements 8\/9/);
  assert.equal(m.tempHp,0);assert.equal(pc.hp,19);

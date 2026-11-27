@@ -35,7 +35,7 @@ document.addEventListener('drop',event=>{
 });
 document.addEventListener('dragend',()=>{fightDrag='';deskDrag='';document.querySelectorAll('.workspace-dragging').forEach(el=>el.classList.remove('workspace-dragging'));});
 document.addEventListener('click',delegateClick);
-document.addEventListener('change',event=>{const el=event.target;
+document.addEventListener('change',event=>{const el=event.target;{const sf=el?.closest?.('#coin-split-form');if(sf){splitPreview(sf);return;}}
  if(el.matches?.('[data-march-rank]')){act('marchRank',{pcId:el.dataset.marchRank,rank:el.value});return;}
  if(el.matches?.('[data-jump-spell]')){jumpSpell=el.checked;render();return;}
  if(el.matches?.('[data-sug-sort]')){adminSort=el.value;render();return;}
@@ -87,3 +87,9 @@ document.addEventListener('change',event=>{const el=event.target;
  if(el.dataset.init){act('init',{id:el.dataset.init,value:Number(el.value)});return;}
 });
 document.addEventListener('input',event=>{if(['media-crop-zoom','media-crop-x','media-crop-y'].includes(event.target.id))drawCrop();});
+// 5.19 : aperçu du partage des pièces pendant la saisie (aucun lancer, simple division).
+function splitPreview(form){const out=form?.querySelector('[data-split-preview]');if(!out||!GEAR)return;const fd=new FormData(form);const n=fd.getAll('ids').length;const amounts=Object.fromEntries(I.MONEY.map(k=>[k,Math.max(0,Math.floor(Number(fd.get(k))||0))]));
+ if(!n||!Object.values(amounts).some(Boolean)){out.textContent='';return;}const {share,rest}=GEAR.splitCoins(amounts,n,{change:fd.get('change')==='on'});const fmt=o=>['pp','gp','ep','sp','cp'].filter(k=>o[k]).map(k=>o[k]+' '+coinAbbr(k)).join(' ');
+ const each=fmt(share),left=fmt(rest);const tr=t=>window.ChroniquesI18n?.t?window.ChroniquesI18n.t(t):t;   // texte écrit directement : traduit ici
+ out.textContent=tr(each?`Chacun reçoit ${each}.`:'Pas assez pour une part chacun.')+(left?' '+tr(`Reste pour le coffre du groupe : ${left}.`):'');}
+document.addEventListener('input',e=>{const f=e.target?.closest?.('#coin-split-form');if(f)splitPreview(f);});

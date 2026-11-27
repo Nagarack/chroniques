@@ -17,6 +17,9 @@ let updateInfo=null,whisperThread='',cmpEdit='',backupsInfo=null,backupReport=nu
 const H6={esc:s=>esc(s),attr:s=>attr(s),option:(v,l,c)=>option(v,l,c)};
 const UIH=(typeof window!=='undefined'&&window.ChroniquesUiHelpers)||require('./ui-helpers.js');
 const {CONDITION_HELP,GM_SCREEN,splitActions,splitLegendary,rollHint,initRows,groupName,tokenInitials}=UIH;
+// 5.19 : mise en forme légère (gras, italique, listes, intertitres, citations) des textes longs écrits par le MJ et les joueurs.
+const RT=(typeof window!=='undefined'&&window.ChroniquesRichText)||null;
+function rich(t,cls='rich'){return `<div class="${cls}">${RT?RT.render(t):'<p>'+esc(t).replace(/\n/g,'<br>')+'</p>'}</div>`;}
 const GEAR=(typeof window!=='undefined'&&window.ChroniquesGear)||(typeof require==='function'?(()=>{try{return require('./gear.js');}catch{return null;}})():null);
 let itemUseOpen='';
 const HB=(typeof window!=='undefined'&&window.ChroniquesHomebrewItems)||(typeof require==='function'?(()=>{try{return require('./homebrew-items.js');}catch{return null;}})():null);

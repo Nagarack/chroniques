@@ -82,6 +82,8 @@ async function handleTask(task){const id=selected;const amount=()=>Math.floor(Ma
  case 'tpl-new':if(actor==='mj'){modal='tpl-new';render();}break;
  case 'libitem-new':if(actor==='mj'){modal='libitem-new';render();}break;
  case 'portraits-by-class':if(confirm('Remplacer les icônes de portrait des aventuriers par l’icône de leur classe ? Les photos importées sont conservées.'))act('portraitsByClass',{}).then(ok=>{if(ok)toast('Portraits mis à jour selon la classe.');});break;
+ case 'pause-done':try{localStorage.setItem(pauseKey(),String(Date.now()));}catch{}render();break;
+ case 'pause-later':try{localStorage.setItem(pauseKey(),String(Date.now()-Math.max(0,pauseEvery-15)*60000));}catch{}render();break;
  case 'session-new':if(confirm('Clore la séance en cours et en commencer une nouvelle ? Le résumé actuel reste consultable dans « Séances précédentes ».'))act('sessionStart',{}).then(ok=>{if(ok)toast('Nouvelle séance commencée.');});break;
  case 'suggest-open':modal='suggest';sugTab='new';suggestData=null;render();loadSuggestions();setTimeout(()=>document.querySelector('#suggest-form [name=title]')?.focus(),50);break;
   case 'sug-reload':suggestData=null;render();loadSuggestions();break;

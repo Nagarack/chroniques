@@ -51,7 +51,13 @@ function coinsValue(c){return Object.entries(COIN_VALUE).reduce((t,[k,v])=>t+(Ma
 function pay(coins,price){const total=coinsValue(coins);if(!Number.isInteger(price)||price<0||price>total)return null;let rest=total-price;const out={pp:0,gp:0,ep:0,sp:0,cp:0};
  for(const k of ['pp','gp','ep','sp','cp']){const keep=Math.min(Math.floor(Number(coins?.[k])||0),Math.floor(rest/COIN_VALUE[k]));out[k]=keep;rest-=keep*COIN_VALUE[k];}
  for(const k of ['gp','sp','cp']){const n=Math.floor(rest/COIN_VALUE[k]);out[k]+=n;rest-=n*COIN_VALUE[k];}return out;}
-function splitCoins(coins,n){const res={share:{},rest:{}};for(const k of Object.keys(COIN_VALUE)){const v=Math.max(0,Math.floor(Number(coins?.[k])||0));res.share[k]=Math.floor(v/n);res.rest[k]=v%n;}return res;}
+// Partage à parts égales. Avec change:true (5.19), le reste de chaque pièce est changé en pièces plus petites avant d’être partagé
+// (1 pp = 10 po, 1 po = 10 pa, 1 pe = 5 pa, 1 pa = 10 pc) : il ne reste au plus que quelques pièces de cuivre.
+function splitCoins(coins,n,{change=false}={}){const res={share:{},rest:{}};const v={};for(const k of Object.keys(COIN_VALUE))v[k]=Math.max(0,Math.floor(Number(coins?.[k])||0));
+ if(!change){for(const k of Object.keys(COIN_VALUE)){res.share[k]=Math.floor(v[k]/n);res.rest[k]=v[k]%n;}return res;}
+ const down={pp:['gp',10],gp:['sp',10],ep:['sp',5],sp:['cp',10],cp:null};
+ for(const k of ['pp','gp','ep','sp','cp']){res.share[k]=Math.floor(v[k]/n);const r=v[k]%n;const d=down[k];if(d&&r){v[d[0]]+=r*d[1];res.rest[k]=0;}else res.rest[k]=r;}
+ return res;}
 function formatPrice(cp){cp=Math.max(0,Math.floor(Number(cp)||0));if(cp===0)return 'gratuit';const parts=[];const gp=Math.floor(cp/100),sp=Math.floor(cp%100/10),c=cp%10;if(gp)parts.push(gp.toLocaleString('fr-FR')+' po');if(sp)parts.push(sp+' pa');if(c)parts.push(c+' pc');return parts.join(' ');}
 function parsePrice(text){const m=/Prix\s*:\s*([\d\s]+)\s*(po|pa|pc|pe|pp)\b/i.exec(String(text||''));if(!m)return null;const n=Number(m[1].replace(/\s/g,''));const k={po:'gp',pa:'sp',pc:'cp',pe:'ep',pp:'pp'}[m[2].toLowerCase()];return n*COIN_VALUE[k];}
 return {mod,armorOf,isShield,magicBonus,equipmentAc,carried,capacity,load,MAX_ATTUNED,attunedCount,isAmmo,healDice,useInfo,diceRange,COIN_VALUE,COIN_FR,coinsValue,pay,splitCoins,formatPrice,parsePrice};

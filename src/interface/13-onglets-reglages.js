@@ -17,7 +17,9 @@ if(typeof document!=='undefined'&&document.addEventListener)document.addEventLis
 let speaking='';
 function speechSupported(){return typeof window!=='undefined'&&'speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';}
 function speakButton(key){return speechSupported()?`<button type="button" class="text-button speak-btn" data-speak="${attr(key)}" aria-pressed="${speaking===key}">${speaking===key?'■ Arrêter la lecture':'Lire à voix haute'}</button>`:'';}
-function speakText(key){if(key==='stage')return stagedScene()?.readAloud||'';const [kind,id]=key.split(':');
+// 5.19 : la voix lit le texte sans les marques de mise en forme (**, *, #, -).
+function speakText(key){const t=speakTextRaw(key);return RT?RT.plain(t):t;}
+function speakTextRaw(key){if(key==='stage')return stagedScene()?.readAloud||'';const [kind,id]=key.split(':');
  if(kind==='scene'){const sc=(state.sessionFlow||[]).find(x=>x.id===id);return sc?.readAloud||'';}
  if(kind==='handout'){const h=(state.handouts||[]).find(x=>x.id===id);return h?[h.title,h.text].filter(Boolean).join('. '):'';}
  return '';}

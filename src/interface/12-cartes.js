@@ -69,7 +69,7 @@ function mapLinkedChoices(){
  const choices=[];
  for(const n of state.combat?.npcs||[])choices.push({key:`npc|${n.id}|`,label:`Créature : ${n.name}`});
  for(const t of state.gmLibrary?.templates||[])choices.push({key:`template|${t.id}|`,label:`Modèle : ${t.name}`});
- for(const [kind,sec,l] of [['place','places','Lieu'],['pnpc','npcs','PNJ'],['quest','quests','Quête']])for(const e of state.campaignPlanner?.[sec]||[])choices.push({key:`${kind}|${e.id}|`,label:`${l} (carnet) : ${e.title}`});
+ for(const [kind,sec,l] of [['place','places','Lieu'],['pnpc','npcs','PNJ'],['quest','quests','Quête']])for(const e of state.campaignPlanner?.[sec]||[])choices.push({key:`${kind}|${e.id}|`,label:kind==='place'?`Lieu du carnet : ${e.title}`:kind==='pnpc'?`PNJ du carnet : ${e.title}`:`Quête du carnet : ${e.title}`});
  for(const c of state.characters||[]){choices.push({key:`character|${c.id}|`,label:`Personnage : ${c.name}`});
   for(const item of c.inventoryItems||[])choices.push({key:`item|${item.id}|${c.id}`,label:`Objet (${c.name}) : ${item.name}`});
   for(const spell of c.grimoire||[])choices.push({key:`spell|${spell.id}|${c.id}`,label:`Sort (${c.name}) : ${spell.name||spell.spellId||'Sort enregistré'}`});

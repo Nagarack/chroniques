@@ -30,7 +30,8 @@ function recapPanel({state,isGM,h}){const {esc}=h;const r=state.recap||{};
  <form class="recap-form"><label for="recap-text">Texte</label><textarea id="recap-text" name="text" rows="9" maxlength="4000">${esc(r.text||'')}</textarea>
  <div class="recap-row"><label class="check"><input type="checkbox" name="published" ${r.published?'checked':''}> Publier pour les joueurs</label><label class="check"><input type="checkbox" name="table" ${r.table?'checked':''}> Afficher sur l’écran de table</label></div>
  <div class="btn-group"><button type="button" class="btn btn-secondary" data-task="recap-compose">Composer à partir de la dernière séance</button><button class="btn btn-primary" type="submit">Enregistrer</button></div></form></section>`;}
-function paragraphs(text,esc){return String(text||'').split(/\n{2,}/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('');}
+// 5.19 : même mise en forme légère que les autres textes longs quand le module est chargé.
+function paragraphs(text,esc){const RT=(typeof globalThis!=='undefined'&&globalThis.ChroniquesRichText)||null;if(RT)return RT.render(text||'');return String(text||'').split(/\n{2,}/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('');}
 // ---------- Frise ----------
 const TL_KINDS=[['all','Tout'],['session','Séances'],['pc','Personnages'],['story','Quêtes & mémoire'],['world','Monde']];
 function timeline(state,{isGM=true}={}){const items=[];

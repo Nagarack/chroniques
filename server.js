@@ -149,6 +149,7 @@ const allowedStatic=new Map([
  ['/src/personality.js',['src/personality.js','text/javascript; charset=utf-8']],
  ['/src/travel-journal.js',['src/travel-journal.js','text/javascript; charset=utf-8']],
  ['/src/jumps.js',['src/jumps.js','text/javascript; charset=utf-8']],
+ ['/src/rich-text.js',['src/rich-text.js','text/javascript; charset=utf-8']],
  ['/src/marching.js',['src/marching.js','text/javascript; charset=utf-8']],
  ['/src/campaign-look.js',['src/campaign-look.js','text/javascript; charset=utf-8']],
  ['/src/foundry-import.js',['src/foundry-import.js','text/javascript; charset=utf-8']],
@@ -640,8 +641,13 @@ function createServer(opts={}){
    cloneItemMedia(s,from.id,item.id,to.id,newId,whole);logPublic(s,from.name+' donne '+(qty>1?qty+' × ':'')+item.name+' à '+to.name+'.');break;}
   case 'coinsSplit':{requireGm(u);const ids=Array.isArray(b.ids)?[...new Set(b.ids.map(String))]:[];const pcs=ids.map(x=>L.findPc(s,x)).filter(Boolean);if(!pcs.length||pcs.length!==ids.length)badRequest('Choisissez au moins un personnage.');
    const amounts={};for(const k of I.MONEY)amounts[k]=intValue(b.amounts?.[k]??0,'Montant '+k,0,9_999_999);if(!Object.values(amounts).some(Boolean))badRequest('Indiquez un montant à partager.');
-   const {share,rest}=GEAR.splitCoins(amounts,pcs.length);for(const p of pcs){p.coins??={};for(const k of I.MONEY)p.coins[k]=Math.min(999999,(Number(p.coins[k])||0)+share[k]);}
-   const fmt=o=>I.MONEY.filter(k=>o[k]).map(k=>o[k]+' '+GEAR.COIN_FR[k]).join(' ')||'rien';logPublic(s,'Partage du butin : '+fmt(share)+' pour chacun ('+pcs.map(p=>p.name).join(', ')+')'+(Object.values(rest).some(Boolean)?' · reste '+fmt(rest)+' non partagé':'')+'.');break;}
+   // 5.19 : la somme peut venir du coffre du groupe ; le reste indivisible y est déposé au lieu d’être perdu ; « faire la monnaie » en option.
+   const fromStash=b.source==='stash';const stash=PS.get(s);if(fromStash)for(const k of I.MONEY)if((Number(stash.coins[k])||0)<amounts[k])badRequest(`Le coffre du groupe ne contient pas assez de pièces (${GEAR.COIN_FR[k]}).`);
+   const {share,rest}=GEAR.splitCoins(amounts,pcs.length,{change:b.change===true});
+   if(fromStash)for(const k of I.MONEY)stash.coins[k]=(Number(stash.coins[k])||0)-amounts[k];
+   for(const p of pcs){p.coins??={};for(const k of I.MONEY)p.coins[k]=Math.min(999999,(Number(p.coins[k])||0)+share[k]);}
+   const restAny=Object.values(rest).some(Boolean);if(restAny)for(const k of I.MONEY)stash.coins[k]=Math.min(9999999,(Number(stash.coins[k])||0)+rest[k]);
+   const fmt=o=>I.MONEY.filter(k=>o[k]).map(k=>o[k]+' '+GEAR.COIN_FR[k]).join(' ')||'rien';logPublic(s,'Partage du butin'+(fromStash?' (depuis le coffre du groupe)':'')+' : '+fmt(share)+' pour chacun ('+pcs.map(p=>p.name).join(', ')+')'+(restAny?' ; reste '+fmt(rest)+' déposé dans le coffre du groupe':'')+'.');break;}
   case 'tableMap':{requireGm(u);const mid=b.mapId==null?null:String(b.mapId);if(mid){const m=CM.read(s,mid);if(!m)badRequest('Carte introuvable.');if(m.visibility!=='shared')badRequest('Partagez d’abord la carte avec les joueurs : l’écran de table n’affiche que ce qu’ils peuvent voir.');}s.tableMapId=mid;break;}
   case 'restShort':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');const cls=pc.progression?.classId||P.detectClass(pc.job);const info=CG.info(cls);
    const avail=Math.max(0,pc.level-(pc.hitDiceUsed||0));const dice=intValue(b.dice??0,'Dés de vie',0,avail);let healed=0;

@@ -62,7 +62,7 @@
  "Ressources & conditions": "Resources & conditions",
  "Ressources restantes": "Remaining resources",
  "RESSOURCES SUIVIES {0}": "TRACKED RESOURCES {0}",
- "restants sur {0} m": "left out of {0} m",
+ "restants sur {0} m": "left of {0} m",
  "Restauration impossible :": "Restoration impossible:",
  "Restauration partielle": "Partial recovery",
  "restaurée": "restored",
