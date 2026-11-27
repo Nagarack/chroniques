@@ -14,7 +14,7 @@
    const checks=(p.concentrationChecks||[]).map(c=>({id:c.id,dc:c.dc,damage:c.damage}));
    const alerts=[];
    if(p.hp<=0)alerts.push('0 PV');else if(p.hp*2<=p.stats.hp)alerts.push('PV bas');
-   if(checks.length)alerts.push(checks.length+' sauvegarde(s) de concentration à résoudre');
+   if(checks.length)alerts.push(checks.length>1?`${checks.length} sauvegardes de concentration à résoudre`:'Une sauvegarde de concentration à résoudre');
    if((p.conditions||[]).some(c=>DANGER.includes(c)))alerts.push('État incapacitant');
    return {id:p.id,name:p.name,job:p.job,level:p.level,initiative:p.initiative,hp:p.hp,hpMax:p.stats.hp,tempHp:p.tempHp||0,ac:p.stats.ac,
     turn:turnId===p.id,conditions:p.conditions||[],concentration:p.concentration||'',checks,resources,spellSlots:{tracked:knownSlots.length>0,left:leftSlots,max:maxSlots,hasSlots:slots.length>0},

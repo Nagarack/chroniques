@@ -29,12 +29,12 @@ function hint(spell,edition,pc,slotLevel=null){if(!spell)return {text:'Référez
  switch(spell.id){
   case 'fire-bolt':return {kind:'attack',text:`Attaque magique : d20 + bonus affiché ; dégâts ${tier(level)}d10 (dés réels).`};
   case 'ray-of-frost':return {kind:'attack',text:`Attaque magique : d20 + bonus affiché ; dégâts ${tier(level)}d8 (dés réels).`};
-  case 'eldritch-blast':return {kind:'attack',text:`${tier(level)} rayon(s) : un d20 d’attaque puis 1d10 de dégâts par rayon (dés réels).`};
+  case 'eldritch-blast':return {kind:'attack',text:`${tier(level)>1?`${tier(level)} rayons`:'1 rayon'} : un d20 d’attaque puis 1d10 de dégâts par rayon (dés réels).`};
   case 'sacred-flame':return {kind:'save',text:`Cible : sauvegarde de Dextérité contre le DD affiché ; ${tier(level)}d8 de dégâts (dés réels).`};
   case 'fireball':return {kind:'save',text:`Cible : sauvegarde de Dextérité contre le DD affiché ; ${8+extra}d6 de feu (moitié en cas de réussite selon les règles).`};
   case 'cure-wounds':return {kind:'heal',text:`Soins : ${edition==='2024'?2*(1+extra):1+extra}d8 + modificateur d’incantation (dés réels).`};
   case 'healing-word':return {kind:'heal',text:`Soins : ${edition==='2024'?2*(1+extra):1+extra}d4 + modificateur d’incantation (dés réels).`};
-  case 'magic-missile':return {kind:'damage',text:`${3+extra} projectile(s) : 1d4 + 1 dégâts chacun ; aucun d20 d’attaque usuel.`};
+  case 'magic-missile':return {kind:'damage',text:`${3+extra} projectiles : 1d4 + 1 dégâts chacun ; aucun d20 d’attaque usuel.`};
   case 'thunderwave':return {kind:'save',text:`Cible : sauvegarde de Constitution contre le DD affiché ; ${2+extra}d8 de dégâts.`};
   case 'guidance':return {kind:'support',text:'Effet de soutien : 1d4 réel selon les conditions du sort, pas de jet automatique.'};
   case 'bless':return {kind:'support',text:'Les créatures bénéficiaires ajoutent 1d4 réel aux jets concernés selon les règles du sort.'};

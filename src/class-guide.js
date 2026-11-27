@@ -34,7 +34,7 @@ function startingAc(dex){return 10+mod(dex);}
 function averageGain(classId,con){const c=CLASS[classId];return c?Math.max(1,c.die/2+1+mod(con)):null;}
 function rolledGain(classId,con,roll){const c=CLASS[classId];const r=Math.floor(Number(roll));if(!c||!(r>=1&&r<=c.die))return null;return Math.max(1,r+mod(con));}
 function asiAt(classId,level,edition){const c=CLASS[classId]||{};const base=[4,8,12,16,19].concat(c.asi||[]);if(!base.includes(level))return null;return edition==='2024'&&level===19?'Don épique':'Amélioration de caractéristiques ou don';}
-function slotsText(sp){if(!sp||!sp.slots.length)return '—';if(sp.kind==='pact')return sp.slots[0]+' emplacement(s) de niveau '+sp.slotLevel;return sp.slots.map((n,i)=>'niv. '+(i+1)+' × '+n).join(', ')+(sp.kind==='mixed'?' + pacte : '+sp.pact.slots[0]+' emplacement(s) de niveau '+sp.pact.slotLevel:'');}
+function slotsText(sp){if(!sp||!sp.slots.length)return '—';if(sp.kind==='pact')return sp.slots[0]+(sp.slots[0]>1?' emplacements de niveau ':' emplacement de niveau ')+sp.slotLevel;return sp.slots.map((n,i)=>'niv. '+(i+1)+' × '+n).join(', ')+(sp.kind==='mixed'?' + pacte : '+sp.pact.slots[0]+(sp.pact.slots[0]>1?' emplacements de niveau ':' emplacement de niveau ')+sp.pact.slotLevel:'');}
 // Ce qui change au prochain niveau : à confirmer par le joueur et le MJ avec le livre ou le SRD.
 function levelUpPreview(pc,edition,targetClass){const primary=(pc.progression&&pc.progression.classId)||(P?P.detectClass(pc.job):null);
  const list=P&&P.classesOf?P.classesOf(pc):[{classId:primary,level:pc.level||1,subclass:'',primary:true}];

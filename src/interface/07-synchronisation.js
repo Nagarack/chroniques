@@ -59,7 +59,7 @@ function isNetworkError(e){return !e.status&&(e instanceof TypeError||/fetch|net
 async function flushOutbox(){if(flushing||!outbox.length||!viewer)return;flushing=true;let sent=0;
  try{while(outbox.length){const item=outbox[0];try{await refresh();const out=await api('action','POST',{baseVersion:version,kind:item.kind,...item.payload,since:syncTag});await acceptAction(out);outbox.shift();sent++;outboxSave();}
   catch(e){if(isNetworkError(e))break;outbox.shift();outboxSave();toast('Action en attente refusée par le serveur : '+e.message,true);}}}
- finally{flushing=false;}if(sent){render();toast(sent+' action(s) faite(s) hors connexion enregistrée(s).');}}
+ finally{flushing=false;}if(sent){render();toast(sent>1?`${sent} actions faites hors connexion enregistrées.`:'Action faite hors connexion enregistrée.');}}
 // Hors connexion : l'effet est montré tout de suite sur cet appareil (en attente), puis envoyé au retour du réseau.
 function applyLocal(kind,p){try{const pc=id=>(state.characters||[]).find(x=>x.id===id);
  if(kind==='hp'){const c=pc(p.id);if(c){const max=c.stats?.hp||c.hp;c.hp=Math.max(0,Math.min(max,c.hp+Number(p.delta||0)));}}

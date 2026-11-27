@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 5.18.1 — Fini les « (s) »
+- **Une soixantaine de textes** qui écrivaient « 3 date(s) proposée(s) », « 1 personnage(s) blessé(s) » ou « 2 jeton(s) posé(s) » s’accordent maintenant avec leur nombre (singulier pour 0 et 1, pluriel au-delà), en français comme en anglais : accueil, combat, cartes et butin, fiche, Chronique, scénarios, réglages, messages de confirmation et étiquettes lues par les lecteurs d’écran.
+- Quand une phrase compte plusieurs choses à la fois, elle devient une liste courte (« Séances : 4, combats : 2, adversaires vaincus : 7 ») au lieu d’une suite de « (s) ».
+- Corrigé au passage : le carnet de campagne affichait « 12 souvenir(s) dont privés », phrase incomplète ; il affiche « Souvenirs, privés compris : 12 ».
+- Les messages d’import Foundry VTT, qui sont des notes techniques, gardent leur forme.
+
 ## 5.18.0 — Identité visuelle
 - **Nouvelle palette, tirée de la table de jeu** : fonds d’encre et de chêne ciré, texte couleur vélin, **vert-de-gris** (la patine du bronze) pour tout ce qui agit, **laiton** pour ce qui distingue sans inviter au clic (nom de l’application, heures du journal, numéro de round), **rouge cire à cacheter** pour les dégâts et le danger. Le thème clair passe d’un papier crème à une **pierre pâle et une encre sépia**. Tous les contrastes de texte restent au-dessus de 4,5:1.
 - **Un nom par page** : le menu, le titre de la page, la recherche et les messages emploient le même nom. « Journal & quêtes » devient **Chronique** ; « Préparer les rencontres » devient **Bibliothèque MJ** ; « Assistant de scénario » devient **Scénarios** ; « Vos campagnes » devient **Mes campagnes** ; « Cartes de campagne » devient **Cartes** ; « Combat & initiative » devient **Combat** ; « Fiches & capacités » devient **Personnages** ; le tableau de bord du MJ s’appelle **Tableau de bord**.
