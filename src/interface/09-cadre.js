@@ -64,6 +64,10 @@ function renderShell(){
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="modal-root">${modalHtml()}</div>${spotlightHtml()}${previewMediaHtml()}`);
 }
+// 5.21 : présence à la séance. Les absents ne sont pas cochés par défaut (XP, partage, tests de groupe) et n’entrent pas dans l’initiative.
+const isAbsent=id=>(state?.sessionStats?.absent||[]).includes(id);
+function attendanceRow(){if(actor!=='mj')return '';const pcs=(state.characters||[]).filter(p=>!p.fallen);if(!pcs.length)return '';
+ return `<div class="attendance" role="group" aria-label="Présence à la séance"><span class="muted small">Présents à la séance :</span>${pcs.map(p=>`<button type="button" class="attendance-chip" data-attendance="${attr(p.id)}" aria-pressed="${isAbsent(p.id)?'false':'true'}">${esc(p.name)}<span class="visually-hidden">${isAbsent(p.id)?' (absent)':' (présent)'}</span></button>`).join('')}</div>`;}
 // 5.19 : durée de la séance (depuis state.sessionStats.startedAt) et rappel de pause, pour le MJ seul. Rien n’est envoyé au serveur.
 let pauseEvery=(()=>{try{const v=Number(localStorage.getItem('chroniques-pause'));return [60,90,120].includes(v)?v:0;}catch{return 0;}})();
 const pauseKey=()=>'chroniques-pause-faite:'+(state?.sessionStats?.id||'');

@@ -1,5 +1,14 @@
 // ——— 28 · Clics ———
+// 5.21 : définition courte d’un terme de jeu, dans une bulle posée sous le terme (fermée par Échap, un clic ailleurs ou un nouveau rendu).
+function closeTerm(){const pop=document.getElementById('term-pop');if(pop)pop.remove();document.querySelectorAll('.term[aria-expanded="true"]').forEach(b=>b.setAttribute('aria-expanded','false'));}
+function openTerm(btn){const d=GLO&&GLO.get(btn.dataset.term,uiLang());if(!d)return;const already=btn.getAttribute('aria-expanded')==='true';closeTerm();if(already)return;
+ const pop=document.createElement('div');pop.id='term-pop';pop.className='term-pop';pop.setAttribute('role','note');pop.setAttribute('translate','no');
+ const h=document.createElement('strong');h.textContent=d.term;const p=document.createElement('p');p.textContent=d.text;pop.append(h,p);document.body.append(pop);
+ btn.setAttribute('aria-expanded','true');btn.setAttribute('aria-controls','term-pop');
+ const r=btn.getBoundingClientRect(),w=Math.min(320,window.innerWidth-24);pop.style.width=w+'px';const left=Math.max(12,Math.min(window.innerWidth-w-12,r.left+r.width/2-w/2));
+ const below=r.bottom+8+pop.offsetHeight<window.innerHeight;pop.style.left=left+'px';pop.style.top=(below?r.bottom+8:Math.max(8,r.top-8-pop.offsetHeight))+'px';}
 function delegateClick(event){
+ {const tb=event.target.closest?.('.term[data-term]');if(tb&&tb.dataset?.term&&tb.classList?.contains('term')){event.preventDefault?.();openTerm(tb);return;}if(typeof document.getElementById==='function'&&document.getElementById('term-pop')&&!event.target.closest?.('#term-pop'))closeTerm();}
  const pick=event.target.closest?.('[data-search-pick]');if(pick&&pick.dataset?.searchPick!==undefined){pickSearch(Number(pick.dataset.searchPick));return;}
  if(event.target.classList?.contains('search-backdrop')){modal='';render();return;}
  const canvas=event.target.closest?.('[data-map-canvas]');
@@ -148,6 +157,10 @@ function delegateClick(event){
   if(ds.tourStart!==undefined){modal='';render();startTour();return;}
   if(ds.catalogAdd&&IC){const e=IC.get(ds.catalogAdd);if(e)act('itemAdd',{id:ds.character,values:IC.toItemValues(e)}).then(ok=>{if(ok)toast(e.name+' ajouté à l’inventaire.');});return;}
   if(ds.surprise){act('surpriseToggle',{id:ds.surprise});return;}
+ if(ds.arcStep){act('arcProgress',{id:ds.pc,arcId:ds.arc,step:ds.arcStep}).then(ok=>{if(ok&&ds.arcStep==='done')toast('Objectif accompli.');});return;}
+ if(ds.arcSecret){act('arcUpdate',{id:ds.pc,arcId:ds.arc,values:{secret:ds.arcSecret==='1'}});return;}
+ if(ds.arcRemove){if(confirm('Retirer cet arc ?'))act('arcRemove',{id:ds.pc,arcId:ds.arcRemove});return;}
+ if(ds.attendance){const now=isAbsent(ds.attendance);act('attendance',{id:ds.attendance,absent:!now});return;}
  if(ds.bestOp){const op=ds.bestOp;if(op==='remove'&&!confirm('Retirer cette créature du bestiaire du groupe ?'))return;act('bestiaryEntry',{id:ds.best,op});return;}
  if(ds.bestFactDel){act('bestiaryFact',{id:ds.bestFactDel,factId:ds.fact});return;}
  if(ds.npcScale){act('npcScale',{id:ds.npcScale,step:Number(ds.step)});return;}

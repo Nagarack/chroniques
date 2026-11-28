@@ -91,7 +91,9 @@
     };
   }
   function log(state,msg){state.combat.log.unshift({id:Math.random().toString(36).slice(2,11),msg,when:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});state.combat.log=state.combat.log.slice(0,60);}
-  function participants(state){return [...state.characters.filter(p=>!p.fallen),...(state.combat.npcs||[])];}
+  // 5.21 : les personnages marqués absents pour la séance en cours ne prennent pas part au combat.
+  function isAbsent(state,id){const a=state.sessionStats?.absent;return Array.isArray(a)&&a.includes(id);}
+  function participants(state){return [...state.characters.filter(p=>!p.fallen&&!isAbsent(state,p.id)),...(state.combat.npcs||[])];}
   function startCombat(state,actor) {
     if(actor!=='mj')throw new Error('Seul le MJ gère l’initiative dans cette démonstration.');
     state.combat.round=1;state.combat.index=0;state.combat.delayed=[];state.combat.readied=[];
@@ -336,5 +338,5 @@
     if(!data||data.schemaVersion!==4||!Array.isArray(data.characters)||!data.combat||!data.characters.every(p=>typeof p.id==='string'&&typeof p.name==='string'&&p.stats&&Number.isFinite(+p.hp)&&Array.isArray(p.abilities)&&Array.isArray(p.resources)&&Array.isArray(p.conditions)&&p.economy))throw new Error('Fichier V0.4 invalide ou non compatible.');
     return true;
   }
-  return {STATES,CORE_ACTIONS,initialState,clone,findPc,actorPc,canViewDetail,canEdit,actionSet,abilityModifier,proficiencyBonus,baseRulesSummary,summary,isBlocked,speedAvailable,abilityAvailable,startCombat,toggleSurprise,nextTurn,setConditionTimer,saveSharedNote,deleteSharedNote,endCombat,activeId,setInitiative,sortInitiative,moveInitiative,concentrationDC,resolveConcentration,spendType,resetEconomy,useAbility,updateMovement,changeHp,setTempHp,setExhaustion,setInspiration,setFallen,delayTurn,actNow,readyAction,readyResolve,DAMAGE_TYPES,DEFENSE_STATES,cleanDefenses,adjustDamage,setDefense,toggleCondition,toggleConcentration,changeResource,deathSave,rest,setPrivateNotes,addPc,validImport};
+  return {STATES,CORE_ACTIONS,initialState,clone,findPc,actorPc,canViewDetail,canEdit,actionSet,abilityModifier,proficiencyBonus,baseRulesSummary,summary,isBlocked,speedAvailable,abilityAvailable,startCombat,toggleSurprise,nextTurn,setConditionTimer,saveSharedNote,deleteSharedNote,endCombat,activeId,setInitiative,sortInitiative,moveInitiative,concentrationDC,resolveConcentration,spendType,resetEconomy,useAbility,updateMovement,changeHp,setTempHp,setExhaustion,setInspiration,setFallen,delayTurn,actNow,readyAction,readyResolve,DAMAGE_TYPES,DEFENSE_STATES,cleanDefenses,adjustDamage,setDefense,toggleCondition,toggleConcentration,changeResource,deathSave,rest,setPrivateNotes,addPc,validImport,isAbsent};
 });

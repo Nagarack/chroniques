@@ -21,6 +21,11 @@ function totals(state){const base=JSON.parse(JSON.stringify(state.campaignTotals
  if(ss&&(ss.combats||ss.events.length||ss.defeated.length))addSession(base,ss);return base;}
 function archive(state){const ss=state.sessionStats;if(!ss)return;const meaningful=ss.combats||ss.events.length||ss.defeated.length||Object.values(ss.pcs||{}).some(p=>p.damage||p.healing||p.downs);if(meaningful){seedTotals(state);addSession(state.campaignTotals,{...ss,endedAt:ss.lastAt});if(!Array.isArray(state.sessionHistory))state.sessionHistory=[];state.sessionHistory.unshift({...ss,endedAt:ss.lastAt});state.sessionHistory=state.sessionHistory.slice(0,MAX_HISTORY);}state.sessionStats=null;}
 function current(state,now=Date.now()){let ss=state.sessionStats;if(ss&&now-Date.parse(ss.lastAt)>GAP_MS){archive(state);ss=null;}if(!ss)ss=state.sessionStats=blank(now);return ss;}
+// 5.21 : présence. Les absents sont notés dans la séance en cours (ils suivent la séance dans l’historique).
+function setAbsent(state,id,absent,now=Date.now()){const ss=current(state,now);if(!Array.isArray(ss.absent))ss.absent=[];ss.absent=ss.absent.filter(x=>x!==id);if(absent)ss.absent.push(id);return ss.absent;}
+function attendance(state){const out={};const sessions=[...(state.sessionHistory||[]),...(state.sessionStats?[state.sessionStats]:[])];
+ for(const p of state.characters||[]){const since=Date.parse(p.createdAt||0)||0;const seen=sessions.filter(s=>Date.parse(s.startedAt)>=since||!p.createdAt);out[p.id]={sessions:seen.length,present:seen.filter(s=>!(s.absent||[]).includes(p.id)).length};}
+ return out;}
 function startNew(state,now=Date.now()){archive(state);state.sessionStats=blank(now);return state.sessionStats;}
 const pcHp=p=>Number(p&&p.hp)||0;
 const items=p=>Array.isArray(p&&p.inventoryItems)?p.inventoryItems:[];
@@ -66,5 +71,5 @@ function text(ss,opts={}){if(!ss)return '';const l=lines(ss,opts);return 'Résum
 function projected(state){const keep=ss=>ss&&ss.published?{id:ss.id,startedAt:ss.startedAt,lastAt:ss.lastAt,published:true,combats:ss.combats,rounds:ss.rounds,pcs:ss.pcs,defeated:ss.defeated.filter(d=>d.visible).map(d=>({name:d.name,visible:true})),events:ss.events.filter(e=>e.audience!=='gm')}:null;
  return {sessionStats:keep(state.sessionStats),sessionHistory:(state.sessionHistory||[]).map(keep).filter(Boolean)};}
 function publish(state,id,value){const ss=state.sessionStats&&state.sessionStats.id===id?state.sessionStats:(state.sessionHistory||[]).find(x=>x.id===id);if(!ss){const e=new Error('Séance introuvable.');e.status=400;throw e;}ss.published=!!value;return ss;}
-return {observe,current,startNew,lines,text,projected,publish,totals,XP,GAP_MS};
+return {observe,current,startNew,setAbsent,attendance,lines,text,projected,publish,totals,XP,GAP_MS};
 });

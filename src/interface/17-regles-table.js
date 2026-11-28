@@ -41,6 +41,10 @@ function tablePage(){const isGM=actor==='mj',c=charter();const rules=c.rules||[]
   ${isGM?`<details class="charter-add" ${rules.length?'':'open'}><summary>＋ Nouvelle règle maison</summary>${charterEdit?'':charterRuleForm(null)}</details>
   ${presets.length?`<details class="charter-presets"><summary>Exemples courants (${presets.length})</summary><p class="muted small">Ajoutez un exemple, puis adaptez-le à votre table.</p><ul>${presets.map(pr=>`<li><strong>${esc(pr.title)}</strong> <span class="muted small">${esc(pr.text)}</span> <button type="button" class="text-button" data-charter-preset="${attr(pr.title)}">Ajouter</button></li>`).join('')}</ul></details>`:''}`:''}
  </section>`;}
+// 5.21 : petit lexique (définitions courtes, dans la langue de l’interface).
+function lexiconPanel(){if(!GLO)return '';const lang=uiLang();const list=GLO.all(lang);
+ return `<details class="panel lexicon"><summary><h3>Petit lexique</h3><span class="muted small">${list.length} termes expliqués simplement</span></summary>
+ <dl class="lexicon-list" translate="no">${list.map(x=>`<div><dt>${esc(x.term)}</dt><dd>${esc(x.text)}</dd></div>`).join('')}</dl><p class="muted small" translate="no">${esc(lang==='en'?'Definitions written from the SRD 5.1 (Wizards of the Coast, CC BY 4.0). On the character sheet and in combat, tap an underlined term to see its definition.':GLO.ATTRIBUTION+' Sur la fiche et au combat, touchez un terme souligné pour voir sa définition.')}</p></details>`;}
 function rulesPage(){
  const head=heading('','Règles du jeu','Le Document de Référence du Système 5.1 en français : règles, états et les 319 sorts. Consultable hors ligne une fois chargé.');
  if(!R)return head+'<section class="panel"><p>Module de règles indisponible.</p></section>';
@@ -49,7 +53,7 @@ function rulesPage(){
  const byLevel=Array.from({length:10},(_,l)=>Object.entries(D.spells).filter(([,x])=>x.level===l).sort((a,b)=>a[1].name.localeCompare(b[1].name,'fr')));
  const quick=[['etats',0,'États'],['combat',20,'Actions au combat'],['combat',45,'Abri'],['aventure',19,'Repos'],['magie',21,'Concentration']].map(([c,i,label])=>{const r=R.data().rules.find(x=>x.id===c);const j=r?r.sections.findIndex(x=>x.title===label||x.title==='Les états'&&label==='États'):-1;return j>=0?`<button type="button" class="btn btn-secondary" data-rule="${attr(c+'|'+j)}">${esc(label)}</button>`:'';}).join('');
  const chapter=sel?D.rules.find(x=>x.id===cid):null;
- return `${head}<div class="rules-layout">
+ return `${head}${lexiconPanel()}<div class="rules-layout">
  <aside class="panel rules-toc" aria-label="Sommaire des règles"><label class="field-label" for="rules-search">Rechercher une règle ou un sort</label><input id="rules-search" type="search" value="${attr(rulesQuery)}" placeholder="Ex. à terre, abri, concentration, boule de feu" autocomplete="off" aria-controls="rules-results">
   <nav aria-label="Chapitres">${D.rules.map(c=>`<details ${sel&&cid===c.id?'open':''}><summary>${esc(c.title)}</summary><ul>${c.sections.map((x,i)=>`<li><button type="button" class="toc-link lvl-${x.level} ${sel&&cid===c.id&&idx===i?'active':''}" data-rule="${attr(c.id+'|'+i)}" ${sel&&cid===c.id&&idx===i?'aria-current="true"':''}>${esc(x.title)}</button></li>`).join('')}</ul></details>`).join('')}
   <details><summary>Sorts (${Object.keys(D.spells).length})</summary>${byLevel.map((list,l)=>`<details class="toc-sub"><summary>${l===0?'Sorts mineurs':'Niveau '+l} <span class="muted small">${list.length}</span></summary><ul>${list.map(([id,x])=>`<li><button type="button" class="toc-link" data-spell-desc="${attr(id)}">${esc(x.name)}</button></li>`).join('')}</ul></details>`).join('')}</details></nav>
@@ -117,6 +121,26 @@ function travelJournalSection(){if(!TJM)return '';const isGM=actor==='mj';const 
  ${trips.map(trip).join('')||'<p class="empty">Aucun voyage pour l’instant. Lancez un voyage (Voyage &amp; exploration) ou déplacez le groupe sur une carte en hexagones.</p>'}</section>`;}
 function fmtKm(km){const n=Number(km)||0;return uiFeet()?(Math.round(n/1.609*10)/10).toLocaleString('en-GB')+' miles':String(Math.round(n*10)/10).replace('.',',')+' km';}
 // 5.10 : personnalité (traits, idéaux, liens, défauts) et liens avec les autres personnages.
+// 5.21 : arcs des personnages (objectifs personnels écrits par le joueur, avancées notées par le MJ).
+function arcSince(a){return ARCM?ARCM.sessionsSince(state,a):0;}
+function arcSinceText(n){return n>1?`Aucune avancée depuis ${n} séances`:n===1?'Aucune avancée depuis 1 séance':'Avancé à cette séance ou pas encore joué';}
+function arcGmButtons(p,a){return a.status==='done'?`<button type="button" class="text-button" data-arc-step="reopen" data-arc="${attr(a.id)}" data-pc="${attr(p.id)}">Rouvrir</button>`:
+ `<form class="arc-advance" data-arc="${attr(a.id)}" data-pc="${attr(p.id)}"><label class="visually-hidden" for="arc-note-${attr(a.id)}">Ce qui s’est passé (facultatif)</label><input id="arc-note-${attr(a.id)}" name="note" maxlength="160" placeholder="Ce qui s’est passé (facultatif)"><button class="btn btn-secondary" type="submit">A avancé</button><button type="button" class="btn btn-secondary" data-arc-step="done" data-arc="${attr(a.id)}" data-pc="${attr(p.id)}">Accompli</button></form>`;}
+function arcsPanel(p){const isGM=actor==='mj';const edit=isGM||L.canEdit(state,actor,p.id);const arcs=Array.isArray(p.arcs)?p.arcs:[];const loc=uiLang()==='en'?'en-GB':'fr-FR';
+ if(!edit&&!arcs.length)return '';
+ return `<section class="panel arcs-panel" aria-labelledby="arcs-${attr(p.id)}"><div class="panel-top"><h3 id="arcs-${attr(p.id)}">Arcs du personnage</h3><span class="mini-pill">${arcs.length} / 3</span></div>
+ ${edit?`<p class="muted small">Un à trois objectifs personnels que le personnage poursuit. Le MJ les voit en préparant la séance et note quand ils avancent. Un arc secret n’est visible que du joueur et du MJ.</p>`:''}
+ ${arcs.length?`<ul class="arc-list">${arcs.map(a=>`<li class="arc ${a.status==='done'?'is-done':''}"><div class="arc-head"><strong>${esc(a.text)}</strong>${a.status==='done'?'<span class="mini-pill">Accompli</span>':''}${a.secret?'<span class="mini-pill">Secret</span>':''}</div>
+  ${a.steps?.length?`<ol class="arc-steps">${a.steps.map(s=>`<li><time datetime="${attr(s.at)}">${esc(new Date(s.at).toLocaleDateString(loc,{day:'numeric',month:'short'}))}</time> ${s.note?esc(s.note):'A avancé'}</li>`).join('')}</ol>`:''}
+  ${isGM&&a.status!=='done'?`<p class="muted small">${arcSinceText(arcSince(a))}.</p>`:''}
+  <div class="btn-group">${isGM?arcGmButtons(p,a):''}${edit?`<button type="button" class="text-button" data-arc-secret="${a.secret?'0':'1'}" data-arc="${attr(a.id)}" data-pc="${attr(p.id)}">${a.secret?'Montrer au groupe':'Garder secret'}</button><button type="button" class="text-button danger-text" data-arc-remove="${attr(a.id)}" data-pc="${attr(p.id)}">Retirer</button>`:''}</div></li>`).join('')}</ul>`:`<p class="muted small">Aucun arc pour l’instant.</p>`}
+ ${edit&&arcs.length<3?`<form class="arc-add" data-pc="${attr(p.id)}"><label>Nouvel objectif<input name="text" maxlength="160" required placeholder="Ex. Retrouver ma sœur disparue à Port-Brume"></label><label class="inline-check"><input type="checkbox" name="secret"> Secret (le joueur et le MJ seulement)</label><button class="btn btn-secondary" type="submit">Ajouter</button></form>`:''}</section>`;}
+// Préparer la séance : tous les arcs en cours, les plus immobiles d’abord.
+function arcsPrepPanel(){if(actor!=='mj')return '';const rows=[];for(const p of state.characters||[])for(const a of (p.arcs||[]))if(a.status!=='done')rows.push({p,a,n:arcSince(a)});
+ if(!rows.length)return `<section class="panel arcs-prep"><div class="panel-top"><h3>Arcs des personnages</h3></div><p class="muted small">Aucun arc en cours. Les joueurs peuvent en écrire sur leur fiche (Historique).</p></section>`;
+ rows.sort((x,y)=>y.n-x.n);
+ return `<section class="panel arcs-prep"><div class="panel-top"><h3>Arcs des personnages</h3><span class="mini-pill">${rows.length}</span></div><p class="muted small">Les objectifs des personnages, les plus délaissés d’abord : une idée pour la prochaine scène.</p>
+ <ul class="arc-list">${rows.map(({p,a,n})=>`<li class="arc"><div class="arc-head"><strong>${esc(p.name)}</strong> : ${esc(a.text)}${a.secret?' <span class="mini-pill">Secret</span>':''}</div><p class="muted small">${arcSinceText(n)}.</p>${arcGmButtons(p,a)}</li>`).join('')}</ul></section>`;}
 function personalityPanel(p){if(!PERSM)return '';const edit=actor==='mj'||L.canEdit(state,actor,p.id);const pers=p.personality||null;const others=(state.characters||[]).filter(x=>x.id!==p.id&&!x.fallen);const byId=new Map((state.characters||[]).map(x=>[x.id,x]));
  const ties=(p.ties||[]).filter(t=>byId.has(t.to));const toMe=(state.characters||[]).filter(x=>x.id!==p.id).flatMap(x=>(x.ties||[]).filter(t=>t.to===p.id).map(t=>({from:x,text:t.text})));
  const view=pers?`<dl class="pers-list">${Object.entries(PERSM.FIELDS).filter(([k])=>pers[k]).map(([k,l])=>`<div><dt>${esc(l)}</dt><dd>${esc(pers[k])}</dd></div>`).join('')}</dl>`:'';

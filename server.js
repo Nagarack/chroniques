@@ -33,6 +33,7 @@ const SH=require('./src/shops');
 const HO=require('./src/handouts');
 const PB=require('./src/party-bestiary.js');
 const CCH=require('./src/combat-chart.js');
+const ARC=require('./src/arcs.js');
 const riddleTries=new Map(); // 5.20 : essais récents par joueur et par énigme (au plus 6 par minute), en mémoire seulement.
 const SC=require('./src/schedule');
 const ICS=require('./src/calendar-ics.js');
@@ -150,6 +151,9 @@ const allowedStatic=new Map([
  ['/src/session-feedback.js',['src/session-feedback.js','text/javascript; charset=utf-8']],
  ['/src/clues.js',['src/clues.js','text/javascript; charset=utf-8']],
  ['/src/personality.js',['src/personality.js','text/javascript; charset=utf-8']],
+ ['/src/arcs.js',['src/arcs.js','text/javascript; charset=utf-8']],
+ ['/src/glossary.js',['src/glossary.js','text/javascript; charset=utf-8']],
+ ['/src/uvtt-import.js',['src/uvtt-import.js','text/javascript; charset=utf-8']],
  ['/src/travel-journal.js',['src/travel-journal.js','text/javascript; charset=utf-8']],
  ['/src/jumps.js',['src/jumps.js','text/javascript; charset=utf-8']],
  ['/src/rich-text.js',['src/rich-text.js','text/javascript; charset=utf-8']],
@@ -395,7 +399,7 @@ function createServer(opts={}){
    if(p.id===u.characterId)return {...p,history:CH.forPlayer(p.history)}; // Notes secrètes du MJ retirées.
    // Shared party combat summary only; never send other characters' abilities, inventories or private notes.
    return {id:p.id,name:p.name,role:p.role,job:p.job,level:p.level,stats:{hp:p.stats.hp,ac:p.stats.ac},speed:p.speed,hp:p.hp,tempHp:p.tempHp,initiative:p.initiative,
-    owner:null,conditions:p.conditions,concentration:p.concentration,exhaustion:p.exhaustion,inspiration:!!p.inspiration,economy:{...p.economy},...(p.form?{form:SHP.summary(p.form)}:{}),...(p.ties?.length?{ties:p.ties.map(t=>({...t}))}:{}),...(p.personality?.shared?{personality:{...p.personality}}:{}),
+    owner:null,conditions:p.conditions,concentration:p.concentration,exhaustion:p.exhaustion,inspiration:!!p.inspiration,economy:{...p.economy},...(p.form?{form:SHP.summary(p.form)}:{}),...(p.ties?.length?{ties:p.ties.map(t=>({...t}))}:{}),...(ARC.publicView(p).length?{arcs:ARC.publicView(p)}:{}),...(p.personality?.shared?{personality:{...p.personality}}:{}),
     resources:[],abilities:[],deathSaves:{success:0,failure:0}};
   });
   if(full.combat)full.combat.timers=(full.combat.timers||[]).filter(t=>full.characters.some(p=>p.id===t.id)); // Durées des créatures du MJ : jamais envoyées.
@@ -517,6 +521,7 @@ function createServer(opts={}){
   case 'mapMarkerVisibilitySet':{requireGm(u);CM.setMarkerVisibility(s,id,String(b.markerId||''),b.visibility);break;}
   case 'mapDelete':{requireGm(u);const gone=CM.remove(s,id);if(gone.filename)deletedMapFiles.push(gone.filename);for(const mark of gone.markers||[])if(mark.image?.source==='upload')deletedMapFiles.push(mark.image.filename);break;}
   case 'mapGrid':{requireGm(u);CM.setGrid(s,id,b.values);break;}
+  case 'mapWallsImport':{requireGm(u);const n=CM.wallsReplace(s,id,b.walls,()=>'wall-'+random(8));logGm(s,`Carte importée : ${n} murs et portes.`);break;}
   case 'mapFog':{requireGm(u);CM.setFog(s,id,String(b.op||''),b.values);break;}
   case 'mapCompanionToken':{const map=CM.read(s,id);if(!map||!CM.canRead(u,map))throw sleepBlock('Carte non accessible.');const n=N.find(s,String(b.npcId||''));if(!n?.ownerPc||!L.canEdit(s,a,n.ownerPc))throw sleepBlock('Seul le maître du compagnon peut le placer.');
    CM.tokenAdd(s,id,'tok-'+random(10),{kind:'npc',refId:n.id,label:n.name.slice(0,40),color:'vert',visible:true,x:Number(b.x)||500,y:Number(b.y)||500});break;}
@@ -804,6 +809,7 @@ function createServer(opts={}){
   case 'historyNote':{requireGm(u);CH.note(s,id,b.text,b.secret===true);break;}
   case 'historyRemove':{requireGm(u);CH.remove(s,id,String(b.entryId||''));break;}
   case 'importPc':{requireGm(u);if(s.characters.length>=30)badRequest('Maximum 30 personnages.');importCharacter(s,a,b.data);break;}
+  case 'attendance':{requireGm(u);const pc=L.findPc(s,id);if(!pc)badRequest('Personnage introuvable.');SS.setAbsent(s,pc.id,b.absent===true);logGm(s,b.absent===true?`${pc.name} est absent pour la séance.`:`${pc.name} est présent pour la séance.`);break;}
   case 'npcScale':{requireGm(u);const step=Number(b.step);if(b.all===true){const targets=N.list(s).filter(n=>!n.ownerPc&&(b.visibleOnly!==true||n.visibility==='public'));if(!targets.length)badRequest('Aucune créature à ajuster.');
     try{for(const n of targets)N.scale(s,n.id,Math.max(-2,Math.min(2,(n.scale||0)+step)));}catch(e){badRequest(e.message);}}
    else{try{N.scale(s,id,step);}catch(e){badRequest(e.message);}}break;}
@@ -850,6 +856,10 @@ function createServer(opts={}){
    MARCH.setRank(s,pcId,String(b.rank||''),Number.isInteger(b.position)?b.position:undefined);break;}
   case 'marchWatches':{requireGm(u);MARCH.setWatches(s,b.watches,b.nightHours);break;}
   case 'marchClear':{requireGm(u);MARCH.clear(s);break;}
+  case 'arcAdd':case 'arcUpdate':case 'arcRemove':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');
+   try{if(b.kind==='arcAdd')ARC.add(pc,'arc-'+random(8),b.values);else if(b.kind==='arcUpdate')ARC.update(pc,String(b.arcId||''),b.values);else ARC.remove(pc,String(b.arcId||''));}catch(e){badRequest(e.message);}break;}
+  case 'arcProgress':{requireGm(u);const pc=L.findPc(s,id);if(!pc)badRequest('Personnage introuvable.');let arc;try{arc=ARC.progress(pc,String(b.arcId||''),String(b.step||''),b.note);}catch(e){badRequest(e.message);}
+   if(!arc.secret&&b.step!=='reopen')logPublic(s,b.step==='done'?`${pc.name} a accompli son objectif : ${arc.text}.`:`L’objectif de ${pc.name} avance : ${arc.text}.`);break;}
   case 'personalitySet':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');PERS.set(pc,b.values);break;}
   case 'tieSet':{const pc=L.findPc(s,id);if(!pc||!L.canEdit(s,a,id))throw sleepBlock('Accès refusé à cette fiche.');PERS.tie(s,pc,String(b.to||''),b.text);break;}
   case 'travelNote':{const kind=['note','encounter','place'].includes(b.noteKind)?b.noteKind:'note';const pc=u.role!=='gm'&&u.characterId?L.findPc(s,u.characterId):null;if(u.role!=='gm'&&!pc)throw sleepBlock('Choisissez d’abord votre personnage.');

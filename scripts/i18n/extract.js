@@ -47,7 +47,7 @@ function collect(file,src,units){const toks=lex(src);const add=u=>{if(u.length>6
  const walkTemplate=parts=>{let combined='';for(const p of parts){if(typeof p==='string')combined+=p;else{combined+=SENT;for(const sub of lex(p.expr))handle(sub);}}unitsOfCombined(combined,add);};
  const handle=tok=>{if(tok.t==='s'){if(tok.v.length>2000)return;unitsOfCombined(tok.v,add);}else walkTemplate(tok.parts);};
  for(const tok of toks)handle(tok);}
-function files(){const list=[];const skip=new Set(['src/i18n.js','src/i18n-core.js','src/dom-morph.js','src/qr.js','src/state-diff.js','src/web-push.js','src/webauthn.js','src/pwa-register.js']);
+function files(){const list=[];const skip=new Set(['src/i18n.js','src/i18n-core.js','src/dom-morph.js','src/qr.js','src/state-diff.js','src/web-push.js','src/webauthn.js','src/pwa-register.js','src/glossary.js']); // glossary.js porte déjà ses deux langues (5.21)
  for(const f of fs.readdirSync(path.join(ROOT,'src')))if(f.endsWith('.js')&&!skip.has('src/'+f))list.push('src/'+f);
  list.push('server.js');for(const f of ['scripts/remote-update.js'])if(fs.existsSync(path.join(ROOT,f)))list.push(f);return list;}
 function run(){const units=new Map();for(const f of files())collect(f,fs.readFileSync(path.join(ROOT,f),'utf8'),units);

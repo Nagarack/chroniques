@@ -136,6 +136,11 @@ function wallAdd(s,mapId,id,v){const m=read(s,mapId);if(!m)bad('Carte introuvabl
  const n=k=>{const x=Number(v?.[k]);if(!Number.isFinite(x)||x<0||x>1000)bad('Position de mur invalide.');return Math.round(x);};const wall={id,x1:n('x1'),y1:n('y1'),x2:n('x2'),y2:n('y2'),door:v?.door===true,open:false};
  if(wall.x1===wall.x2&&wall.y1===wall.y2)bad('Mur trop court.');w.push(wall);return wall;}
 function wallRemove(s,mapId,id){const m=read(s,mapId);if(!m)bad('Carte introuvable.');const w=wallsOf(m);const i=id==='__last'?w.length-1:w.findIndex(x=>x.id===id);if(i<0)bad('Mur introuvable.');return w.splice(i,1)[0];}
+// 5.21 : murs et portes importés d’un fichier Universal VTT (remplacent les murs existants ; validés un par un).
+function wallsReplace(s,mapId,list,newId){const m=read(s,mapId);if(!m)bad('Carte introuvable.');if(!Array.isArray(list))bad('Murs invalides.');if(list.length>MAX_WALLS)bad('Maximum '+MAX_WALLS+' murs par carte.');
+ const out=[];const n=v=>{const x=Number(v);if(!Number.isFinite(x)||x<0||x>1000)bad('Position de mur invalide.');return Math.round(x);};
+ for(const v of list){const w={id:newId(),x1:n(v?.x1),y1:n(v?.y1),x2:n(v?.x2),y2:n(v?.y2),door:v?.door===true,open:v?.door===true&&v?.open===true};if(w.x1===w.x2&&w.y1===w.y2)continue;out.push(w);}
+ m.walls=out;return out.length;}
 function wallClear(s,mapId){const m=read(s,mapId);if(!m)bad('Carte introuvable.');m.walls=[];}
 function doorSet(s,mapId,id,open){const m=read(s,mapId);if(!m)bad('Carte introuvable.');const d=wallsOf(m).find(x=>x.id===id&&x.door);if(!d)bad('Porte introuvable.');d.open=!!open;return d;}
 // Polygone de visibilité : rayons vers chaque extrémité de mur proche et 48 rayons réguliers, arrêtés au premier mur fermé.
@@ -179,4 +184,4 @@ function drawClear(s,mapId,by){const m=read(s,mapId);if(!m)bad('Carte introuvabl
 // 5.8 : altitude d’un jeton (vol, lévitation, fosse), en mètres ; 0 la retire.
 function tokenElev(s,mapId,id,v){const t=tokenRead(s,mapId,id);if(!t)bad('Jeton introuvable.');const n=Number(v);if(!Number.isFinite(n)||n<-150||n>3000)bad('Altitude : de -150 à 3 000 m.');const r=Math.round(n*10)/10;if(r)t.elev=r;else delete t.elev;return t;}
 function areaClear(s,mapId){const m=read(s,mapId);if(!m)bad('Carte introuvable.');m.areas=[];return m;}
-module.exports={MAX_DRAWINGS,DRAW_COLORS,drawAdd,drawRemove,drawClear,tokenElev,isDay,effectiveLight,syncPcLights,hexToggle,hexFog,hexMove,imageSize,MAX_WALLS,wallAdd,wallRemove,wallClear,doorSet,visibilityPolygon,TRAP_REFS,TRAP_STATES,trapSet,LIGHTS,setVision,tokenLight,tokenRadius,visionReveal,scaleMeters,PLANNER_LINKS,AREA_SHAPES,MAX_AREAS,areaAdd,areaRemove,areaClear,MAX_TOKENS,TOKEN_COLORS,setGrid,setFog,tokenRead,tokenAdd,tokenMove,tokenSet,tokenRemove,MAX_MAPS,MAX_MARKERS,SYMBOLS,maps,read,canRead,projected,add,update,setMapVisibility,setMarkerVisibility,remove,markerRead,markerAdd,markerUpdate,markerRemove};
+module.exports={wallsReplace,MAX_DRAWINGS,DRAW_COLORS,drawAdd,drawRemove,drawClear,tokenElev,isDay,effectiveLight,syncPcLights,hexToggle,hexFog,hexMove,imageSize,MAX_WALLS,wallAdd,wallRemove,wallClear,doorSet,visibilityPolygon,TRAP_REFS,TRAP_STATES,trapSet,LIGHTS,setVision,tokenLight,tokenRadius,visionReveal,scaleMeters,PLANNER_LINKS,AREA_SHAPES,MAX_AREAS,areaAdd,areaRemove,areaClear,MAX_TOKENS,TOKEN_COLORS,setGrid,setFog,tokenRead,tokenAdd,tokenMove,tokenSet,tokenRemove,MAX_MAPS,MAX_MARKERS,SYMBOLS,maps,read,canRead,projected,add,update,setMapVisibility,setMarkerVisibility,remove,markerRead,markerAdd,markerUpdate,markerRemove};

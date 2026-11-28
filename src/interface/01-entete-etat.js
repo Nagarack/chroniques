@@ -20,6 +20,11 @@ const {CONDITION_HELP,GM_SCREEN,splitActions,splitLegendary,rollHint,initRows,gr
 // 5.19 : mise en forme légère (gras, italique, listes, intertitres, citations) des textes longs écrits par le MJ et les joueurs.
 const RT=(typeof window!=='undefined'&&window.ChroniquesRichText)||null;
 function rich(t,cls='rich'){return `<div class="${cls}">${RT?RT.render(t):'<p>'+esc(t).replace(/\n/g,'<br>')+'</p>'}</div>`;}
+const GLO=(typeof window!=='undefined'&&window.ChroniquesGlossary)||null;
+// 5.21 : terme du lexique. Le libellé devient un bouton discret qui affiche une définition courte (clic, toucher ou clavier).
+function term(key,label){return GLO&&GLO.TERMS[key]?`<button type="button" class="term" data-term="${key}" aria-expanded="false">${label}</button>`:label;}
+const UVT=(typeof window!=='undefined'&&window.ChroniquesUvtt)||null;
+const ARCM=(typeof window!=='undefined'&&window.ChroniquesArcs)||null;
 const GEAR=(typeof window!=='undefined'&&window.ChroniquesGear)||(typeof require==='function'?(()=>{try{return require('./gear.js');}catch{return null;}})():null);
 let itemUseOpen='';
 const HB=(typeof window!=='undefined'&&window.ChroniquesHomebrewItems)||(typeof require==='function'?(()=>{try{return require('./homebrew-items.js');}catch{return null;}})():null);

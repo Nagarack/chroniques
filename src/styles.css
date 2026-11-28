@@ -2755,3 +2755,30 @@ details.jump-panel[open]>summary h3::after{content:" ⌃"}
 .bestiary-card .panel-top{flex-wrap:wrap;gap:6px 12px}
 .bestiary-fact-form label,.bestiary-add label{display:grid;gap:4px}.bestiary-fact-form input,.bestiary-add input{width:100%}
 .bestiary-add{margin:4px 0 12px;max-width:560px}
+/* 5.21 : lexique, présence, arcs. */
+.term{all:unset;cursor:help;border-bottom:1px dotted currentColor;color:inherit;font:inherit}
+.term:focus-visible{outline:2px solid var(--c-focus);outline-offset:2px;border-radius:2px}
+.term-pop{position:fixed;z-index:80;padding:10px 12px;background:var(--c-surface-2);color:var(--c-text);border:1px solid var(--c-line);border-radius:var(--c-radius);box-shadow:var(--c-shadow);font-size:.92rem;line-height:1.45}
+.term-pop strong{display:block;margin-bottom:4px;color:var(--c-brass)}.term-pop p{margin:0}
+.lexicon summary{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;cursor:pointer;list-style:none}.lexicon summary h3{margin:0}
+.lexicon-list{display:grid;gap:10px 24px;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));margin:12px 0}
+.lexicon-list dt{font-weight:600}.lexicon-list dd{margin:2px 0 0;color:var(--c-muted)}
+.attendance{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px}
+.attendance-chip{border:1px solid var(--c-line);background:var(--c-surface);color:var(--c-muted);border-radius:999px;padding:4px 12px;font:inherit;font-size:.88rem;cursor:pointer;text-decoration:line-through}
+.attendance-chip[aria-pressed="true"]{background:var(--c-accent-strong);border-color:var(--c-accent-strong);color:var(--c-on-accent);text-decoration:none}
+.attendance-summary{margin:0 0 10px}
+.arc-list{list-style:none;margin:8px 0;padding:0;display:grid;gap:10px}
+.arc{padding:8px 0;border-top:1px solid var(--c-line-soft)}.arc.is-done .arc-head strong{text-decoration:line-through;color:var(--c-muted)}
+.arc-head{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.arc-steps{margin:6px 0;padding-left:1.3em;font-size:.9rem}.arc-steps time{color:var(--c-brass);margin-right:4px}
+.arc-advance,.arc-add{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-top:6px}.arc-advance input{flex:1 1 200px}.arc-add label:first-child{flex:1 1 260px;display:grid;gap:4px}
+/* 5.21 : toile des relations. */
+.rel-edge path{fill:none;stroke-width:2}.rel-edge .rel-hit{stroke:transparent;stroke-width:12}
+.rel-ami path:first-child,.rel-sample.rel-ami{stroke:var(--viz-3)}
+.rel-hostile path:first-child,.rel-sample.rel-hostile{stroke:var(--c-danger);stroke-dasharray:7 5}
+.rel-autre path:first-child,.rel-sample.rel-autre{stroke:var(--c-brass);stroke-dasharray:2 4;stroke-linecap:round}
+.rel-sample{stroke-width:2.5}
+.rel-edge:hover path:first-child{stroke-width:3.5}
+.rel-node circle{fill:var(--c-accent);stroke:var(--c-surface);stroke-width:2}.rel-npc rect{fill:var(--c-brass);stroke:var(--c-surface);stroke-width:2}
+.rel-group{font-style:italic}
+.rel-legend svg{flex:none}

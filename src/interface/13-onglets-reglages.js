@@ -1,6 +1,6 @@
 // ——— 13 · Onglets, écran allumé, lecture à voix haute, affichage ———
 const TAB_SETS={encounters:[['monstres','Monstres'],['objets','Objets'],['marchands','Marchands'],['rencontres','Rencontres']],
- chronicle:[['seances','Séances',['seances','resumes']],['monde','Monde',['calendrier','voyages']],['carnet','Carnet & enquête',['carnet','enquete','bestiaire']],['histoire','Histoire',['frise','memoire']],['documents','Documents',['documents']]]};
+ chronicle:[['seances','Séances',['seances','resumes']],['monde','Monde',['calendrier','voyages']],['carnet','Carnet & enquête',['carnet','enquete','bestiaire','toile']],['histoire','Histoire',['frise','memoire']],['documents','Documents',['documents']]]};
 const tabMembers=t=>t[2]||[t[0]];
 let textSize=0;try{textSize=Math.max(0,Math.min(2,Number(localStorage.getItem('chroniques-taille'))||0));}catch{}
 // 5.10 : lecture facilitée (police OpenDyslexic, espacements) et couleurs adaptées aux daltoniens (palette Okabe-Ito + symboles), réglées par appareil.

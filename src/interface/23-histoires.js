@@ -60,6 +60,7 @@ function sessionPage(){const isGM=actor==='mj',scenes=state.sessionFlow||[],inPr
  return `${heading('',isGM?'Préparer la séance':'Scènes partagées',isGM?'Organisez des scènes courtes et reliées à votre campagne. Toutes les scènes sont privées par défaut.':'Découvrez les scènes que le MJ a décidé de partager.')}
  <div class="scene-overview"><span><b>${scenes.length}</b> ${isGM?'scènes créées':'scènes partagées'}</span><span><b>${inProgress}</b> en cours</span><span><b>${planned}</b> à venir</span></div>
  ${isGM&&stagedScene()?`<p class="deploy-banner" role="status">🎭 <span>En scène :</span> <strong>${esc(stagedScene().title)}</strong> <button type="button" class="text-button" data-scene-unstage>Retirer de l’écran</button></p>`:''}
+ ${isGM?arcsPrepPanel():''}
  ${isGM&&X?X.ambiencePanel({amb:state.ambience,h:H6}):''}
  ${isGM?`<section class="panel scene-compose"><details><summary>＋ Créer une scène</summary><form class="scene-create">${sceneForm(null)}<button type="submit" class="btn btn-primary">Enregistrer cette scène</button></form></details></section>`:''}
  <div class="ux-scene-filter" role="group" aria-label="Filtrer les scènes">${[['all','Toutes'],['active','En cours'],['planned','À venir'],['completed','Terminées']].map(([id,label])=>`<button type="button" class="ux-filter ${sceneFilter===id?'active':''}" data-ux-scene-filter="${id}" aria-pressed="${sceneFilter===id}">${label} (${id==='all'?scenes.length:scenes.filter(x=>x.status===id).length})</button>`).join('')}</div>

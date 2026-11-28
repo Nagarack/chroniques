@@ -98,7 +98,7 @@ function groupCheckPanel(){if(!GCM)return '';const g=state.groupChecks||{};const
  if(!a){const last=(g.history||[])[0];return `<section class="panel gc-panel no-print"><div class="panel-top"><h3>Test ou sauvegarde de groupe</h3></div>
   <form class="gc-start"><div class="three-fields"><label>Type<select name="kind"><option value="check">Test de groupe (la moitié doit réussir)</option><option value="save">Sauvegarde (chacun pour soi)</option></select></label><label>Compétence ou sauvegarde<input name="label" maxlength="60" required list="gc-labels" placeholder="Ex. Discrétion"></label><label>DD<input name="dc" type="number" min="1" max="40" value="12" required></label></div>
   <datalist id="gc-labels">${gcLabels().map(l=>`<option value="${attr((window.ChroniquesI18n?.t||(x=>x))(l))}"></option>`).join('')}</datalist>
-  <fieldset class="gc-who"><legend>Participants</legend>${pcs.filter(p=>!p.fallen).map(p=>`<label class="check"><input type="checkbox" name="ids" value="${attr(p.id)}" checked> ${esc(p.name)}</label>`).join('')}</fieldset>
+  <fieldset class="gc-who"><legend>Participants</legend>${pcs.filter(p=>!p.fallen).map(p=>`<label class="check"><input type="checkbox" name="ids" value="${attr(p.id)}" ${isAbsent(p.id)?'':'checked'}> ${esc(p.name)}</label>`).join('')}</fieldset>
   <label class="check"><input type="checkbox" name="showDc"> Montrer le DD aux joueurs</label><button class="btn btn-primary" type="submit">Demander les jets</button></form>
   ${last?`<p class="muted small">Dernier : ${esc(last.label)} · ${last.kind==='check'?(last.verdict.groupSuccess?'réussi':'raté'):`réussites : ${last.verdict.successes}, échecs : ${last.verdict.failures}`}</p>`:''}</section>`;}
  const v=GCM.verdict(a);

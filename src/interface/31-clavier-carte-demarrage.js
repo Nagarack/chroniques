@@ -1,4 +1,6 @@
 // ——— 31 · Clavier, outils de carte, démarrage ———
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.getElementById('term-pop')){const b=document.querySelector('.term[aria-expanded="true"]');closeTerm();b?.focus();return;}});
+window.addEventListener?.('scroll',()=>{if(document.getElementById('term-pop'))closeTerm();},{passive:true});
 document.addEventListener('keydown',event=>{if(event.key!=='Tab'||!modal)return;const box=document.querySelector('#modal-root .modal');if(!box)return;const f=[...box.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(x=>x.offsetParent!==null);if(!f.length)return;const first=f[0],last=f[f.length-1];if(!box.contains(document.activeElement)){event.preventDefault();first.focus();}else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}});
 document.addEventListener('keydown',event=>{const t=event.target;if((event.key==='Enter'||event.key===' ')&&t&&t.getAttribute&&t.getAttribute('role')==='button'&&t.tagName!=='BUTTON'){event.preventDefault();t.click();}});
 document.addEventListener('keydown',event=>{
